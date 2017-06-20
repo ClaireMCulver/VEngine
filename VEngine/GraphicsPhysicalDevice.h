@@ -24,6 +24,7 @@ public:
 		uint32_t computeQueueIndex;
 		uint32_t transferQueueIndex;
 		uint32_t sparseQueueIndex;
+		uint32_t queuesNeeded;
 	} QueueFamilyIndices;
 
 	VkPhysicalDevice				 GetPhysicalDevice() const					{ return physicalDevices[0]; }
@@ -51,6 +52,6 @@ private:
 
 	int queuesNeeded = 0;
 private:
-	void GetQueueFamilyIndices();
+	void FindQueueFamilyIndices();
 };
 

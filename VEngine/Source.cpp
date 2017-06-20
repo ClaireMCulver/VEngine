@@ -17,11 +17,13 @@
 
 #include "GraphicsInstance.h"
 #include "GraphicsPhysicalDevice.h"
+#include "GraphicsLogicalDevice.h"
 
 void main()
 {
 	GraphicsInstance instance;
 	GraphicsPhysicalDevice physicalDevices = GraphicsPhysicalDevice(instance);
+	GraphicsLogicalDevice logicalDevice = GraphicsLogicalDevice(physicalDevices);
 
 	return;
 }

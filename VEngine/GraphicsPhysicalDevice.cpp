@@ -54,7 +54,7 @@ GraphicsPhysicalDevice::~GraphicsPhysicalDevice()
 {
 }
 
-void GraphicsPhysicalDevice::GetQueueFamilyIndices()
+void GraphicsPhysicalDevice::FindQueueFamilyIndices()
 {
 	bool graphicsFound = false, computeFound = false, transferFound = false, sparseFound = false;
 	//I've decided to just get the queues from the first device for now. There's just no point for now in having multiple queues from multiple devices.
@@ -93,6 +93,7 @@ void GraphicsPhysicalDevice::GetQueueFamilyIndices()
 			}
 			if (graphicsFound == true && computeFound == true && transferFound == true && sparseFound == true)
 			{
+				physicalDeviceQueueFamilyIndices[i].queuesNeeded = queuesNeeded;
 				break;
 			}
 		}
