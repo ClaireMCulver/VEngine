@@ -57,9 +57,6 @@
     <ClCompile Include="Swapchain.cpp">
       <Filter>Source Files\OLDGraphics\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files\OLDGraphics</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicsInstance.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -68,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="GraphicsLogicalDevice.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +92,6 @@
     <ClInclude Include="Swapchain.h">
       <Filter>Header Files\OLDGraphics\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Header Files\OLDGraphics</Filter>
-    </ClInclude>
     <ClInclude Include="GraphicsInstance.h">
       <Filter>Header Files\Graphics</Filter>
     </ClInclude>
@@ -112,6 +109,9 @@
     </ClInclude>
     <ClInclude Include="GraphicsLogicalDevice.h">
       <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

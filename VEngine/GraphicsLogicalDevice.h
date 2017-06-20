@@ -20,14 +20,8 @@ public:
 private:
 	VkDevice logicalDevice;
 
-	VkQueue graphicsQueue;
-	VkQueue presentQueue;
-	VkQueue transferQueue;
-	VkQueue sparseQueue;
+public:
+	VkDevice GetLogicalDevice() const { return logicalDevice; }
 
-
-	std::vector<const char*> deviceLayers;
-	std::vector<const char*> deviceExtensions;
-	VkPhysicalDeviceFeatures requestedFeatures;
 };
 

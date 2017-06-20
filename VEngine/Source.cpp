@@ -1,5 +1,3 @@
-//#include "vld.h"
-
 #include <iostream>
 #include <cstdlib>
 #include <assert.h>
@@ -15,15 +13,11 @@
 #endif
 #include "vulkan\vulkan.h"
 
-#include "GraphicsInstance.h"
-#include "GraphicsPhysicalDevice.h"
-#include "GraphicsLogicalDevice.h"
+#include "Graphics.h"
 
 void main()
 {
-	GraphicsInstance instance;
-	GraphicsPhysicalDevice physicalDevices = GraphicsPhysicalDevice(instance);
-	GraphicsLogicalDevice logicalDevice = GraphicsLogicalDevice(physicalDevices);
+	Graphics graphicsSystem;
 
 	return;
 }

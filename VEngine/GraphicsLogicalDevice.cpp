@@ -28,6 +28,8 @@ GraphicsLogicalDevice::GraphicsLogicalDevice(GraphicsPhysicalDevice &physicalDev
 	logicalDeviceCI.pEnabledFeatures = nullptr;
 
 	vkCreateDevice(physicalDevice.GetPhysicalDevice(), &logicalDeviceCI, nullptr, &logicalDevice);
+
+	//Fetch the queues
 }
 
 
