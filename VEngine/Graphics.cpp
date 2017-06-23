@@ -2,7 +2,7 @@
 
 
 
-Graphics::Graphics()
+GraphicsSystem::GraphicsSystem()
 {
 	instance = new GraphicsInstance();
 	physicalDevice = new GraphicsPhysicalDevice(*instance);
@@ -19,14 +19,14 @@ Graphics::Graphics()
 }
 
 
-Graphics::~Graphics()
+GraphicsSystem::~GraphicsSystem()
 {
 	delete logicalDevice;
 	delete physicalDevice;
 	delete instance;
 }
 
-void Graphics::SubmitGraphicsJob(VkCommandBuffer graphicsJob)
+void GraphicsSystem::SubmitGraphicsJob(VkCommandBuffer graphicsJob)
 {
 	VkSubmitInfo graphicsInfo;
 	graphicsInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

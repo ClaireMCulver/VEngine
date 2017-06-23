@@ -10,11 +10,11 @@
 #include "GraphicsPhysicalDevice.h"
 #include "GraphicsLogicalDevice.h"
 
-class Graphics
+class GraphicsSystem
 {
 public:
-	Graphics();
-	~Graphics();
+	GraphicsSystem();
+	~GraphicsSystem();
 
 private:
 	GraphicsInstance* instance;
@@ -29,5 +29,12 @@ private:
 
 public:
 	void SubmitGraphicsJob(VkCommandBuffer graphicsJob);
+
+
+	GraphicsInstance* GetInstance() const				{ return instance; }
+	GraphicsPhysicalDevice* GetPhysicalDevice() const	{ return physicalDevice; }
+	GraphicsLogicalDevice* GetLogicalDevice() const		{ return logicalDevice; }
+
+
 };
 

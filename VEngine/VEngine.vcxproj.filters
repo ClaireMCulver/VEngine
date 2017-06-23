@@ -31,13 +31,22 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{d17458af-be1e-4425-bd7a-a219a64ef78e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Dispatchable Handles">
+      <UniqueIdentifier>{a5f63a04-37c9-46d4-8739-0d1296e07dbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects">
+      <UniqueIdentifier>{412fe146-86e6-4555-95b5-332e904a0351}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Dispatchable Handles">
+      <UniqueIdentifier>{b7a8a625-3df3-4af7-90ee-5a3a9ccd5be4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects">
+      <UniqueIdentifier>{4bc1e97a-bb01-4e6e-ac22-6b183e18598e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Win32Window.cpp">
-      <Filter>Source Files\OLDGraphics</Filter>
     </ClCompile>
     <ClCompile Include="RenderableGeometry.cpp">
       <Filter>Source Files\OLDGraphics</Filter>
@@ -54,27 +63,27 @@
     <ClCompile Include="GraphicsSystem.cpp">
       <Filter>Source Files\OLDGraphics\Backend</Filter>
     </ClCompile>
-    <ClCompile Include="Swapchain.cpp">
-      <Filter>Source Files\OLDGraphics\Backend</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsInstance.cpp">
+    <ClCompile Include="Graphics.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="GraphicsPhysicalDevice.cpp">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Source Files\Graphics\Dispatchable Handles</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsInstance.cpp">
+      <Filter>Source Files\Graphics\Dispatchable Handles</Filter>
     </ClCompile>
     <ClCompile Include="GraphicsLogicalDevice.cpp">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Source Files\Graphics\Dispatchable Handles</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="SwapChain.cpp">
+      <Filter>Source Files\Graphics\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Window.cpp">
+      <Filter>Source Files\Graphics\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsDefs.h">
-      <Filter>Header Files\OLDGraphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Win32Window.h">
       <Filter>Header Files\OLDGraphics</Filter>
     </ClInclude>
     <ClInclude Include="RenderableGeometry.h">
@@ -89,12 +98,6 @@
     <ClInclude Include="RenderPass.h">
       <Filter>Header Files\OLDGraphics</Filter>
     </ClInclude>
-    <ClInclude Include="Swapchain.h">
-      <Filter>Header Files\OLDGraphics\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsInstance.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VEngineDefs.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
@@ -104,14 +107,23 @@
     <ClInclude Include="GraphicsSystem.h">
       <Filter>Header Files\OLDGraphics\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsPhysicalDevice.h">
+    <ClInclude Include="Graphics.h">
       <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsPhysicalDevice.h">
+      <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsLogicalDevice.h">
-      <Filter>Header Files\Graphics</Filter>
+      <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="GraphicsInstance.h">
+      <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>Header Files\Graphics\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32Window.h">
+      <Filter>Header Files\Graphics\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
