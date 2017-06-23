@@ -15,7 +15,7 @@ struct WindowData
 class Win32Window
 {
 public:
-	Win32Window(std::string WindowName, float xResolution, float yResolution, bool isFullscreen);
+	Win32Window(std::string WindowName, int xResolution, int yResolution, bool isFullscreen);
 	~Win32Window();
 
 	const WindowData GetWindowData() const { return windowData; }

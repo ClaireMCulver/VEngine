@@ -2,6 +2,11 @@
 
 //Cpp Core
 #include <vector>
+#include <assert.h>
+
+
+#include "GameDefs.h"
+#include "VEngineDefs.h"
 
 #ifndef VK_USE_PLATFORM_WIN32_KHR
 #define VK_USE_PLATFORM_WIN32_KHR

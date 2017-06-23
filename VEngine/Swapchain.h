@@ -7,6 +7,7 @@
 
 #include "Graphics.h"
 #include "Win32Window.h"
+#include "GameDefs.h"
 
 class SwapChain
 {
@@ -18,7 +19,9 @@ private:
 	//Swapchain
 	VkSwapchainKHR vkSwapchain; 
 	uint32_t swapchainImageCount = 2; //Number of images in the swapchain.
-	std::vector<SwapchainBuffer> swapchainBuffers;
+	std::vector<VkImage> swapchainImages;
+	std::vector<VkImageView> swapchainImageViews;
+	uint32_t currentImage = 0;
 
 	//Windows surface
 	VkSurfaceKHR vkSurface;
@@ -29,7 +32,6 @@ private:
 	bool isFullscreen = false;
 
 private:
-
 	void InitializeSurface(GraphicsInstance* instance);
 };
 

@@ -15,9 +15,12 @@
 
 #include "Graphics.h"
 
+#include "SwapChain.h"
+
 void main()
 {
 	GraphicsSystem graphicsSystem;
+	SwapChain swapchain = SwapChain(graphicsSystem, 800, 600, false);
 
 	return;
 }

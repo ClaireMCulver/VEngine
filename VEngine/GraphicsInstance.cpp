@@ -1,9 +1,7 @@
 #include "GraphicsInstance.h"
 
-#include "GameDefs.h"
-#include "VEngineDefs.h"
 
-#include <assert.h>
+
 
 //Debug layer callbacks
 #ifdef _DEBUG

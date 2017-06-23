@@ -1,7 +1,7 @@
 #include "Win32Window.h"
 
 
-Win32Window::Win32Window(std::string WindowName, float xResolution, float yResolution, bool isFullscreen)
+Win32Window::Win32Window(std::string WindowName, int xResolution, int yResolution, bool isFullscreen)
 {
 	windowData.connection = GetModuleHandle(NULL);
 
