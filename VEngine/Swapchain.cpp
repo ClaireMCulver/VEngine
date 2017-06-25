@@ -6,6 +6,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 {
 	VkResult result;
 
+	pGraphicsSystem = &graphicsSystem;
 	const VkDevice vkLogicalDevice = graphicsSystem.GetLogicalDevice()->GetLogicalDevice();
 	const VkPhysicalDevice vkPhysicalDevice = graphicsSystem.GetPhysicalDevice()->GetPhysicalDevice();
 
@@ -20,10 +21,26 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 
 	// Check for if the specified queue family supports presentation //
 	VkBool32 presentationSupported = false;
-	presentationSupported |= vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.graphicsQueueIndex);
-	presentationSupported |= vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.computeQueueIndex);
-	presentationSupported |= vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.transferQueueIndex);
-	presentationSupported |= vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.sparseQueueIndex);
+	if (vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.graphicsQueueIndex) == VK_TRUE)
+	{
+		presentationSupported |= true;
+		presentationQueue = graphicsSystem.GetGraphicsQueue();
+	}
+	if (vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.computeQueueIndex) == VK_TRUE)
+	{
+		presentationSupported |= true;
+		presentationQueue = graphicsSystem.GetTransferQueue();
+	}
+	if (vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.transferQueueIndex) == VK_TRUE)
+	{
+		presentationSupported |= true;
+		presentationQueue = graphicsSystem.GetTransferQueue();
+	}
+	if (vkGetPhysicalDeviceWin32PresentationSupportKHR(vkPhysicalDevice, indices.sparseQueueIndex) == VK_TRUE)
+	{
+		presentationSupported |= true;
+		presentationQueue = graphicsSystem.GetSparseQueue();
+	}
 	assert(presentationSupported == VK_TRUE);
 
 
@@ -42,7 +59,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	swapchainCI.flags = 0;
 	swapchainCI.surface = vkSurface;
 	swapchainCI.minImageCount = this->swapchainImageCount;
-	swapchainCI.imageFormat = VkFormat::VK_FORMAT_R8G8B8A8_UNORM;
+	swapchainCI.imageFormat = SwapChainImageFormat;
 	swapchainCI.imageColorSpace = VkColorSpaceKHR::VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
 	swapchainCI.imageExtent = { (uint32_t)xResolution, (uint32_t)yResolution };
 	swapchainCI.imageArrayLayers = 1;
@@ -95,7 +112,31 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 		result = vkCreateImageView(vkLogicalDevice, &imageViewCI, NULL, &swapchainImageViews[i]);
 		assert(result == VK_SUCCESS);
 	}
+	
+	// Semaphore Creation //
+	VkSemaphoreCreateInfo imageAcquiredSignalInfo;
+	imageAcquiredSignalInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	imageAcquiredSignalInfo.pNext = NULL;
+	imageAcquiredSignalInfo.flags = 0;
+	vkCreateSemaphore(vkLogicalDevice, &imageAcquiredSignalInfo, NULL, &imageAcquireSignal);
 
+	VkSemaphoreCreateInfo imageTransferedSignalInfo;
+	imageTransferedSignalInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	imageTransferedSignalInfo.pNext = NULL;
+	imageTransferedSignalInfo.flags = 0;
+	vkCreateSemaphore(vkLogicalDevice, &imageTransferedSignalInfo, NULL, &imageTransferedSignal);
+
+	// Presentation Information //
+	currentImage = 0;
+	//The semaphores might change, but so I'll put all this here for a simple optimization.
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.pNext = NULL;
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = &imageTransferedSignal;
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &vkSwapchain;
+	presentInfo.pImageIndices = &currentImage;
+	presentInfo.pResults = NULL;
 }
 
 
@@ -103,7 +144,16 @@ SwapChain::~SwapChain()
 {
 	delete win32Window;
 
-	//Destroy swapchain;
+	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetLogicalDevice();
+
+	vkDeviceWaitIdle(vkLogicalDevice);
+
+	vkDestroySurfaceKHR(pGraphicsSystem->GetInstance()->GetInstance(), vkSurface, NULL);
+
+	vkDestroySwapchainKHR(vkLogicalDevice, vkSwapchain, NULL);
+
+	vkDestroySemaphore(vkLogicalDevice, imageAcquireSignal, NULL);
+	vkDestroySemaphore(vkLogicalDevice, imageTransferedSignal, NULL);
 }
 
 
@@ -122,4 +172,53 @@ void SwapChain::InitializeSurface(GraphicsInstance* instance)
 
 	result = vkCreateWin32SurfaceKHR(instance->GetInstance(), &surfaceCI, NULL, &vkSurface);
 	assert(result);
+}
+
+void SwapChain::PresentNextImage()
+{
+	//This should actually be moved to where I blit the rendered buffer to the current image.
+
+	vkQueuePresentKHR(presentationQueue, &presentInfo);
+}
+
+void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkImageLayout srcImageLayout)
+{
+	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetLogicalDevice();
+	vkAcquireNextImageKHR(vkLogicalDevice, vkSwapchain, UINT64_MAX, imageAcquireSignal, NULL, &currentImage);
+
+	VkImageBlit blitRegion;
+	blitRegion.srcSubresource = 
+	{
+		VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, //aspectMask;
+		0, //mipLevel;
+		0, //baseArrayLayer;
+		1  //layerCount;
+	};
+	//TODO: Image class? Framebuffer class?
+	blitRegion.srcOffsets[0] = { 0, 0, 0 };
+	blitRegion.srcOffsets[1] = { 0, 0, 1 };
+	blitRegion.dstSubresource = 
+	{
+		VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, //aspectMask;
+		0, //mipLevel;
+		0, //baseArrayLayer;
+		1  //layerCount;
+	};
+	blitRegion.dstOffsets[0] = { 0, 0, 0 };
+	blitRegion.dstOffsets[1] = { windowSize[0], windowSize[1], 1 };
+
+	//TODO: Command buffer allocation
+	VkCommandBufferBeginInfo blitBeginInfo;
+	blitBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	blitBeginInfo.pNext = 0;
+	blitBeginInfo.flags = 0;
+	blitBeginInfo.pInheritanceInfo = NULL;
+
+	vkBeginCommandBuffer(blitBuffer, &blitBeginInfo);
+
+	vkCmdBlitImage(blitBuffer, srcImage, srcImageLayout, swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
+
+	vkEndCommandBuffer(blitBuffer);
+
+	pGraphicsSystem->SubmitTransferJob(blitBuffer, &imageAcquireSignal, 1, &imageTransferedSignal, 1);
 }

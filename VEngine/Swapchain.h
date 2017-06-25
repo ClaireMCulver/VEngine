@@ -19,9 +19,17 @@ private:
 	//Swapchain
 	VkSwapchainKHR vkSwapchain; 
 	uint32_t swapchainImageCount = 2; //Number of images in the swapchain.
+	VkFormat SwapChainImageFormat = VK_FORMAT_R8G8B8A8_UNORM;
 	std::vector<VkImage> swapchainImages;
 	std::vector<VkImageView> swapchainImageViews;
 	uint32_t currentImage = 0;
+	VkQueue presentationQueue;
+	VkPresentInfoKHR presentInfo;
+
+	VkCommandBuffer blitBuffer;
+
+	VkSemaphore imageAcquireSignal;
+	VkSemaphore imageTransferedSignal;
 
 	//Windows surface
 	VkSurfaceKHR vkSurface;
@@ -31,7 +39,16 @@ private:
 	float windowSize[2];
 	bool isFullscreen = false;
 
+	//Handles to graphics system
+	GraphicsSystem* pGraphicsSystem;
+
 private:
 	void InitializeSurface(GraphicsInstance* instance);
-};
 
+public:
+	//Transfers the image passed to the swapchain as part of a command buffer.
+	void BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkImageLayout srcImageLayout);
+
+	//Present the next image in the swapchain
+	void PresentNextImage();
+};
