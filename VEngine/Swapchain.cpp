@@ -178,6 +178,9 @@ void SwapChain::PresentNextImage()
 {
 	//This should actually be moved to where I blit the rendered buffer to the current image.
 
+
+	//Decided to have presentation within the swapchain rather than in a job system, since it's rather independant, given it's dependence on everything else being done. 
+	//If that makes any sense.
 	vkQueuePresentKHR(presentationQueue, &presentInfo);
 }
 

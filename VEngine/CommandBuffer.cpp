@@ -16,20 +16,51 @@ CommandBuffer::CommandBuffer(CommandPool commandPool, VkCommandBufferLevel buffe
 
 	vkAllocateCommandBuffers(pCommandPool->GetVkLogicalDevice(), &allocationInfo, &vkCommandBuffer);
 	
+	// Begin Info //
+	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	beginInfo.pNext = NULL;
+	beginInfo.flags = 0;
+	beginInfo.pInheritanceInfo = NULL;
+
 	// Submit info //
-	vkBufferSubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	vkBufferSubmitInfo.pNext = 0;
-	vkBufferSubmitInfo.waitSemaphoreCount = 0;
-	vkBufferSubmitInfo.pWaitSemaphores = NULL;
-	vkBufferSubmitInfo.pWaitDstStageMask = 0;
-	vkBufferSubmitInfo.commandBufferCount = 1;
-	vkBufferSubmitInfo.pCommandBuffers = &vkCommandBuffer;
-	vkBufferSubmitInfo.signalSemaphoreCount = 0;
-	vkBufferSubmitInfo.pSignalSemaphores = NULL;
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.pNext = 0;
+	submitInfo.waitSemaphoreCount = 0;
+	submitInfo.pWaitSemaphores = NULL;
+	submitInfo.pWaitDstStageMask = 0;
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &vkCommandBuffer;
+	submitInfo.signalSemaphoreCount = 0;
+	submitInfo.pSignalSemaphores = NULL;
 }
 
 
 CommandBuffer::~CommandBuffer()
 {
 	vkFreeCommandBuffers(pCommandPool->GetVkLogicalDevice(), pCommandPool->GetVKCommandPool(), 1, &vkCommandBuffer);
+}
+
+void CommandBuffer::BeginRecording()
+{
+	vkBeginCommandBuffer(vkCommandBuffer, &beginInfo);
+}
+
+void CommandBuffer::EndRecording()
+{
+	vkEndCommandBuffer(vkCommandBuffer);
+}
+
+void CommandBuffer::ResetBuffer()
+{
+	vkResetCommandBuffer(vkCommandBuffer, 0);
+}
+
+void CommandBuffer::AddWaitSemaphore(VkSemaphore semaphore)
+{
+	//TODO figure out how I should organize this.
+}
+
+void CommandBuffer::AddSignalSemaphore(VkSemaphore semaphore)
+{
+	//TODO figure out how I should organize this.
 }

@@ -15,18 +15,27 @@ public:
 	~CommandBuffer();
 
 	VkCommandBuffer GetVKCommandBuffer() const { return vkCommandBuffer; }
+	VkSubmitInfo GetSubmitInfo() const { return submitInfo; }
 
-	//TODO: How the fuck do I want to do these?
+	//Begin recording of the buffer
 	void BeginRecording();
+
+	//End the recording of the buffer
 	void EndRecording();
-	void SubmitBuffer();
-	void AddWaitSemaphore();
-	void AddSignalSemaphore();
+
+	//End the recording of the buffer
+	void ResetBuffer();
+
+	//TODO: How the fuck do I want to do this?
+	void AddWaitSemaphore(VkSemaphore semaphore);
+	//TODO: How the fuck do I want to do this?
+	void AddSignalSemaphore(VkSemaphore semaphore);
 
 
 private:
 	VkCommandBuffer vkCommandBuffer;
-	VkSubmitInfo vkBufferSubmitInfo;
+	VkSubmitInfo submitInfo;
+	VkCommandBufferBeginInfo beginInfo;
 
 	CommandPool* pCommandPool;
 

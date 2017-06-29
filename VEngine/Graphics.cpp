@@ -16,6 +16,11 @@ GraphicsSystem::GraphicsSystem()
 	vkGetDeviceQueue(vkDevice, indices.computeQueueIndex, 0, &computeQueue);
 	vkGetDeviceQueue(vkDevice, indices.transferQueueIndex, 0, &transferQueue);
 	vkGetDeviceQueue(vkDevice, indices.sparseQueueIndex, 0, &sparseQueue);
+
+	graphicsCmdPool = new CommandPool(*logicalDevice, indices.graphicsQueueIndex);
+	computeCmdPool  = new CommandPool(*logicalDevice, indices.computeQueueIndex);
+	transferCmdPool = new CommandPool(*logicalDevice, indices.transferQueueIndex);
+	sparseCmdPool   = new CommandPool(*logicalDevice, indices.sparseQueueIndex);
 }
 
 
@@ -24,6 +29,17 @@ GraphicsSystem::~GraphicsSystem()
 	delete logicalDevice;
 	delete physicalDevice;
 	delete instance;
+
+	delete graphicsCmdPool;
+	delete computeCmdPool;
+	delete transferCmdPool;
+	delete sparseCmdPool;
+}
+
+void GraphicsSystem::SubmitGraphicsJob(CommandBuffer graphicsJob)
+{
+	const VkSubmitInfo submitInfo = graphicsJob.GetSubmitInfo();
+	vkQueueSubmit(graphicsQueue, 1, &submitInfo, NULL);
 }
 
 void GraphicsSystem::SubmitGraphicsJob(VkCommandBuffer graphicsJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0)
@@ -41,6 +57,12 @@ void GraphicsSystem::SubmitGraphicsJob(VkCommandBuffer graphicsJob, VkSemaphore*
 	graphicsInfo.pSignalSemaphores = pSignalSemaphores;
 
 	vkQueueSubmit(graphicsQueue, 1, &graphicsInfo, NULL);
+}
+
+void GraphicsSystem::SubmitTransferJob(CommandBuffer transferJob)
+{
+	const VkSubmitInfo submitInfo = transferJob.GetSubmitInfo();
+	vkQueueSubmit(transferQueue, 1, &submitInfo, NULL);
 }
 
 void GraphicsSystem::SubmitTransferJob(VkCommandBuffer transferJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0)

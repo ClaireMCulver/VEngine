@@ -42,13 +42,14 @@ private:
 	//Handles to graphics system
 	GraphicsSystem* pGraphicsSystem;
 
-private:
-	void InitializeSurface(GraphicsInstance* instance);
-
 public:
 	//Transfers the image passed to the swapchain as part of a command buffer.
 	void BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkImageLayout srcImageLayout);
 
 	//Present the next image in the swapchain
 	void PresentNextImage();
+
+private:
+	void InitializeSurface(GraphicsInstance* instance);
+
 };

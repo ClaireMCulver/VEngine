@@ -10,6 +10,9 @@
 #include "GraphicsPhysicalDevice.h"
 #include "GraphicsLogicalDevice.h"
 
+#include "CommandPool.h"
+#include "CommandBuffer.h"
+
 class GraphicsSystem
 {
 public:
@@ -27,8 +30,18 @@ private:
 	VkQueue transferQueue;
 	VkQueue sparseQueue;
 
+	//Command buffer pools
+	//TODO: Do I really want these here? or somewhere else?
+	CommandPool* graphicsCmdPool;
+	CommandPool* computeCmdPool;
+	CommandPool* transferCmdPool;
+	CommandPool* sparseCmdPool;
+
 public:
+	void SubmitGraphicsJob(CommandBuffer graphicsJob);
 	void SubmitGraphicsJob(VkCommandBuffer graphicsJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0);
+	
+	void SubmitTransferJob(CommandBuffer transferJob);
 	void SubmitTransferJob(VkCommandBuffer transferJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0);
 
 
