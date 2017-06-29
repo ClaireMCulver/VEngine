@@ -194,8 +194,8 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 		0, //baseArrayLayer;
 		1  //layerCount;
 	};
-	//TODO: Image class? Framebuffer class?
 	blitRegion.srcOffsets[0] = { 0, 0, 0 };
+	//TODO: Image class? Framebuffer class?
 	blitRegion.srcOffsets[1] = { 0, 0, 1 };
 	blitRegion.dstSubresource = 
 	{
@@ -213,7 +213,8 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 	blitBeginInfo.pNext = 0;
 	blitBeginInfo.flags = 0;
 	blitBeginInfo.pInheritanceInfo = NULL;
-
+	
+	// Record command buffer and submit it //
 	vkBeginCommandBuffer(blitBuffer, &blitBeginInfo);
 
 	vkCmdBlitImage(blitBuffer, srcImage, srcImageLayout, swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
@@ -221,4 +222,7 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 	vkEndCommandBuffer(blitBuffer);
 
 	pGraphicsSystem->SubmitTransferJob(blitBuffer, &imageAcquireSignal, 1, &imageTransferedSignal, 1);
+
+	//Restart command buffer 
+	vkResetCommandBuffer(blitBuffer, 0);
 }

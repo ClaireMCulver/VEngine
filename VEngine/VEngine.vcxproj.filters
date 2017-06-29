@@ -43,6 +43,12 @@
     <Filter Include="Source Files\Graphics\Objects">
       <UniqueIdentifier>{4bc1e97a-bb01-4e6e-ac22-6b183e18598e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Objects\CommandBuffer">
+      <UniqueIdentifier>{b08830de-ee75-4d2e-83b9-52e193253ffe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\CommandBuffer">
+      <UniqueIdentifier>{534bc7df-7aad-4e7d-8907-0f1b25035e1f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -80,6 +86,12 @@
     </ClCompile>
     <ClCompile Include="Win32Window.cpp">
       <Filter>Source Files\Graphics\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandPool.cpp">
+      <Filter>Source Files\Graphics\Objects\CommandBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandBuffer.cpp">
+      <Filter>Source Files\Graphics\Objects\CommandBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -124,6 +136,12 @@
     </ClInclude>
     <ClInclude Include="Win32Window.h">
       <Filter>Header Files\Graphics\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandPool.h">
+      <Filter>Header Files\Graphics\Objects\CommandBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandBuffer.h">
+      <Filter>Header Files\Graphics\Objects\CommandBuffer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

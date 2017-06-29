@@ -36,7 +36,6 @@ public:
 	GraphicsPhysicalDevice* GetPhysicalDevice() const	{ return physicalDevice; }
 	GraphicsLogicalDevice* GetLogicalDevice() const		{ return logicalDevice; }
 
-	
 
 	VkQueue GetGraphicsQueue() const	{ return graphicsQueue; }
 	VkQueue GetComputeQueue() const		{ return computeQueue; }
