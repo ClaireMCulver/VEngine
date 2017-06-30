@@ -11,7 +11,7 @@
 class CommandBuffer
 {
 public:
-	CommandBuffer(CommandPool commandPool, VkCommandBufferLevel bufferLevel);
+	CommandBuffer(CommandPool &commandPool, VkCommandBufferLevel bufferLevel);
 	~CommandBuffer();
 
 	VkCommandBuffer GetVKCommandBuffer() const { return vkCommandBuffer; }

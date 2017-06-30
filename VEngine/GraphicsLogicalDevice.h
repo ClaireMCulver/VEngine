@@ -18,10 +18,10 @@ public:
 	~GraphicsLogicalDevice();
 
 private:
-	VkDevice logicalDevice;
-
+	VkDevice vkLogicalDevice;
+	std::vector<const char*> deviceExtentions;
 public:
-	VkDevice GetLogicalDevice() const { return logicalDevice; }
+	VkDevice GetVKLogicalDevice() const { return vkLogicalDevice; }
 
 };
 

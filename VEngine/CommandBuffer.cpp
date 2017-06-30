@@ -2,7 +2,7 @@
 
 
 
-CommandBuffer::CommandBuffer(CommandPool commandPool, VkCommandBufferLevel bufferLevel)
+CommandBuffer::CommandBuffer(CommandPool &commandPool, VkCommandBufferLevel bufferLevel)
 {
 	pCommandPool = &commandPool;
 

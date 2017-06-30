@@ -1,4 +1,6 @@
 #pragma once
 
-const char* GameName = "Playground";
+#ifndef GameName
+#define GameName "Playground"
+#endif // !GameName
 const int GameVersion = 1;

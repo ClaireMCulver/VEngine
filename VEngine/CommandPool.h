@@ -5,12 +5,11 @@
 #include <vulkan\vulkan.h>
 
 #include "GraphicsLogicalDevice.h"
-#include "CommandBuffer.h"
 
 class CommandPool
 {
 public:
-	CommandPool(GraphicsLogicalDevice logicalDevice, uint32_t commandBufferQueueFamily);
+	CommandPool(GraphicsLogicalDevice &logicalDevice, uint32_t commandBufferQueueFamily);
 	~CommandPool();
 
 private:

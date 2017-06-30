@@ -10,8 +10,8 @@
 #include "GraphicsPhysicalDevice.h"
 #include "GraphicsLogicalDevice.h"
 
-#include "CommandPool.h"
 #include "CommandBuffer.h"
+#include "CommandPool.h"
 
 class GraphicsSystem
 {

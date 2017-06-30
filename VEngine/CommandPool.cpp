@@ -2,7 +2,7 @@
 
 
 
-CommandPool::CommandPool(GraphicsLogicalDevice logicalDevice, uint32_t commandBufferQueueFamily)
+CommandPool::CommandPool(GraphicsLogicalDevice &logicalDevice, uint32_t commandBufferQueueFamily)
 {
 	VkCommandPoolCreateInfo commandPoolCI;
 	commandPoolCI.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -10,7 +10,9 @@ CommandPool::CommandPool(GraphicsLogicalDevice logicalDevice, uint32_t commandBu
 	commandPoolCI.flags = VkCommandPoolCreateFlagBits::VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
 	commandPoolCI.queueFamilyIndex = commandBufferQueueFamily;
 
-	vkLogicalDevice = logicalDevice.GetLogicalDevice();
+	vkLogicalDevice = logicalDevice.GetVKLogicalDevice();
+
+	vkCreateCommandPool(vkLogicalDevice, &commandPoolCI, NULL, &vkCommandPool);
 }
 
 

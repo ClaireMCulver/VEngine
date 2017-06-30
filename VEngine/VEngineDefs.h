@@ -1,6 +1,8 @@
 #pragma once
 
-const char* EngineName = "V_ENGINE";
+#ifndef EngineName
+#define EngineName "V_ENGINE"
+#endif // !EngineName
 const int EngineVersion = 1;
 
 

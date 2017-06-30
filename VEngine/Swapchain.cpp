@@ -7,7 +7,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	VkResult result;
 
 	pGraphicsSystem = &graphicsSystem;
-	const VkDevice vkLogicalDevice = graphicsSystem.GetLogicalDevice()->GetLogicalDevice();
+	const VkDevice vkLogicalDevice = graphicsSystem.GetLogicalDevice()->GetVKLogicalDevice();
 	const VkPhysicalDevice vkPhysicalDevice = graphicsSystem.GetPhysicalDevice()->GetPhysicalDevice();
 
 	// Get the queue family indices for the physical device //
@@ -43,7 +43,6 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	}
 	assert(presentationSupported == VK_TRUE);
 
-
 	// On to initialization //
 
 	// Initialize the app window on the os //
@@ -51,6 +50,36 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 
 	// Initialize the surface we are going to render to //
 	InitializeSurface(graphicsSystem.GetInstance());
+
+	// Surface Validation //
+	//Check that the surface is supported by at least one queue
+	VkBool32 graphicsSurfaceSupported = false;
+	vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, indices.graphicsQueueIndex, vkSurface, &graphicsSurfaceSupported);
+
+	VkBool32 computeSurfaceSupported = false;
+	vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, indices.graphicsQueueIndex, vkSurface, &computeSurfaceSupported);	
+	
+	VkBool32 transferSurfaceSupported = false;
+	vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, indices.graphicsQueueIndex, vkSurface, &transferSurfaceSupported);	
+	
+	VkBool32 sparseSurfaceSupported = false;
+	vkGetPhysicalDeviceSurfaceSupportKHR(vkPhysicalDevice, indices.graphicsQueueIndex, vkSurface, &sparseSurfaceSupported);
+
+	if (!(graphicsSurfaceSupported || computeSurfaceSupported || transferSurfaceSupported || sparseSurfaceSupported))
+	{
+		printf("Surface not supported");
+
+		exit(1);
+	}
+
+	//Fetch the surface formats
+	uint32_t surfaceFormatCount;
+	std::vector<VkSurfaceFormatKHR> surfaceFormats;
+	vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &surfaceFormatCount, NULL);
+	surfaceFormats.resize(surfaceFormatCount);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(vkPhysicalDevice, vkSurface, &surfaceFormatCount, surfaceFormats.data());
+
+
 
 	// Create info for the swapchain //
 	VkSwapchainCreateInfoKHR swapchainCI;
@@ -67,7 +96,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	swapchainCI.imageSharingMode = VkSharingMode::VK_SHARING_MODE_EXCLUSIVE;
 	swapchainCI.queueFamilyIndexCount = familyIndices.size();
 	swapchainCI.pQueueFamilyIndices = familyIndices.data();
-	swapchainCI.preTransform = VkSurfaceTransformFlagBitsKHR::VK_SURFACE_TRANSFORM_INHERIT_BIT_KHR;
+	swapchainCI.preTransform = VkSurfaceTransformFlagBitsKHR::VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 	swapchainCI.compositeAlpha = VkCompositeAlphaFlagBitsKHR::VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 	swapchainCI.presentMode = VkPresentModeKHR::VK_PRESENT_MODE_FIFO_KHR;
 	swapchainCI.clipped = VK_TRUE;
@@ -149,13 +178,20 @@ SwapChain::~SwapChain()
 {
 	delete win32Window;
 
-	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetLogicalDevice();
+	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetVKLogicalDevice();
 
 	vkDeviceWaitIdle(vkLogicalDevice);
 
-	vkDestroySurfaceKHR(pGraphicsSystem->GetInstance()->GetInstance(), vkSurface, NULL);
+	//Destroy swapchain images?
 
-	vkDestroySwapchainKHR(vkLogicalDevice, vkSwapchain, NULL);
+	for (size_t i = 0, count = swapchainImageViews.size(); i < count; i++)
+	{
+		vkDestroyImageView(vkLogicalDevice, swapchainImageViews[i], NULL);
+	}
+
+	vkDestroySwapchainKHR(vkLogicalDevice, vkSwapchain, NULL); //Note: Swapchains must be destroyed before the surface which depends on them.
+
+	vkDestroySurfaceKHR(pGraphicsSystem->GetInstance()->GetInstance(), vkSurface, NULL);
 
 	vkDestroySemaphore(vkLogicalDevice, imageAcquireSignal, NULL);
 	vkDestroySemaphore(vkLogicalDevice, imageTransferedSignal, NULL);
@@ -176,7 +212,7 @@ void SwapChain::InitializeSurface(GraphicsInstance* instance)
 	surfaceCI.hwnd = windowData.window;
 
 	result = vkCreateWin32SurfaceKHR(instance->GetInstance(), &surfaceCI, NULL, &vkSurface);
-	assert(result);
+	assert(result == VK_SUCCESS);
 }
 
 void SwapChain::PresentNextImage()
@@ -191,7 +227,7 @@ void SwapChain::PresentNextImage()
 
 void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkImageLayout srcImageLayout)
 {
-	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetLogicalDevice();
+	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetVKLogicalDevice();
 	vkAcquireNextImageKHR(vkLogicalDevice, vkSwapchain, UINT64_MAX, imageAcquireSignal, NULL, &currentImage);
 
 	VkImageBlit blitRegion;
@@ -213,7 +249,7 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 		1  //layerCount;
 	};
 	blitRegion.dstOffsets[0] = { 0, 0, 0 };
-	blitRegion.dstOffsets[1] = { windowSize[0], windowSize[1], 1 };
+	blitRegion.dstOffsets[1] = { (int32_t)windowSize[0], (int32_t)windowSize[1], 1 };
 	
 	// Record command buffer and submit it //
 	blitBuffer->BeginRecording();

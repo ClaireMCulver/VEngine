@@ -16,7 +16,7 @@ Win32Window::Win32Window(std::string WindowName, int xResolution, int yResolutio
 	windowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
 	windowClass.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
 	windowClass.lpszMenuName = NULL;
-	windowClass.lpszClassName = "Dragons";
+	windowClass.lpszClassName = "v_WindowClass";
 	windowClass.hIconSm = LoadIcon(NULL, IDI_WINLOGO);
 
 	if (!RegisterClassEx(&windowClass)) {
@@ -28,7 +28,8 @@ Win32Window::Win32Window(std::string WindowName, int xResolution, int yResolutio
 
 	RECT windowRect = { 0, 0, (LONG)xResolution, (LONG)yResolution };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
-	windowData.window = CreateWindowEx(0, WindowName.c_str(), WindowName.c_str(), WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_SYSMENU, 100, 100, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, windowData.connection, NULL);
+	windowData.window = CreateWindowEx(0, windowClass.lpszClassName, WindowName.c_str(), WS_OVERLAPPEDWINDOW | WS_VISIBLE | WS_SYSMENU, 100, 100, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, windowData.connection, NULL);
+	
 	assert(windowData.window);
 }
 

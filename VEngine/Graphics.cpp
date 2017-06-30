@@ -8,7 +8,7 @@ GraphicsSystem::GraphicsSystem()
 	physicalDevice = new GraphicsPhysicalDevice(*instance);
 	logicalDevice = new GraphicsLogicalDevice(*physicalDevice);
 
-	const VkDevice vkDevice = logicalDevice->GetLogicalDevice();
+	const VkDevice vkDevice = logicalDevice->GetVKLogicalDevice();
 
 	GraphicsPhysicalDevice::QueueFamilyIndices indices = physicalDevice->GetQueueFamilyIndices();
 
@@ -26,14 +26,14 @@ GraphicsSystem::GraphicsSystem()
 
 GraphicsSystem::~GraphicsSystem()
 {
-	delete logicalDevice;
-	delete physicalDevice;
-	delete instance;
-
 	delete graphicsCmdPool;
 	delete computeCmdPool;
 	delete transferCmdPool;
 	delete sparseCmdPool;
+
+	delete logicalDevice;
+	delete physicalDevice;
+	delete instance;
 }
 
 void GraphicsSystem::SubmitGraphicsJob(CommandBuffer graphicsJob)
@@ -42,7 +42,7 @@ void GraphicsSystem::SubmitGraphicsJob(CommandBuffer graphicsJob)
 	vkQueueSubmit(graphicsQueue, 1, &submitInfo, NULL);
 }
 
-void GraphicsSystem::SubmitGraphicsJob(VkCommandBuffer graphicsJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0)
+void GraphicsSystem::SubmitGraphicsJob(VkCommandBuffer graphicsJob, VkSemaphore* pWaitSemaphores, uint32_t waitSemaphoreCount, VkSemaphore* pSignalSemaphores, uint32_t signalSemaphoreCount)
 {
 	VkSubmitInfo graphicsInfo;
 	graphicsInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -65,7 +65,7 @@ void GraphicsSystem::SubmitTransferJob(CommandBuffer transferJob)
 	vkQueueSubmit(transferQueue, 1, &submitInfo, NULL);
 }
 
-void GraphicsSystem::SubmitTransferJob(VkCommandBuffer transferJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0)
+void GraphicsSystem::SubmitTransferJob(VkCommandBuffer transferJob, VkSemaphore* pWaitSemaphores, uint32_t waitSemaphoreCount, VkSemaphore* pSignalSemaphores, uint32_t signalSemaphoreCount)
 {
 	VkSubmitInfo transferInfo;
 	transferInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

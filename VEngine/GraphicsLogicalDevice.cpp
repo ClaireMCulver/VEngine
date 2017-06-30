@@ -14,7 +14,10 @@ GraphicsLogicalDevice::GraphicsLogicalDevice(GraphicsPhysicalDevice &physicalDev
 	float graphicsPriority = 0.0f;
 	queuesRequested.pQueuePriorities = &graphicsPriority; //Add in priorities for potential optimization
 
+	// Device extentions //
+	deviceExtentions.push_back(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
+	// Device creation //
 	VkDeviceCreateInfo logicalDeviceCI;
 	logicalDeviceCI.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 	logicalDeviceCI.pNext = nullptr;
@@ -23,18 +26,16 @@ GraphicsLogicalDevice::GraphicsLogicalDevice(GraphicsPhysicalDevice &physicalDev
 	logicalDeviceCI.pQueueCreateInfos = &queuesRequested;
 	logicalDeviceCI.enabledLayerCount = 0;
 	logicalDeviceCI.ppEnabledLayerNames = nullptr;
-	logicalDeviceCI.enabledExtensionCount = 0;
-	logicalDeviceCI.ppEnabledExtensionNames = nullptr;
+	logicalDeviceCI.enabledExtensionCount = deviceExtentions.size();
+	logicalDeviceCI.ppEnabledExtensionNames = deviceExtentions.data();
 	logicalDeviceCI.pEnabledFeatures = nullptr;
 
-	vkCreateDevice(physicalDevice.GetPhysicalDevice(), &logicalDeviceCI, nullptr, &logicalDevice);
-
-	//Fetch the queues
+	vkCreateDevice(physicalDevice.GetPhysicalDevice(), &logicalDeviceCI, nullptr, &vkLogicalDevice);
 }
 
 
 GraphicsLogicalDevice::~GraphicsLogicalDevice()
 {
-	vkDeviceWaitIdle(logicalDevice);
-	vkDestroyDevice(logicalDevice, nullptr);
+	vkDeviceWaitIdle(vkLogicalDevice);
+	vkDestroyDevice(vkLogicalDevice, NULL);
 }
