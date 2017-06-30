@@ -26,7 +26,7 @@ private:
 	VkQueue presentationQueue;
 	VkPresentInfoKHR presentInfo;
 
-	VkCommandBuffer blitBuffer;
+	CommandBuffer* blitBuffer;
 
 	VkSemaphore imageAcquireSignal;
 	VkSemaphore imageTransferedSignal;

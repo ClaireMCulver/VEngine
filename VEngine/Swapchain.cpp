@@ -137,6 +137,11 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	presentInfo.pSwapchains = &vkSwapchain;
 	presentInfo.pImageIndices = &currentImage;
 	presentInfo.pResults = NULL;
+
+	// Blit buffer creation //
+	blitBuffer = new CommandBuffer(*pGraphicsSystem->GetTransferCommandPool(), VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	blitBuffer->AddWaitSemaphore(imageAcquireSignal);
+	blitBuffer->AddSignalSemaphore(imageTransferedSignal);
 }
 
 
@@ -209,23 +214,16 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 	};
 	blitRegion.dstOffsets[0] = { 0, 0, 0 };
 	blitRegion.dstOffsets[1] = { windowSize[0], windowSize[1], 1 };
-
-	//TODO: Command buffer allocation
-	VkCommandBufferBeginInfo blitBeginInfo;
-	blitBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	blitBeginInfo.pNext = 0;
-	blitBeginInfo.flags = 0;
-	blitBeginInfo.pInheritanceInfo = NULL;
 	
 	// Record command buffer and submit it //
-	vkBeginCommandBuffer(blitBuffer, &blitBeginInfo);
+	blitBuffer->BeginRecording();
 
-	vkCmdBlitImage(blitBuffer, srcImage, srcImageLayout, swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
+	vkCmdBlitImage(blitBuffer->GetVKCommandBuffer(), srcImage, srcImageLayout, swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
 
-	vkEndCommandBuffer(blitBuffer);
+	blitBuffer->EndRecording();
 
-	pGraphicsSystem->SubmitTransferJob(blitBuffer, &imageAcquireSignal, 1, &imageTransferedSignal, 1);
+	pGraphicsSystem->SubmitTransferJob(*blitBuffer);
 
 	//Restart command buffer 
-	vkResetCommandBuffer(blitBuffer, 0);
+	blitBuffer->ResetBuffer();
 }

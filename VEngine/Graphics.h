@@ -31,7 +31,6 @@ private:
 	VkQueue sparseQueue;
 
 	//Command buffer pools
-	//TODO: Do I really want these here? or somewhere else?
 	CommandPool* graphicsCmdPool;
 	CommandPool* computeCmdPool;
 	CommandPool* transferCmdPool;
@@ -54,5 +53,11 @@ public:
 	VkQueue GetComputeQueue() const		{ return computeQueue; }
 	VkQueue GetTransferQueue() const	{ return transferQueue; }
 	VkQueue GetSparseQueue() const		{ return sparseQueue; }
+
+
+	CommandPool* GetGraphicsCommandPool() const { return graphicsCmdPool; }
+	CommandPool* GetComputeCommandPool() const { return computeCmdPool;  }
+	CommandPool* GetTransferCommandPool() const { return transferCmdPool; }
+	CommandPool* GetSparseCommandPool() const { return sparseCmdPool;   }
 };
 
