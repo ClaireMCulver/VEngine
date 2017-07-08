@@ -49,6 +49,18 @@
     <Filter Include="Source Files\Graphics\Objects\CommandBuffer">
       <UniqueIdentifier>{534bc7df-7aad-4e7d-8907-0f1b25035e1f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Shaders">
+      <UniqueIdentifier>{c33899bf-876e-4b4b-9cb3-2bbda1e0b1e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Shaders">
+      <UniqueIdentifier>{d5905017-e9de-4a98-90aa-223454b54ea1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Presentation">
+      <UniqueIdentifier>{24c1602e-239d-4141-8fce-b15d15e19d34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Presentation">
+      <UniqueIdentifier>{a68f612a-be5c-4fa4-a133-42f9f8fbd0e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -81,17 +93,20 @@
     <ClCompile Include="GraphicsLogicalDevice.cpp">
       <Filter>Source Files\Graphics\Dispatchable Handles</Filter>
     </ClCompile>
-    <ClCompile Include="SwapChain.cpp">
-      <Filter>Source Files\Graphics\Objects</Filter>
-    </ClCompile>
-    <ClCompile Include="Win32Window.cpp">
-      <Filter>Source Files\Graphics\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="CommandPool.cpp">
       <Filter>Source Files\Graphics\Objects\CommandBuffer</Filter>
     </ClCompile>
     <ClCompile Include="CommandBuffer.cpp">
       <Filter>Source Files\Graphics\Objects\CommandBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Window.cpp">
+      <Filter>Source Files\Graphics\Objects\Presentation</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChain.cpp">
+      <Filter>Source Files\Graphics\Objects\Presentation</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -131,17 +146,20 @@
     <ClInclude Include="GraphicsInstance.h">
       <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
     </ClInclude>
-    <ClInclude Include="SwapChain.h">
-      <Filter>Header Files\Graphics\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Win32Window.h">
-      <Filter>Header Files\Graphics\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="CommandPool.h">
       <Filter>Header Files\Graphics\Objects\CommandBuffer</Filter>
     </ClInclude>
     <ClInclude Include="CommandBuffer.h">
       <Filter>Header Files\Graphics\Objects\CommandBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32Window.h">
+      <Filter>Header Files\Graphics\Objects\Presentation</Filter>
+    </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>Header Files\Graphics\Objects\Presentation</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -109,7 +109,7 @@ bool Material::CreateBindings()
 	viBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //As apposed to instance rendering.
 
 	//vertices
-	viAttribs[0].binding = 0; //Which binding the per-vertex daata comes from.
+	viAttribs[0].binding = 0; //Which binding the per-vertex data comes from.
 	viAttribs[0].location = 0; //Location value in vertex shader. Because we need that.
 	viAttribs[0].format = VK_FORMAT_R32G32B32A32_SFLOAT; //Format of the data. float3
 	viAttribs[0].offset = 0; //Number of bytes from the start of the data to begin.
