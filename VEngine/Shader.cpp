@@ -12,7 +12,12 @@ Shader::Shader(const char* filePath, VkShaderStageFlagBits shaderType)
 
 Shader::~Shader()
 {
-	vkDestroyShaderModule(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), vkShaderModule, NULL);
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+
+	vkDestroyDescriptorSetLayout(logicalDevice, resourceSetLayout, NULL);
+
+	vkDestroyShaderModule(logicalDevice, vkShaderModule, NULL);
 }
 
 
@@ -83,17 +88,17 @@ bool Shader::CreateVertexBindings()
 	return true;
 }
 
-bool Shader::CreateResourceBindings(const std::string* fileData)
+bool Shader::CreateResourceSetLayout(const std::string* fileData)
 {
 	size_t currentPosition = 0;
-	std::vector<VkDescriptorSetLayoutBinding> resourceBindings;
+	std::vector<VkDescriptorSetLayoutBinding> resourceSetLayoutBindings;
 
 	while (fileData->find("uniform", currentPosition+1) != std::string::npos)
 	{
-		resourceBindings.push_back
+		resourceSetLayoutBindings.push_back
 		(
 			{											//VkDescriptorSetLayoutBinding
-				resourceBindings.size(),				//binding			//Binding of the resource in the shader
+				resourceSetLayoutBindings.size(),				//binding			//Binding of the resource in the shader
 				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,		//descriptorType	//Type of resource in the shader
 				1,										//descriptorCount	//Make one descriptor. Multiple descriptors would be for an array of resources in the shader.
 				VK_SHADER_STAGE_VERTEX_BIT,				//stageFlags		//Which stage of the pipeline CAN access the uniform.
@@ -102,15 +107,17 @@ bool Shader::CreateResourceBindings(const std::string* fileData)
 		);
 	}
 
-	VkDescriptorSetLayoutCreateInfo resourceBindingLayoutCI;
-	resourceBindingLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	resourceBindingLayoutCI.pNext = NULL;
-	resourceBindingLayoutCI.flags = 0;
-	resourceBindingLayoutCI.bindingCount = resourceBindings.size();
-	resourceBindingLayoutCI.pBindings = resourceBindings.data();
+	VkDescriptorSetLayoutCreateInfo resourceSetLayoutCI;
+	resourceSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	resourceSetLayoutCI.pNext = NULL;
+	resourceSetLayoutCI.flags = 0;
+	resourceSetLayoutCI.bindingCount = resourceSetLayoutBindings.size();
+	resourceSetLayoutCI.pBindings = resourceSetLayoutBindings.data();
 
-	VkResult result = vkCreateDescriptorSetLayout(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), &resourceBindingLayoutCI, NULL, &resourceLayout);
+	VkResult result = vkCreateDescriptorSetLayout(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), &resourceSetLayoutCI, NULL, &resourceSetLayout);
 	assert(result == VK_SUCCESS);
+
+	return true;
 }
 
 bool Shader::GLSLtoSPV(const VkShaderStageFlagBits shader_type, const char *pshader, const char* shaderName, std::vector<unsigned int> &spirv)

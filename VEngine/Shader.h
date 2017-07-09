@@ -31,7 +31,7 @@ private:
 	VkVertexInputBindingDescription viBinding;//Binding of the vertices within the shaders
 	std::vector<VkVertexInputAttributeDescription> viAttribs;//Bindings for the attributes of the vertices.
 
-	VkDescriptorSetLayout resourceLayout;
+	VkDescriptorSetLayout resourceSetLayout;
 
 private:
 	//TODO: This currently does not take in a file path, but the actual shader text. Fix that.
@@ -41,7 +41,7 @@ private:
 	bool CreateVertexBindings();
 
 	//Finds the number of uniforms in the shader and creates relevant bindings for them.
-	bool CreateResourceBindings(const std::string* fileData);
+	bool CreateResourceSetLayout(const std::string* fileData);
 
 private:
 	bool GLSLtoSPV(const VkShaderStageFlagBits shader_type, const char *pshader, const char* shaderName, std::vector<unsigned int> &spirv);

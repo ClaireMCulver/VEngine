@@ -26,6 +26,7 @@ private:
 	GraphicsPhysicalDevice* physicalDevice;
 	GraphicsLogicalDevice* logicalDevice;
 
+	//TODO: Move this stuff into job system, so that graphics system is only for the dispatchaeble handles.
 	//Job queues
 	VkQueue graphicsQueue;
 	VkQueue computeQueue;

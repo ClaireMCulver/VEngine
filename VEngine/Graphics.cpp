@@ -1,6 +1,6 @@
 #include "Graphics.h"
 
-GraphicsSystem::singleton = NULL;
+GraphicsSystem* GraphicsSystem::singleton = NULL;
 
 GraphicsSystem::GraphicsSystem()
 {

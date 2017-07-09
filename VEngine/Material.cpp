@@ -441,11 +441,11 @@ bool Material::CreateDescriptors()
 	writes[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 	writes[0].pNext = NULL;
 	writes[0].dstSet = pipelineData.descriptors[0];
+	writes[0].dstBinding = 0;
+	writes[0].dstArrayElement = 0;
 	writes[0].descriptorCount = 1;
 	writes[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	writes[0].pBufferInfo = &uniformData.buffer_info;
-	writes[0].dstArrayElement = 0;
-	writes[0].dstBinding = 0;
 
 	vkUpdateDescriptorSets(logicalDevice, 1, writes, 0, NULL);
 	return true;
