@@ -41,7 +41,7 @@ private:
 	bool CreateVertexBindings();
 
 	//Finds the number of uniforms in the shader and creates relevant bindings for them.
-	bool CreateResourceSetLayout(const std::string* fileData);
+	bool CreateResourceSetLayout(const std::string* fileData, VkShaderStageFlagBits shaderType);
 
 private:
 	bool GLSLtoSPV(const VkShaderStageFlagBits shader_type, const char *pshader, const char* shaderName, std::vector<unsigned int> &spirv);

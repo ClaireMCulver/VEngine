@@ -43,12 +43,6 @@
     <Filter Include="Source Files\Graphics\Objects">
       <UniqueIdentifier>{4bc1e97a-bb01-4e6e-ac22-6b183e18598e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphics\Objects\CommandBuffer">
-      <UniqueIdentifier>{b08830de-ee75-4d2e-83b9-52e193253ffe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Graphics\Objects\CommandBuffer">
-      <UniqueIdentifier>{534bc7df-7aad-4e7d-8907-0f1b25035e1f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Graphics\Objects\Shaders">
       <UniqueIdentifier>{c33899bf-876e-4b4b-9cb3-2bbda1e0b1e1}</UniqueIdentifier>
     </Filter>
@@ -66,6 +60,24 @@
     </Filter>
     <Filter Include="Source Files\Graphics\Objects\UniformBuffer">
       <UniqueIdentifier>{f16e32f5-4a9b-4378-a2d3-6b8346a176b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Buffers">
+      <UniqueIdentifier>{bc7e4b72-af05-4bbc-b462-7cebce60a8b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Buffers\CommandBuffer">
+      <UniqueIdentifier>{b08830de-ee75-4d2e-83b9-52e193253ffe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Buffers">
+      <UniqueIdentifier>{bb777286-1e0a-4231-8dfb-2b1241bfa9f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Buffers\CommandBuffer">
+      <UniqueIdentifier>{534bc7df-7aad-4e7d-8907-0f1b25035e1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Geometry">
+      <UniqueIdentifier>{6561e7f9-2f1d-4bee-b2db-b3eead30bf0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Geometry">
+      <UniqueIdentifier>{749c12f4-b924-4f4d-8f6e-8b611bdd73c6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -100,10 +112,10 @@
       <Filter>Source Files\Graphics\Dispatchable Handles</Filter>
     </ClCompile>
     <ClCompile Include="CommandPool.cpp">
-      <Filter>Source Files\Graphics\Objects\CommandBuffer</Filter>
+      <Filter>Source Files\Graphics\Objects\Buffers\CommandBuffer</Filter>
     </ClCompile>
     <ClCompile Include="CommandBuffer.cpp">
-      <Filter>Source Files\Graphics\Objects\CommandBuffer</Filter>
+      <Filter>Source Files\Graphics\Objects\Buffers\CommandBuffer</Filter>
     </ClCompile>
     <ClCompile Include="Win32Window.cpp">
       <Filter>Source Files\Graphics\Objects\Presentation</Filter>
@@ -111,11 +123,17 @@
     <ClCompile Include="SwapChain.cpp">
       <Filter>Source Files\Graphics\Objects\Presentation</Filter>
     </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DescriptorPool.cpp">
       <Filter>Source Files\Graphics\Objects\UniformBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Graphics\Objects\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Source Files\Graphics\Objects\Geometry</Filter>
+    </ClCompile>
+    <ClCompile Include="GPUBuffer.cpp">
+      <Filter>Source Files\Graphics\Objects\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -143,9 +161,6 @@
     <ClInclude Include="GraphicsSystem.h">
       <Filter>Header Files\OLDGraphics\Backend</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="GraphicsPhysicalDevice.h">
       <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
     </ClInclude>
@@ -156,10 +171,10 @@
       <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
     </ClInclude>
     <ClInclude Include="CommandPool.h">
-      <Filter>Header Files\Graphics\Objects\CommandBuffer</Filter>
+      <Filter>Header Files\Graphics\Objects\Buffers\CommandBuffer</Filter>
     </ClInclude>
     <ClInclude Include="CommandBuffer.h">
-      <Filter>Header Files\Graphics\Objects\CommandBuffer</Filter>
+      <Filter>Header Files\Graphics\Objects\Buffers\CommandBuffer</Filter>
     </ClInclude>
     <ClInclude Include="Win32Window.h">
       <Filter>Header Files\Graphics\Objects\Presentation</Filter>
@@ -167,11 +182,20 @@
     <ClInclude Include="SwapChain.h">
       <Filter>Header Files\Graphics\Objects\Presentation</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DescriptorPool.h">
       <Filter>Header Files\Graphics\Objects\UniformBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics.h">
+      <Filter>Header Files\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Graphics\Objects\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Header Files\Graphics\Objects\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUBuffer.h">
+      <Filter>Header Files\Graphics\Objects\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

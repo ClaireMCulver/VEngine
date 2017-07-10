@@ -14,7 +14,7 @@
 
 struct VertexBuffer
 {
-	VkBuffer buffer;
+	VkBuffer vkBuffer;
 	VkDeviceMemory memory;
 	VkDescriptorBufferInfo buffer_info;
 };

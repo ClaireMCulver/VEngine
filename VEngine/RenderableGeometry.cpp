@@ -9,7 +9,7 @@ RenderableGeometry::RenderableGeometry()
 RenderableGeometry::~RenderableGeometry()
 {
 	//Vertex buffer
-	vkDestroyBuffer(GraphicsSystem::GetSingleton()->GetLogicalDevice(), vertexBuffer.buffer, NULL); 
+	vkDestroyBuffer(GraphicsSystem::GetSingleton()->GetLogicalDevice(), vertexBuffer.vkBuffer, NULL); 
 	vkFreeMemory(GraphicsSystem::GetSingleton()->GetLogicalDevice(), vertexBuffer.memory, NULL);
 }
 
@@ -34,12 +34,12 @@ bool RenderableGeometry::LoadMesh(std::vector<Triangle> *geometry)
 
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice();
 
-	VkResult res = vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &vertexBuffer.buffer);
+	VkResult res = vkCreateBuffer(logicalDevice, &bufferInfo, nullptr, &vertexBuffer.vkBuffer);
 	assert(res == VK_SUCCESS);
 
 	//Fetch the memory requirements
 	VkMemoryRequirements memRequirements;
-	vkGetBufferMemoryRequirements(logicalDevice, vertexBuffer.buffer, &memRequirements);
+	vkGetBufferMemoryRequirements(logicalDevice, vertexBuffer.vkBuffer, &memRequirements);
 
 	VkPhysicalDeviceMemoryProperties memoryProperties = GraphicsSystem::GetSingleton()->GetPhysicalMemoryProperties();
 
@@ -55,7 +55,7 @@ bool RenderableGeometry::LoadMesh(std::vector<Triangle> *geometry)
 		throw std::runtime_error("failed to allocate vertex buffer memory!");
 	}
 
-	vkBindBufferMemory(logicalDevice, vertexBuffer.buffer, vertexBuffer.memory, 0);
+	vkBindBufferMemory(logicalDevice, vertexBuffer.vkBuffer, vertexBuffer.memory, 0);
 
 	void* data;
 	vkMapMemory(logicalDevice, vertexBuffer.memory, 0, bufferInfo.size, 0, &data);
@@ -74,7 +74,7 @@ bool RenderableGeometry::Render(VkCommandBuffer commandBuffer)
 		objectData.descriptors.data(), 0, NULL);
 
 	const VkDeviceSize offsets[1] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexBuffer.buffer, offsets);
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexBuffer.vkBuffer, offsets);
 
 	vkCmdDraw(commandBuffer, 12 * 3, 1, 0, 0);
 
@@ -125,7 +125,7 @@ void RenderableGeometry::RecordCommandBuffer(VkRenderPass rndrPass)
 		pipelineData.descriptors.data(), 0, NULL);
 
 	const VkDeviceSize offsets[1] = { 0 };
-	vkCmdBindVertexBuffers(renderCmdBuffer, 0, 1, &vertexBuffer.buffer, offsets);
+	vkCmdBindVertexBuffers(renderCmdBuffer, 0, 1, &vertexBuffer.vkBuffer, offsets);
 
 	vkCmdDraw(renderCmdBuffer, 12 * 3, 1, 0, 0);
 	vkCmdEndRenderPass(renderCmdBuffer);

@@ -88,20 +88,22 @@ bool Shader::CreateVertexBindings()
 	return true;
 }
 
-bool Shader::CreateResourceSetLayout(const std::string* fileData)
+bool Shader::CreateResourceSetLayout(const std::string* fileData, VkShaderStageFlagBits shaderType)
 {
 	size_t currentPosition = 0;
 	std::vector<VkDescriptorSetLayoutBinding> resourceSetLayoutBindings;
 
 	while (fileData->find("uniform", currentPosition+1) != std::string::npos)
 	{
+		//Determine type of uniform.
+
 		resourceSetLayoutBindings.push_back
 		(
 			{											//VkDescriptorSetLayoutBinding
-				resourceSetLayoutBindings.size(),				//binding			//Binding of the resource in the shader
+				resourceSetLayoutBindings.size(),		//binding			//Binding of the resource in the shader
 				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,		//descriptorType	//Type of resource in the shader
 				1,										//descriptorCount	//Make one descriptor. Multiple descriptors would be for an array of resources in the shader.
-				VK_SHADER_STAGE_VERTEX_BIT,				//stageFlags		//Which stage of the pipeline CAN access the uniform.
+				shaderType,				//stageFlags		//Which stage of the pipeline CAN access the uniform.
 				NULL									//pImmutableSamplers
 			}
 		);

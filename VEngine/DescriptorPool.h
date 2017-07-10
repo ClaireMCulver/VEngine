@@ -11,7 +11,6 @@
 
 #include "Graphics.h"
 
-
 class DescriptorPool
 {
 public:
