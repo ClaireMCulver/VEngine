@@ -23,6 +23,8 @@ private:
 
 public:
 	//public functions
+	VkBuffer GetVKBuffer() const			{ return vkBuffer; }
+	VkDeviceMemory GetBufferMemory() const	{ return vkMemory; }
 
 private:
 

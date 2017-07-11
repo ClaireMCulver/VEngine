@@ -12,7 +12,7 @@
 #include <glm\common.hpp>
 
 #include "Graphics.h"
-#include "Buffer.h"
+#include "GPUBuffer.h"
 
 struct Triangle
 {
@@ -39,6 +39,8 @@ public:
 
 private: 
 	GPUBuffer* vertexBuffer;
+
+	uint32_t numVertices;
 
 public: 
 	bool LoadMeshFromFile(char* filePath);
