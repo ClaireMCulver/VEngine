@@ -13,23 +13,7 @@
 
 #include "Graphics.h"
 #include "GPUBuffer.h"
-
-struct Triangle
-{
-	glm::vec3 vertexA;
-	glm::vec3 vertexB;
-	glm::vec3 vertexC;
-	
-	//Removed until I get file loading in. Either one works.
-	//glm::vec3 normalA;
-	//glm::vec3 normalB;
-	//glm::vec3 normalC;
-
-	glm::vec2 UVA;
-	glm::vec2 UVB;
-	glm::vec2 UVC;
-};
-
+#include "GraphicsDefs.h"
 
 class Geometry
 {

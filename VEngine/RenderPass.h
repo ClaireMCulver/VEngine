@@ -9,8 +9,8 @@
 #include "GraphicsDefs.h"
 
 //Engine
-#include "GraphicsSystem.h"
-#include "RenderableGeometry.h"
+#include "Graphics.h"
+#include "Geometry.h"
 #include "FrameBuffer.h"
 
 
@@ -37,6 +37,8 @@ public:
 	void RecordBuffer();
 	void SubmitBuffer();
 
+	VkRenderPass GetVKRenderPass() const { return renderPass; }
+
 private:
 	VkRenderPass renderPass;
 	VkRenderPassBeginInfo renderPassBeginInfo;
@@ -55,7 +57,7 @@ private:
 	VkRect2D renderArea;
 	std::vector<VkClearValue> clearValues;
 
-	std::vector<RenderableGeometry*> registeredMeshes;
+	std::vector<Geometry*> registeredMeshes;
 
 	VkSubmitInfo bufferSubmitInfo;
 	VkPipelineStageFlags pipelineStage = VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;

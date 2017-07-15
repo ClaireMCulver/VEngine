@@ -5,4 +5,4 @@
 #endif // !GameName
 const int GameVersion = 1;
 
-int32_t WindowSize[] = { 800, 600 };
+const int32_t WindowSize[] = { 800, 600 };

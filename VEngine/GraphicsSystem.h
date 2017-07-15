@@ -73,7 +73,7 @@ private:
 
 	Win32Window window;
 	VkSurfaceKHR surface;
-	glm::vec2 windowSize;
+	//glm::vec2 windowSize;
 
 	VkFormat format;
 

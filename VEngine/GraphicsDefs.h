@@ -62,6 +62,11 @@ struct Triangle
 	glm::vec2 uvB;
 	glm::vec4 vertexC;
 	glm::vec2 uvC;
+
+	//Removed until I get file loading in. Either one works.
+	//glm::vec3 normalA;
+	//glm::vec3 normalB;
+	//glm::vec3 normalC;
 };
 
 #define XYZ1(_x_, _y_, _z_) glm::vec4(_x_, _y_, _z_, 1.f)

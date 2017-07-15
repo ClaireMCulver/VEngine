@@ -23,6 +23,9 @@ public:
 	Shader(const char* filePath, VkShaderStageFlagBits shaderType);
 	~Shader();
 
+	VkShaderModule GetVKShaderModule() const { return vkShaderModule; }
+	VkShaderStageFlags GetVKShaderStage() const { return vkShaderType; }
+
 private:
 	//Shader module
 	VkShaderModule vkShaderModule;

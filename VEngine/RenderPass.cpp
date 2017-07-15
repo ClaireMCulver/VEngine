@@ -205,7 +205,7 @@ void RenderPass::RecordBuffer()
 	// Render pass contents //
 		for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
 		{
-			registeredMeshes[i]->Render(renderBuffer);
+			registeredMeshes[i]->Draw(renderBuffer);
 		}
 
 	//end render pass

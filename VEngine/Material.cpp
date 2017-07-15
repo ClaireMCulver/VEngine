@@ -3,6 +3,56 @@
 
 Material::Material()
 {
+	//Description of binding and attributes for pipeline
+ 	viBinding.binding = 0; //Index of the array
+ 	viBinding.stride = (sizeof(float) * 4) + (sizeof(float) * 2); //Number of bytes from one vertex data set to the next
+ 	viBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //As apposed to instance rendering.
+ 
+ 
+    //Vertices
+ 	viAttribs.push_back
+ 	(
+ 		{									//VkVertexInputBindingDescription
+ 			0,								//binding	//Which binding the per-vertex data comes from.
+ 			0,								//location	//Location value in vertex shader. Because we need that.
+ 			VK_FORMAT_R32G32B32A32_SFLOAT,	//format	//Format of the data. float3
+ 			0								//offset	//Number of bytes from the start of the data to begin.
+ 		}
+ 	);												   
+ 
+ 	//UVs
+ 	viAttribs.push_back
+ 	(
+ 		{								//VkVertexInputBindingDescription
+ 			0,							//binding	
+ 			1,							//location	
+ 			VK_FORMAT_R32G32_SFLOAT,	//format	
+ 			(sizeof(float) * 4)			//offset	
+ 		}
+ 	);			
+}
+
+Material::~Material()
+{
+	
+}
+
+void Material::AddShader(Shader newShader)
+{
+	VkPipelineShaderStageCreateInfo shaderStage;
+	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+	shaderStage.pNext = NULL;
+	shaderStage.flags = 0;
+	shaderStage.stage = (VkShaderStageFlagBits)newShader.GetVKShaderStage();
+	shaderStage.module = newShader.GetVKShaderStage;
+	shaderStage.pName = "main";
+	shaderStage.pSpecializationInfo = NULL;
+
+	shaderStages.push_back(shaderStage);
+}
+
+void Material::FinalizeMaterial(RenderPass renderPass)
+{
 	VkResult res;
 	VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE];
 	VkPipelineDynamicStateCreateInfo dynamicState = {};
@@ -11,7 +61,7 @@ Material::Material()
 	dynamicState.pNext = NULL;
 	dynamicState.pDynamicStates = dynamicStateEnables;
 	dynamicState.dynamicStateCount = 0;
-	
+
 	VkPipelineVertexInputStateCreateInfo vi;
 	memset(&vi, 0, sizeof(vi));
 	vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -19,16 +69,16 @@ Material::Material()
 	vi.flags = 0;
 	vi.vertexBindingDescriptionCount = 1;
 	vi.pVertexBindingDescriptions = &viBinding;
-	vi.vertexAttributeDescriptionCount = 2;
+	vi.vertexAttributeDescriptionCount = viAttribs.size();
 	vi.pVertexAttributeDescriptions = viAttribs.data();
-	
+
 	VkPipelineInputAssemblyStateCreateInfo ia;
 	ia.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
 	ia.pNext = NULL;
 	ia.flags = 0;
 	ia.primitiveRestartEnable = VK_FALSE;
 	ia.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-	
+
 	VkPipelineRasterizationStateCreateInfo rs;
 	rs.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 	rs.pNext = NULL;
@@ -43,7 +93,7 @@ Material::Material()
 	rs.depthBiasClamp = 0;
 	rs.depthBiasSlopeFactor = 0;
 	rs.lineWidth = 1.0f;
-	
+
 	VkPipelineColorBlendStateCreateInfo cb;
 	cb.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	cb.pNext = NULL;
@@ -65,7 +115,7 @@ Material::Material()
 	cb.blendConstants[1] = 1.0f;
 	cb.blendConstants[2] = 1.0f;
 	cb.blendConstants[3] = 1.0f;
-	
+
 	VkPipelineViewportStateCreateInfo vp = {};
 	vp.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	vp.pNext = NULL;
@@ -76,7 +126,7 @@ Material::Material()
 	dynamicStateEnables[dynamicState.dynamicStateCount++] = VK_DYNAMIC_STATE_SCISSOR;
 	vp.pScissors = NULL;
 	vp.pViewports = NULL;
-	
+
 	VkPipelineDepthStencilStateCreateInfo ds;
 	ds.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
 	ds.pNext = NULL;
@@ -96,7 +146,7 @@ Material::Material()
 	ds.back.depthFailOp = VK_STENCIL_OP_KEEP;
 	ds.back.writeMask = 0;
 	ds.front = ds.back;
-	
+
 	VkPipelineMultisampleStateCreateInfo ms;
 	ms.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
 	ms.pNext = NULL;
@@ -107,7 +157,7 @@ Material::Material()
 	ms.alphaToCoverageEnable = VK_FALSE;
 	ms.alphaToOneEnable = VK_FALSE;
 	ms.minSampleShading = 0.0;
-	
+
 	VkGraphicsPipelineCreateInfo pipelineInfo;
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.pNext = NULL;
@@ -126,22 +176,20 @@ Material::Material()
 	pipelineInfo.pDepthStencilState = &ds;
 	pipelineInfo.pStages = shaderStages.data();
 	pipelineInfo.stageCount = shaderStages.size();
-	pipelineInfo.renderPass = renderPass;
+	pipelineInfo.renderPass = renderPass.GetVKRenderPass();
 	pipelineInfo.subpass = 0;
-	
+
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-	
+
 	//Currently an access violation
 	res = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipelineData.pipeline);
 	assert(res == VK_SUCCESS);
 }
 
-Material::~Material()
+void Material::BindPipeline(CommandBuffer commandBuffer)
 {
-	
-}
+	const VkCommandBuffer buffer = commandBuffer.GetVKCommandBuffer();
+	vkCmdBindPipeline(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
 
-void Material::AddShader(Shader newShader)
-{
-
+	vkCmdBindDescriptorSets(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipelineLayout, 0, descriptors.size(), descriptors.data(), 0, NULL);
 }
