@@ -4,9 +4,9 @@
 
 Shader::Shader(const char* filePath, VkShaderStageFlagBits shaderType)
 {
-	LoadShaderFromFile(filePath, shaderType);
+	vkShaderType = shaderType;
 
-	CreateVertexBindings();
+	LoadShaderFromFile(filePath, shaderType);
 }
 
 
@@ -54,40 +54,6 @@ bool Shader::LoadShaderFromFile(const char* filePath, VkShaderStageFlagBits shad
 	return true;
 }
 
-bool Shader::CreateVertexBindings()
-{
-	//Description of binding and attributes for pipeline
-	viBinding.binding = 0; //Index of the array
-	viBinding.stride = (sizeof(float) * 4) + (sizeof(float) * 2); //Number of bytes from one vertex data set to the next
-	viBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //As apposed to instance rendering.
-
-
-   //Vertices
-	viAttribs.push_back
-	(
-		{									//VkVertexInputBindingDescription
-			0,								//binding	//Which binding the per-vertex data comes from.
-			0,								//location	//Location value in vertex shader. Because we need that.
-			VK_FORMAT_R32G32B32A32_SFLOAT,	//format	//Format of the data. float3
-			0								//offset	//Number of bytes from the start of the data to begin.
-		}
-	);												   
-
-	//UVs
-	viAttribs.push_back
-	(
-		{								//VkVertexInputBindingDescription
-			0,							//binding	
-			1,							//location	
-			VK_FORMAT_R32G32_SFLOAT,	//format	
-			(sizeof(float) * 4)			//offset	
-		}
-	);			
-
-
-	return true;
-}
-
 bool Shader::CreateResourceSetLayout(const std::string* fileData, VkShaderStageFlagBits shaderType)
 {
 	size_t currentPosition = 0;
@@ -103,7 +69,7 @@ bool Shader::CreateResourceSetLayout(const std::string* fileData, VkShaderStageF
 				resourceSetLayoutBindings.size(),		//binding			//Binding of the resource in the shader
 				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,		//descriptorType	//Type of resource in the shader
 				1,										//descriptorCount	//Make one descriptor. Multiple descriptors would be for an array of resources in the shader.
-				shaderType,				//stageFlags		//Which stage of the pipeline CAN access the uniform.
+				vkShaderType,				//stageFlags		//Which stage of the pipeline CAN access the uniform.
 				NULL									//pImmutableSamplers
 			}
 		);

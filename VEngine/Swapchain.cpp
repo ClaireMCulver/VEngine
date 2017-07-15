@@ -168,7 +168,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	presentInfo.pResults = NULL;
 
 	// Blit buffer creation //
-	blitBuffer = new CommandBuffer(*pGraphicsSystem->GetTransferCommandPool(), VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	blitBuffer = new CommandBuffer(CommandBufferType::Transfer, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 	blitBuffer->AddWaitSemaphore(imageAcquireSignal);
 	blitBuffer->AddSignalSemaphore(imageTransferedSignal);
 }
@@ -258,7 +258,7 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 
 	blitBuffer->EndRecording();
 
-	pGraphicsSystem->SubmitTransferJob(*blitBuffer);
+	JobSystem::SubmitTransferJob(*blitBuffer);
 
 	//Restart command buffer 
 	blitBuffer->ResetBuffer();

@@ -7,7 +7,7 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, VkFormat frameBufferFo
 	images.reserve(1 + useDepth);
 	attachements.reserve(1 + useDepth);
 
-	const VkDevice logicalDevice = GraphicsSystem::GetLogicalDevice();
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	// Colour attachement creation //
 	
@@ -114,7 +114,7 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, VkFormat frameBufferFo
 
 FrameBuffer::~FrameBuffer()
 {
-	const VkDevice logicalDevice = GraphicsSystem::GetLogicalDevice();
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	//destroy image views
 	for (size_t i = 0; i < attachements.size(); i++)

@@ -116,7 +116,7 @@ void RenderPass::CreateRenderPass()
 	renderPassCI.dependencyCount = 0;
 	renderPassCI.pDependencies = NULL;
 
-	const VkDevice logicalDevice = GraphicsSystem::GetLogicalDevice();
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	result = vkCreateRenderPass(logicalDevice, &renderPassCI, NULL, &renderPass);
 	assert(result == VK_SUCCESS);
@@ -160,7 +160,7 @@ void RenderPass::CreateRenderPass()
 	VkCommandBufferAllocateInfo cmdCI;
 	cmdCI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	cmdCI.pNext = NULL;
-	cmdCI.commandPool = GraphicsSystem::GetSingleton()->GetCommandPool();
+	cmdCI.commandPool = GraphicsSystem::GetSingleton()->GetGraphicsCommandPool()->GetVKCommandPool();
 	cmdCI.level = VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 	
 	result = vkAllocateCommandBuffers(logicalDevice, &cmdCI, &renderBuffer);
@@ -232,7 +232,7 @@ void RenderPass::SubmitBuffer()
 
 void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat, bool hasDepthBuffer)
 {
-	const VkDevice logicalDevice = GraphicsSystem::GetLogicalDevice();
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	// Colour attachement creation //
 

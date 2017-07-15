@@ -9,7 +9,7 @@
 #include "GraphicsDefs.h"
 
 //Engine
-#include "GraphicsSystem.h"
+#include "Graphics.h"
 
 class FrameBuffer
 {

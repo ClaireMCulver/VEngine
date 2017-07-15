@@ -79,21 +79,30 @@
     <Filter Include="Source Files\Graphics\Objects\Geometry">
       <UniqueIdentifier>{749c12f4-b924-4f4d-8f6e-8b611bdd73c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Objects\RenderPass">
+      <UniqueIdentifier>{f19ee9e2-ab8c-4b36-9861-6997c5039df7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\RenderPass">
+      <UniqueIdentifier>{5b169181-8451-4836-9fd8-486d8d4aeb9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Images">
+      <UniqueIdentifier>{458ef351-a0f5-47f7-beea-886cda561bb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Images\FrameBuffer">
+      <UniqueIdentifier>{5c60b489-e248-414b-98b2-120541086c73}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Images">
+      <UniqueIdentifier>{8d707b88-8cf9-4231-bade-e6cea18c7005}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Images\FrameBuffer">
+      <UniqueIdentifier>{4d378957-d9c8-4d93-937a-c3d701fc0fbc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RenderableGeometry.cpp">
-      <Filter>Source Files\OLDGraphics</Filter>
-    </ClCompile>
-    <ClCompile Include="FrameBuffer.cpp">
-      <Filter>Source Files\OLDGraphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files\OLDGraphics</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderPass.cpp">
       <Filter>Source Files\OLDGraphics</Filter>
     </ClCompile>
     <ClCompile Include="GraphicsSystem.cpp">
@@ -135,21 +144,27 @@
     <ClCompile Include="GPUBuffer.cpp">
       <Filter>Source Files\Graphics\Objects\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Graphics\Objects\Shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPass.cpp">
+      <Filter>Source Files\Graphics\Objects\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files\Graphics\Objects\Images\FrameBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="DeferredRenderPass.cpp">
+      <Filter>Source Files\Graphics\Objects\RenderPass</Filter>
+    </ClCompile>
+    <ClCompile Include="JobSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GraphicsDefs.h">
       <Filter>Header Files\OLDGraphics</Filter>
     </ClInclude>
     <ClInclude Include="RenderableGeometry.h">
-      <Filter>Header Files\OLDGraphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files\OLDGraphics</Filter>
-    </ClInclude>
-    <ClInclude Include="FrameBuffer.h">
-      <Filter>Header Files\OLDGraphics</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPass.h">
       <Filter>Header Files\OLDGraphics</Filter>
     </ClInclude>
     <ClInclude Include="VEngineDefs.h">
@@ -196,6 +211,21 @@
     </ClInclude>
     <ClInclude Include="GPUBuffer.h">
       <Filter>Header Files\Graphics\Objects\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Graphics\Objects\Shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPass.h">
+      <Filter>Header Files\Graphics\Objects\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files\Graphics\Objects\Images\FrameBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="DeferredRenderPass.h">
+      <Filter>Header Files\Graphics\Objects\RenderPass</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

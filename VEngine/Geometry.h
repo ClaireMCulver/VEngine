@@ -43,9 +43,9 @@ private:
 	uint32_t numVertices;
 
 public: 
-	bool LoadMeshFromFile(char* filePath);
-	bool LoadMesh(std::vector<Triangle> &geometry);
-
-	bool Draw(VkCommandBuffer commandBuffer);
+	void LoadMeshFromFile(char* filePath);
+	void LoadMesh(std::vector<Triangle> &geometry);
+	
+	void Draw(VkCommandBuffer commandBuffer);
 };
 

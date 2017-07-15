@@ -6,12 +6,21 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan\vulkan.h>
 
+#include "Graphics.h"
 #include "CommandPool.h"
+
+enum CommandBufferType
+{
+	Graphics = 0,
+	Compute = 1,
+	Transfer = 2,
+	Sparse = 3
+};
 
 class CommandBuffer
 {
 public:
-	CommandBuffer(CommandPool &commandPool, VkCommandBufferLevel bufferLevel);
+	CommandBuffer(CommandBufferType bufferType, VkCommandBufferLevel bufferLevel);
 	~CommandBuffer();
 
 	VkCommandBuffer GetVKCommandBuffer() const { return vkCommandBuffer; }

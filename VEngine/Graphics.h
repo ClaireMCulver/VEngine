@@ -40,12 +40,6 @@ private:
 	CommandPool* sparseCmdPool;
 
 public:
-	void SubmitGraphicsJob(CommandBuffer graphicsJob);
-	void SubmitGraphicsJob(VkCommandBuffer graphicsJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0);
-	
-	void SubmitTransferJob(CommandBuffer transferJob);
-	void SubmitTransferJob(VkCommandBuffer transferJob, VkSemaphore* pWaitSemaphores = NULL, uint32_t waitSemaphoreCount = 0, VkSemaphore* pSignalSemaphores = NULL, uint32_t signalSemaphoreCount = 0);
-
 	static GraphicsSystem* GetSingleton()				{ return singleton; }
 	GraphicsInstance* GetInstance() const				{ return instance; }
 	GraphicsPhysicalDevice* GetPhysicalDevice() const	{ return physicalDevice; }

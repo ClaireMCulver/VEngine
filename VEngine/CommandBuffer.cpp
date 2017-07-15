@@ -2,15 +2,32 @@
 
 
 
-CommandBuffer::CommandBuffer(CommandPool &commandPool, VkCommandBufferLevel bufferLevel)
+CommandBuffer::CommandBuffer(CommandBufferType bufferType, VkCommandBufferLevel bufferLevel)
 {
-	pCommandPool = &commandPool;
+	switch (bufferType)
+	{
+	case Graphics:
+		pCommandPool = GraphicsSystem::GetSingleton()->GetGraphicsCommandPool();
+		break;
+	case Compute:
+		pCommandPool = GraphicsSystem::GetSingleton()->GetComputeCommandPool();
+		break;
+	case Transfer:
+		pCommandPool = GraphicsSystem::GetSingleton()->GetTransferCommandPool();
+		break;
+	case Sparse:
+		pCommandPool = GraphicsSystem::GetSingleton()->GetSparseCommandPool();
+		break;
+	default:
+		pCommandPool = GraphicsSystem::GetSingleton()->GetGraphicsCommandPool();
+		break;
+	}
 
 	// Allocation //
 	VkCommandBufferAllocateInfo allocationInfo;
 	allocationInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocationInfo.pNext = NULL;
-	allocationInfo.commandPool = commandPool.GetVKCommandPool();
+	allocationInfo.commandPool = pCommandPool->GetVKCommandPool();
 	allocationInfo.level = bufferLevel;
 	allocationInfo.commandBufferCount = 1;
 

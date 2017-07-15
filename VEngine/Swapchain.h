@@ -10,6 +10,7 @@
 #include "Graphics.h"
 #include "Win32Window.h"
 #include "GameDefs.h"
+#include "JobSystem.h"
 
 class SwapChain
 {
