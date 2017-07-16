@@ -157,13 +157,13 @@
       <Filter>Source Files\Graphics\Objects\RenderPass</Filter>
     </ClCompile>
     <ClCompile Include="JobSystem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Graphics\Dispatchable Handles</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderableObject.cpp">
+      <Filter>Source Files\Graphics\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GraphicsDefs.h">
-      <Filter>Header Files\OLDGraphics</Filter>
-    </ClInclude>
     <ClInclude Include="RenderableGeometry.h">
       <Filter>Header Files\OLDGraphics</Filter>
     </ClInclude>
@@ -224,8 +224,14 @@
     <ClInclude Include="DeferredRenderPass.h">
       <Filter>Header Files\Graphics\Objects\RenderPass</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsDefs.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
     <ClInclude Include="JobSystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderableObject.h">
+      <Filter>Header Files\Graphics\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

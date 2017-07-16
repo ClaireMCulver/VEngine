@@ -25,6 +25,7 @@ public:
 
 	VkShaderModule GetVKShaderModule() const { return vkShaderModule; }
 	VkShaderStageFlags GetVKShaderStage() const { return vkShaderType; }
+	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return resourceSetLayout; }
 
 private:
 	//Shader module

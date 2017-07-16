@@ -23,32 +23,27 @@ public:
 
 public:
 	//Adds a new shader stage to the material
-	void AddShader(Shader newShader);
-	
+	void AddShader(Shader &newShader);
+
 	//Finalizes the material pipeline on the GPU side.
-	void FinalizeMaterial(RenderPass renderPass);
+	void FinalizeMaterial(RenderPass &renderPass);
 
 
 	//Binds the pipeline
-	void BindPipeline(CommandBuffer commandBuffer);
+	void BindPipeline(CommandBuffer &commandBuffer);
 
-
+	//Returns the pipeline and pipeline layout handles
 	PipelineData GetPipelineData() const { return pipelineData; }
-private:
-
 
 private:
-	static PipelineData pipelineData;
-	std::vector<VkDescriptorSet> descriptors; //Describes the uniform data buffer to vulkan.
+	//Pipeline handles
+	PipelineData pipelineData;
 
 	//Vertex binding and per-vertex attribute info
 	VkVertexInputBindingDescription viBinding;//Binding of the vertices within the shaders
 	std::vector<VkVertexInputAttributeDescription> viAttribs;//Bindings for the attributes of the vertices.
 
+	//Pipeline information
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages; //Stages in the shader pipeline
 	std::vector<VkDescriptorSetLayout> layoutDescriptors; //uniform layout bindings for the shaders.
-
-	//std::vector<VkDescriptorSet> descriptors; //Describes the uniform data buffer to vulkan.
-	//VkPipeline pipeline; //Graphics Pipeline
-	//VkPipelineLayout pipelineLayout; //Layout of the pipeline
 };

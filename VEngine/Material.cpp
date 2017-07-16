@@ -34,10 +34,14 @@ Material::Material()
 
 Material::~Material()
 {
-	
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	vkDestroyPipelineLayout(logicalDevice, pipelineData.pipelineLayout, NULL);
+
+	vkDestroyPipeline(logicalDevice, pipelineData.pipeline, NULL);
 }
 
-void Material::AddShader(Shader newShader)
+void Material::AddShader(Shader &newShader)
 {
 	VkPipelineShaderStageCreateInfo shaderStage;
 	shaderStage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -49,11 +53,15 @@ void Material::AddShader(Shader newShader)
 	shaderStage.pSpecializationInfo = NULL;
 
 	shaderStages.push_back(shaderStage);
+
+	layoutDescriptors.push_back(newShader.GetVKDescriptorSetLayout());
 }
 
-void Material::FinalizeMaterial(RenderPass renderPass)
+void Material::FinalizeMaterial(RenderPass &renderPass)
 {
 	VkResult res;
+
+	// Graphics Pipeline Description //
 	VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE];
 	VkPipelineDynamicStateCreateInfo dynamicState = {};
 	memset(dynamicStateEnables, 0, sizeof dynamicStateEnables);
@@ -181,15 +189,27 @@ void Material::FinalizeMaterial(RenderPass renderPass)
 
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
-	//Currently an access violation
 	res = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipelineData.pipeline);
 	assert(res == VK_SUCCESS);
+
+
+	// Pipeline Layout Creation //
+	VkPipelineLayoutCreateInfo pipelineLayoutCI;
+	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutCI.pNext = NULL;
+	pipelineLayoutCI.flags = 0;
+	pipelineLayoutCI.setLayoutCount = layoutDescriptors.size();
+	pipelineLayoutCI.pSetLayouts = layoutDescriptors.data();
+	pipelineLayoutCI.pushConstantRangeCount = 0;
+	pipelineLayoutCI.pPushConstantRanges = NULL;
+	
+	res = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineData.pipelineLayout);
 }
 
-void Material::BindPipeline(CommandBuffer commandBuffer)
+void Material::BindPipeline(CommandBuffer &commandBuffer)
 {
 	const VkCommandBuffer buffer = commandBuffer.GetVKCommandBuffer();
 	vkCmdBindPipeline(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
 
-	vkCmdBindDescriptorSets(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipelineLayout, 0, descriptors.size(), descriptors.data(), 0, NULL);
+	//vkCmdBindDescriptorSets(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipelineLayout, 0, descriptors.size(), descriptors.data(), 0, NULL);
 }
