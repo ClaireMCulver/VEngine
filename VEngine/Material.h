@@ -34,6 +34,7 @@ public:
 
 	//Returns the pipeline and pipeline layout handles
 	PipelineData GetPipelineData() const { return pipelineData; }
+	std::vector<VkDescriptorSetLayout> GetDescriptorLayout() const { return layoutDescriptors; }
 
 private:
 	//Pipeline handles

@@ -6,13 +6,22 @@
 #endif
 #include "vulkan\vulkan.h"
 
+#include "Geometry.h"
+#include "Material.h"
+#include "CommandBuffer.h"
+
 class RenderableObject
 {
 public:
-	RenderableObject();
+	RenderableObject(Geometry *mesh, Material *material);
 	~RenderableObject();
 
-private:
+	void Draw(CommandBuffer &commandBuffer);
 
+private:
+	Geometry* geometry;
+	Material* material;
+
+	std::vector<VkDescriptorSet> uniforms;
 };
 

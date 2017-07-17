@@ -21,11 +21,15 @@ GraphicsSystem::GraphicsSystem()
 	computeCmdPool  = new CommandPool(*logicalDevice, indices.computeQueueIndex);
 	transferCmdPool = new CommandPool(*logicalDevice, indices.transferQueueIndex);
 	sparseCmdPool   = new CommandPool(*logicalDevice, indices.sparseQueueIndex);
+
+	descriptorPool = new DescriptorPool();
 }
 
 
 GraphicsSystem::~GraphicsSystem()
 {
+	delete descriptorPool;
+
 	delete graphicsCmdPool;
 	delete computeCmdPool;
 	delete transferCmdPool;
