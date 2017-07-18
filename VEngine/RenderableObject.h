@@ -1,5 +1,8 @@
 #pragma once
 
+//GLM
+#include "glm\mat4x4.hpp"
+
 //vulkan definitions
 #ifndef VK_USE_PLATFORM_WIN32_KHR
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -9,6 +12,7 @@
 #include "Geometry.h"
 #include "Material.h"
 #include "CommandBuffer.h"
+#include "GPUBuffer.h"
 
 class RenderableObject
 {
@@ -18,10 +22,20 @@ public:
 
 	void Draw(CommandBuffer &commandBuffer);
 
+	// Uniform updates //
+
+	//Updates the uniform in uniformSet at binding
+	void SetUniform_Mat4x4(glm::mat4x4 &data, int uniformSet, int binding);
+
 private:
 	Geometry* geometry;
 	Material* material;
 
+	glm::mat4x4 MVPMatrix;
+
 	std::vector<VkDescriptorSet> uniforms;
+
+	GPUBuffer* uniformBuffer;
+	VkWriteDescriptorSet uniformWrite;
 };
 

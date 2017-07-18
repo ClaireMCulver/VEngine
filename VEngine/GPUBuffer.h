@@ -14,12 +14,17 @@
 class GPUBuffer
 {
 public:
-	GPUBuffer(VkBufferUsageFlags bufferUsage, void* data, uint64_t memorySize);
+	GPUBuffer(VkBufferUsageFlags bufferUsage, uint64_t bufferSize);
+	GPUBuffer(VkBufferUsageFlags bufferUsage, void* data, uint64_t bufferSize);
 	~GPUBuffer();
+
+	//Copies data into the buffer
+	void CopyMemoryIntoBuffer(void* data, uint64_t memorySize);
 
 private:
 	VkBuffer vkBuffer;
 	VkDeviceMemory vkMemory;
+	uint64_t bufferSize;
 
 public:
 	//public functions
