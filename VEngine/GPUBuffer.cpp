@@ -66,9 +66,9 @@ GPUBuffer::GPUBuffer(VkBufferUsageFlags bufferUsage, void* data, uint64_t memory
 	bufferMemoryAI.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	bufferMemoryAI.pNext = NULL;
 	bufferMemoryAI.allocationSize = bufferCI.size;
-	bufferMemoryAI.memoryTypeIndex = FindMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memRequirements.memoryTypeBits);
+	bufferMemoryAI.memoryTypeIndex = FindMemoryType(memRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-	assert(bufferMemoryAI.memoryTypeIndex > -1);
+	//assert(bufferMemoryAI.memoryTypeIndex > -1);
 	result = vkAllocateMemory(logicalDevice, &bufferMemoryAI, NULL, &vkMemory);
 	assert(result == VK_SUCCESS);
 
@@ -107,10 +107,7 @@ uint32_t GPUBuffer::FindMemoryType(uint32_t typeBits, VkFlags requirements_mask)
 {
 	const VkPhysicalDeviceMemoryProperties memory_properties = GraphicsSystem::GetSingleton()->GetPhysicalDevice()->GetPhysicalDeviceMemoryPropertiess();
 	
-	uint32_t typeIndex = -1;
-
-
-
+	uint32_t typeIndex = 0;
 
 	// Search memtypes to find first index with those properties
 	for (uint32_t i = 0; i < memory_properties.memoryTypeCount; i++) {
@@ -118,11 +115,11 @@ uint32_t GPUBuffer::FindMemoryType(uint32_t typeBits, VkFlags requirements_mask)
 			// Type is available, does it match user properties?
 			if ((memory_properties.memoryTypes[i].propertyFlags & requirements_mask) == requirements_mask) {
 				typeIndex = i;
-				return true;
+				return typeIndex;
 			}
 		}
 		typeBits >>= 1;
 	}
 	// No memory types matched, return failure
-	return typeBits;
+	return typeIndex;
 }

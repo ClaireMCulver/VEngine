@@ -1,5 +1,7 @@
 #include "DescriptorPool.h"
 
+DescriptorPool* DescriptorPool::singleton = NULL;
+
 DescriptorPool::DescriptorPool()
 {
 	//TODO: figure out a way to manage the number of needed descriptors. I don't like doing this hard coded.
@@ -19,6 +21,9 @@ DescriptorPool::DescriptorPool()
 	descPoolCI.pPoolSizes = typeCount.data();
 
 	vkCreateDescriptorPool(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), &descPoolCI, NULL, &vkDescriptorPool);
+
+	assert(singleton == NULL);
+	singleton = this;
 }
 
 

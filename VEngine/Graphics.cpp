@@ -22,14 +22,13 @@ GraphicsSystem::GraphicsSystem()
 	transferCmdPool = new CommandPool(*logicalDevice, indices.transferQueueIndex);
 	sparseCmdPool   = new CommandPool(*logicalDevice, indices.sparseQueueIndex);
 
-	descriptorPool = new DescriptorPool();
+	assert(singleton == NULL);
+	singleton = this;
 }
 
 
 GraphicsSystem::~GraphicsSystem()
 {
-	delete descriptorPool;
-
 	delete graphicsCmdPool;
 	delete computeCmdPool;
 	delete transferCmdPool;

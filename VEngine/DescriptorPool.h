@@ -18,9 +18,13 @@ public:
 	~DescriptorPool();
 
 private:
+	static DescriptorPool* singleton;
+
 	VkDescriptorPool vkDescriptorPool;
 
 public:
+	static DescriptorPool* GetSingleton() { return singleton; }
+	
 	VkDescriptorPool GetVKDescriptorPool() const { return vkDescriptorPool; }
 };
 

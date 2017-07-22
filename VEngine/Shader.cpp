@@ -6,7 +6,12 @@ Shader::Shader(const char* filePath, VkShaderStageFlagBits shaderType)
 {
 	vkShaderType = shaderType;
 
+	//This is here for the sake of 'I don't load shaders in text files currently.'
+	std::string fileText(filePath);
+
 	LoadShaderFromFile(filePath, shaderType);
+
+	CreateResourceSetLayout(&fileText, shaderType);
 }
 
 
@@ -56,23 +61,26 @@ bool Shader::LoadShaderFromFile(const char* filePath, VkShaderStageFlagBits shad
 
 bool Shader::CreateResourceSetLayout(const std::string* fileData, VkShaderStageFlagBits shaderType)
 {
-	size_t currentPosition = 0;
 	std::vector<VkDescriptorSetLayoutBinding> resourceSetLayoutBindings;
 
-	while (fileData->find("uniform", currentPosition+1) != std::string::npos)
+	size_t currentPosition = 0;
+	currentPosition = fileData->find("uniform", currentPosition + 1);
+
+	while (currentPosition != std::string::npos)
 	{
 		//Determine type of uniform.
-
 		resourceSetLayoutBindings.push_back
 		(
 			{											//VkDescriptorSetLayoutBinding
 				resourceSetLayoutBindings.size(),		//binding			//Binding of the resource in the shader
 				VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,		//descriptorType	//Type of resource in the shader
 				1,										//descriptorCount	//Make one descriptor. Multiple descriptors would be for an array of resources in the shader.
-				vkShaderType,				//stageFlags		//Which stage of the pipeline CAN access the uniform.
+				vkShaderType,							//stageFlags		//Which stage of the pipeline CAN access the uniform.
 				NULL									//pImmutableSamplers
 			}
 		);
+
+		currentPosition = fileData->find("uniform", currentPosition + 1);
 	}
 
 	VkDescriptorSetLayoutCreateInfo resourceSetLayoutCI;

@@ -16,7 +16,7 @@ RenderableObject::RenderableObject(Geometry *mesh, Material *mat)
 	VkDescriptorSetAllocateInfo descriptorSetCI;
 	descriptorSetCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	descriptorSetCI.pNext = NULL;
-	descriptorSetCI.descriptorPool = GraphicsSystem::GetSingleton()->GetDescriptorPool()->GetVKDescriptorPool();
+	descriptorSetCI.descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
 	descriptorSetCI.descriptorSetCount = uniformLayout->size();
 	descriptorSetCI.pSetLayouts = uniformLayout->data();
 
@@ -30,7 +30,7 @@ RenderableObject::RenderableObject(Geometry *mesh, Material *mat)
 RenderableObject::~RenderableObject()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-	const VkDescriptorPool descriptorPool = GraphicsSystem::GetSingleton()->GetDescriptorPool()->GetVKDescriptorPool();
+	const VkDescriptorPool descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
 	
 	vkFreeDescriptorSets(logicalDevice, descriptorPool, uniforms.size(), uniforms.data());
 }

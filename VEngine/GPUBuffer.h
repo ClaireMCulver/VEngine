@@ -32,7 +32,7 @@ public:
 	VkDeviceMemory GetBufferMemory() const	{ return vkMemory; }
 
 private:
-
 	uint32_t FindMemoryType(uint32_t typeBits, VkFlags requirements_mask);
+
 };
 

@@ -12,7 +12,6 @@
 
 #include "CommandBuffer.h"
 #include "CommandPool.h"
-#include "DescriptorPool.h"
 
 class GraphicsSystem
 {
@@ -40,9 +39,6 @@ private:
 	CommandPool* transferCmdPool;
 	CommandPool* sparseCmdPool;
 
-	//DescriptorPool
-	DescriptorPool* descriptorPool;
-
 public:
 	static GraphicsSystem* GetSingleton()				{ return singleton; }
 	GraphicsInstance* GetInstance() const				{ return instance; }
@@ -60,7 +56,5 @@ public:
 	CommandPool* GetComputeCommandPool() const { return computeCmdPool;  }
 	CommandPool* GetTransferCommandPool() const { return transferCmdPool; }
 	CommandPool* GetSparseCommandPool() const { return sparseCmdPool;   }
-
-	DescriptorPool* GetDescriptorPool() const { return descriptorPool; }
 };
 

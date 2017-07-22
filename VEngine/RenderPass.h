@@ -11,6 +11,7 @@
 //Engine
 #include "Graphics.h"
 #include "Geometry.h"
+#include "Image.h"
 #include "FrameBuffer.h"
 
 
@@ -48,8 +49,8 @@ private:
 
 	std::vector<VkSubpassDescription> subpassDescriptions; //descriptions of the subpasses themselves.
 	std::vector<SubpassReferences> subpassReferences;//references to descriptions for each subpass.
-	std::vector<VkImage> images; //images within the vulkan instance
-	std::vector<VkImageView> imageViews; //views of the images for the frame buffer
+	std::vector<Image*> images;
+	std::vector<VkImageView> vkImageViews; //views of the images for the frame buffer
 	std::vector<VkAttachmentDescription> attachmentDescriptions; //descriptions of the attachement for the renderpass itself
 	VkFramebuffer frameBuffer;
 

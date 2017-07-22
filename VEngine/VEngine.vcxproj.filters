@@ -162,6 +162,9 @@
     <ClCompile Include="RenderableObject.cpp">
       <Filter>Source Files\Graphics\Objects</Filter>
     </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Source Files\Graphics\Objects\Images</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RenderableGeometry.h">
@@ -232,6 +235,9 @@
     </ClInclude>
     <ClInclude Include="RenderableObject.h">
       <Filter>Header Files\Graphics\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Header Files\Graphics\Objects\Images</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

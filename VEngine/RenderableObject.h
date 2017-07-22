@@ -13,6 +13,7 @@
 #include "Material.h"
 #include "CommandBuffer.h"
 #include "GPUBuffer.h"
+#include "DescriptorPool.h"
 
 class RenderableObject
 {
