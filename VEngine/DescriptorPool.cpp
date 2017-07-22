@@ -15,7 +15,7 @@ DescriptorPool::DescriptorPool()
 	VkDescriptorPoolCreateInfo descPoolCI;
 	descPoolCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	descPoolCI.pNext = NULL;
-	descPoolCI.flags = 0; //I do not plan to return any descriptors to the pool at any time, so flags == 0;
+	descPoolCI.flags = VkDescriptorPoolCreateFlagBits::VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 	descPoolCI.maxSets = 12;
 	descPoolCI.poolSizeCount = typeCount.size();
 	descPoolCI.pPoolSizes = typeCount.data();

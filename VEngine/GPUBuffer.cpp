@@ -32,7 +32,6 @@ GPUBuffer::GPUBuffer(VkBufferUsageFlags bufferUsage, uint64_t memorySize)
 	bufferMemoryAI.allocationSize = bufferCI.size;
 	bufferMemoryAI.memoryTypeIndex = FindMemoryType(VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, memRequirements.memoryTypeBits);
 
-	assert(bufferMemoryAI.memoryTypeIndex > -1);
 	result = vkAllocateMemory(logicalDevice, &bufferMemoryAI, NULL, &vkMemory);
 	assert(result == VK_SUCCESS);
 }

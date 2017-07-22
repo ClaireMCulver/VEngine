@@ -36,7 +36,7 @@ private:
 
 	std::vector<VkDescriptorSet> uniforms;
 
-	GPUBuffer* uniformBuffer;
+	GPUBuffer* uniformBuffer = NULL;
 	VkWriteDescriptorSet uniformWrite;
 };
 

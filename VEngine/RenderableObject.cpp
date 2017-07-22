@@ -8,17 +8,17 @@ RenderableObject::RenderableObject(Geometry *mesh, Material *mat)
 
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
-	std::vector<VkDescriptorSetLayout>* uniformLayout = &material->GetDescriptorLayout();
+	std::vector<VkDescriptorSetLayout> uniformLayout = material->GetDescriptorLayout();
 	
 	// Uniform allocations //
-	uniforms.resize(uniformLayout->size());
+	uniforms.resize(uniformLayout.size());
 	
 	VkDescriptorSetAllocateInfo descriptorSetCI;
 	descriptorSetCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	descriptorSetCI.pNext = NULL;
 	descriptorSetCI.descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
-	descriptorSetCI.descriptorSetCount = uniformLayout->size();
-	descriptorSetCI.pSetLayouts = uniformLayout->data();
+	descriptorSetCI.descriptorSetCount = uniformLayout.size();
+	descriptorSetCI.pSetLayouts = uniformLayout.data();
 
 	vkAllocateDescriptorSets(logicalDevice, &descriptorSetCI, uniforms.data());
 
@@ -31,6 +31,8 @@ RenderableObject::~RenderableObject()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 	const VkDescriptorPool descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
+
+	delete uniformBuffer;
 	
 	vkFreeDescriptorSets(logicalDevice, descriptorPool, uniforms.size(), uniforms.data());
 }

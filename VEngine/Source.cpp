@@ -35,15 +35,12 @@ void main()
 	Shader standardVertShader(vertShaderText.data(), VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
 	Shader standardFragShader(fragShaderText.data(), VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
 	
-	//Reinclude material.h in the project for compilation.
-	//Material standardMaterial;
-	//standardMaterial.AddShader(standardVertShader);
-	//standardMaterial.AddShader(standardFragShader);
-	//standardMaterial.FinalizeMaterial(mainRenderPass);
+	Material standardMaterial;
+	standardMaterial.AddShader(standardVertShader);
+	standardMaterial.AddShader(standardFragShader);
+	standardMaterial.FinalizeMaterial(mainRenderPass);
 	
-	
-	//
-	//RenderableObject cube(&cubeMesh, &standardMaterial);
+	RenderableObject cube(&cubeMesh, &standardMaterial);
 
 
 	return;

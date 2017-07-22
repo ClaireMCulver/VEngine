@@ -13,8 +13,8 @@ Material::Material()
  	viAttribs.push_back
  	(
  		{									//VkVertexInputBindingDescription
- 			0,								//binding	//Which binding the per-vertex data comes from.
  			0,								//location	//Location value in vertex shader. Because we need that.
+ 			0,								//binding	//Which binding the per-vertex data comes from.
  			VK_FORMAT_R32G32B32A32_SFLOAT,	//format	//Format of the data. float3
  			0								//offset	//Number of bytes from the start of the data to begin.
  		}
@@ -24,8 +24,8 @@ Material::Material()
  	viAttribs.push_back
  	(
  		{								//VkVertexInputBindingDescription
- 			0,							//binding	
  			1,							//location	
+ 			0,							//binding	
  			VK_FORMAT_R32G32_SFLOAT,	//format	
  			(sizeof(float) * 4)			//offset	
  		}
@@ -48,7 +48,7 @@ void Material::AddShader(Shader &newShader)
 	shaderStage.pNext = NULL;
 	shaderStage.flags = 0;
 	shaderStage.stage = (VkShaderStageFlagBits)newShader.GetVKShaderStage();
-	shaderStage.module = newShader.GetVKShaderStage;
+	shaderStage.module = newShader.GetVKShaderModule();
 	shaderStage.pName = "main";
 	shaderStage.pSpecializationInfo = NULL;
 
@@ -60,6 +60,20 @@ void Material::AddShader(Shader &newShader)
 void Material::FinalizeMaterial(RenderPass &renderPass)
 {
 	VkResult res;
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	// Pipeline Layout //
+	VkPipelineLayoutCreateInfo pipelineLayoutCI;
+	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutCI.pNext = NULL;
+	pipelineLayoutCI.flags = 0;
+	pipelineLayoutCI.setLayoutCount = layoutDescriptors.size();
+	pipelineLayoutCI.pSetLayouts = layoutDescriptors.data();
+	pipelineLayoutCI.pushConstantRangeCount = 0;
+	pipelineLayoutCI.pPushConstantRanges = NULL;
+
+	res = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineData.pipelineLayout);
+	assert(res == VK_SUCCESS);
 
 	// Graphics Pipeline Description //
 	VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE];
@@ -187,23 +201,9 @@ void Material::FinalizeMaterial(RenderPass &renderPass)
 	pipelineInfo.renderPass = renderPass.GetVKRenderPass();
 	pipelineInfo.subpass = 0;
 
-	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	res = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipelineData.pipeline);
 	assert(res == VK_SUCCESS);
-
-
-	// Pipeline Layout Creation //
-	VkPipelineLayoutCreateInfo pipelineLayoutCI;
-	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutCI.pNext = NULL;
-	pipelineLayoutCI.flags = 0;
-	pipelineLayoutCI.setLayoutCount = layoutDescriptors.size();
-	pipelineLayoutCI.pSetLayouts = layoutDescriptors.data();
-	pipelineLayoutCI.pushConstantRangeCount = 0;
-	pipelineLayoutCI.pPushConstantRanges = NULL;
-	
-	res = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineData.pipelineLayout);
 }
 
 void Material::BindPipeline(CommandBuffer &commandBuffer)
