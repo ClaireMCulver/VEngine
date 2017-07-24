@@ -258,7 +258,7 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 
 	blitBuffer->EndRecording();
 
-	JobSystem::SubmitTransferJob(*blitBuffer);
+	blitBuffer->SubmitBuffer();
 
 	//Restart command buffer 
 	blitBuffer->ResetBuffer();

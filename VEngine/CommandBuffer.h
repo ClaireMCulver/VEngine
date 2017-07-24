@@ -25,6 +25,7 @@ public:
 
 	VkCommandBuffer GetVKCommandBuffer() const { return vkCommandBuffer; }
 	VkSubmitInfo GetSubmitInfo() const { return submitInfo; }
+	VkQueue GetSubmitQueue() const { return submitQueue; }
 
 	//Begin recording of the buffer
 	void BeginRecording();
@@ -32,7 +33,10 @@ public:
 	//End the recording of the buffer
 	void EndRecording();
 
-	//End the recording of the buffer
+	//Submits the buffer to the job system for work.
+	void SubmitBuffer();
+
+	//Reset the buffer to begin recording again
 	void ResetBuffer();
 
 	//TODO: How the fuck do I want to do this?
@@ -40,15 +44,22 @@ public:
 	//TODO: How the fuck do I want to do this?
 	void AddSignalSemaphore(VkSemaphore semaphore);
 
+	void SetFence(VkFence* fence) { vkFence = fence; }
+
+	void SetDestinationStageMask(VkPipelineStageFlags stageMask);
+
 
 private:
 	VkCommandBuffer vkCommandBuffer;
 	VkSubmitInfo submitInfo;
+	VkQueue submitQueue;
 	VkCommandBufferBeginInfo beginInfo;
 
 	CommandPool* pCommandPool;
+	VkFence* vkFence = NULL;
 
 	std::vector<VkSemaphore> waitSemaphores;
 	std::vector<VkSemaphore> signalSemaphores;
+	VkPipelineStageFlags dstStageMask;
 };
 

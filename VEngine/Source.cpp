@@ -38,10 +38,33 @@ void main()
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
 	standardMaterial.AddShader(standardFragShader);
-	standardMaterial.FinalizeMaterial(mainRenderPass);
+	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass());
 	
 	RenderableObject cube(&cubeMesh, &standardMaterial);
 
+	glm::mat4x4 Projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
+	glm::mat4x4 View = glm::lookAt(glm::vec3(-5, 3, -10),  // Camera is at (-5,3,-10), in World Space
+		glm::vec3(0, 0, 0),     // and looks at the origin
+		glm::vec3(0, -1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
+	);
+	glm::mat4x4 Model = glm::mat4(1.0f);
 
+	// Vulkan clip space has inverted Y and half Z.
+	// clang-format off
+	glm::mat4x4 Clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.5f, 0.0f,
+		0.0f, 0.0f, 0.5f, 1.0f);
+	// clang-format on
+	glm::mat4x4 MVP = Clip * Projection * View * Model;
+	
+	cube.SetUniform_Mat4x4(MVP, 0, 0);
+
+	mainRenderPass.RegisterObject(cube);
+	mainRenderPass.RecordBuffer();
+	mainRenderPass.SubmitBuffer();
+
+
+	graphicsSystem.WaitForDeviceIdle();
 	return;
 }

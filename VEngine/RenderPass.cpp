@@ -17,8 +17,6 @@ RenderPass::~RenderPass()
 	
 	vkDestroyRenderPass(logicalDevice, renderPass, NULL);
 
-	vkFreeCommandBuffers(logicalDevice, GraphicsSystem::GetSingleton()->GetGraphicsCommandPool()->GetVKCommandPool(), 1, &renderBuffer);
-
 	for (size_t i = 0, count = images.size(); i < count; i++)
 	{
 		delete images[i];
@@ -185,15 +183,9 @@ void RenderPass::CreateRenderPass()
 
 	
 	//Allocate command buffer
-	VkCommandBufferAllocateInfo cmdCI;
-	cmdCI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	cmdCI.pNext = NULL;
-	cmdCI.commandPool = GraphicsSystem::GetSingleton()->GetGraphicsCommandPool()->GetVKCommandPool();
-	cmdCI.level = VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	cmdCI.commandBufferCount = 1;
-	
-	result = vkAllocateCommandBuffers(logicalDevice, &cmdCI, &renderBuffer);
-	assert(result == VK_SUCCESS);
+	renderBuffer = new CommandBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	renderBuffer->AddSignalSemaphore(renderFinishedSemaphore);
+	renderBuffer->SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
 }
 
 void RenderPass::BindRenderPass(VkCommandBuffer &cmdBuffer)
@@ -208,14 +200,9 @@ void RenderPass::UnbindRenderPass(VkCommandBuffer &cmdBuffer)
 
 void RenderPass::RecordBuffer()
 {
-	VkCommandBufferBeginInfo cmdBI;
-	cmdBI.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	cmdBI.pNext = NULL;
-	cmdBI.flags = 0;
-	cmdBI.pInheritanceInfo = NULL;
-
 	//begin recording buffer;
-	vkBeginCommandBuffer(renderBuffer, &cmdBI);
+	renderBuffer->BeginRecording();
+	VkCommandBuffer vkRenderBuffer = renderBuffer->GetVKCommandBuffer();
 
 	//bind viewport and scissor
 	viewport.height = (float)renderArea.extent.height;
@@ -225,38 +212,29 @@ void RenderPass::RecordBuffer()
 	viewport.x = 0;
 	viewport.y = 0;
 
-	vkCmdSetViewport(renderBuffer, 0, 1, &viewport);
-	vkCmdSetScissor(renderBuffer, 0, 1, &renderArea);
+	vkCmdSetViewport(vkRenderBuffer, 0, 1, &viewport);
+	vkCmdSetScissor(vkRenderBuffer, 0, 1, &renderArea);
 
 	//Render pass
-	vkCmdBeginRenderPass(renderBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
+	vkCmdBeginRenderPass(vkRenderBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
 	// Render pass contents //
 		for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
 		{
-			registeredMeshes[i]->Draw(renderBuffer);
+			registeredMeshes[i]->Draw(*renderBuffer);
 		}
 
 	//end render pass
-	vkCmdEndRenderPass(renderBuffer);
+	vkCmdEndRenderPass(vkRenderBuffer);
 
 	//finish recording buffer
-	vkEndCommandBuffer(renderBuffer);
+	renderBuffer->EndRecording();
 
-	bufferSubmitInfo.pNext = NULL;
-	bufferSubmitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-	bufferSubmitInfo.waitSemaphoreCount = 0;
-	bufferSubmitInfo.pWaitSemaphores = NULL;
-	bufferSubmitInfo.pWaitDstStageMask = &pipelineStage;
-	bufferSubmitInfo.commandBufferCount = 1;
-	bufferSubmitInfo.pCommandBuffers = &renderBuffer;
-	bufferSubmitInfo.signalSemaphoreCount = 1;
-	bufferSubmitInfo.pSignalSemaphores = &renderFinishedSemaphore;
 }
 
 void RenderPass::SubmitBuffer()
 {
-	vkQueueSubmit(GraphicsSystem::GetSingleton()->GetGraphicsQueue(), 1, &bufferSubmitInfo, NULL);
+	renderBuffer->SubmitBuffer();
 }
 
 void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat, bool hasDepthBuffer)
@@ -264,10 +242,16 @@ void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeig
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	images.push_back(new Image(pixelWidth, pixelHeight, imageFormat, VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT));
+	images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
 	if (hasDepthBuffer)
 	{
 		images.push_back(new Image(pixelWidth, pixelHeight, VkFormat::VK_FORMAT_D16_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT));
+		images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 	}
 }
 
+void RenderPass::RegisterObject(RenderableObject &object)
+{
+	registeredMeshes.push_back(&object);
+}

@@ -57,7 +57,7 @@ void Material::AddShader(Shader &newShader)
 	layoutDescriptors.push_back(newShader.GetVKDescriptorSetLayout());
 }
 
-void Material::FinalizeMaterial(RenderPass &renderPass)
+void Material::FinalizeMaterial(VkRenderPass renderPass)
 {
 	VkResult res;
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
@@ -198,7 +198,7 @@ void Material::FinalizeMaterial(RenderPass &renderPass)
 	pipelineInfo.pDepthStencilState = &ds;
 	pipelineInfo.pStages = shaderStages.data();
 	pipelineInfo.stageCount = shaderStages.size();
-	pipelineInfo.renderPass = renderPass.GetVKRenderPass();
+	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 
 

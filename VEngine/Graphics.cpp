@@ -38,3 +38,8 @@ GraphicsSystem::~GraphicsSystem()
 	delete physicalDevice;
 	delete instance;
 }
+
+void GraphicsSystem::WaitForDeviceIdle()
+{
+	vkDeviceWaitIdle(logicalDevice->GetVKLogicalDevice());
+}

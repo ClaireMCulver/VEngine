@@ -9,6 +9,7 @@
 #include "vulkan\vulkan.h"
 
 #include "Graphics.h"
+#include "CommandBuffer.h"
 
 class Image
 {
@@ -16,16 +17,22 @@ public:
 	Image(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageUsageFlags usage, VkImageAspectFlags imageAspect);
 	~Image();
 
+	void ChangeImageLayout(VkImageLayout newLayout);
+
 	VkImage GetImage() const { return vkImage; }
 	VkImageView GetImageView() const { return vkImageView; }
 	VkClearValue GetClearValue() const { return vkClearColour; }
 
 private:
+	//Vulkan Handles
 	VkImage vkImage;
 	VkImageView vkImageView;
 	VkDeviceMemory vkDeviceMemory;
 	VkClearValue vkClearColour;
 
+	//Image properties
+	VkImageLayout vkImageLayout;
+	VkImageAspectFlags vkImageAspect;
 private:
 	uint32_t FindMemoryType(uint32_t typeBits, VkFlags requirements_mask);
 };

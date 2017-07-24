@@ -7,7 +7,6 @@
 
 #include "Graphics.h"
 #include "Shader.h"
-#include "RenderPass.h"
 
 struct PipelineData
 {
@@ -26,7 +25,7 @@ public:
 	void AddShader(Shader &newShader);
 
 	//Finalizes the material pipeline on the GPU side.
-	void FinalizeMaterial(RenderPass &renderPass);
+	void FinalizeMaterial(VkRenderPass renderPass);
 
 
 	//Binds the pipeline

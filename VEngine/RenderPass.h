@@ -10,10 +10,11 @@
 
 //Engine
 #include "Graphics.h"
-#include "Geometry.h"
 #include "Image.h"
 #include "FrameBuffer.h"
 
+#include "CommandBuffer.h"
+#include "RenderableObject.h"
 
 struct SubpassReferences
 {
@@ -40,12 +41,14 @@ public:
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
 
+	void RegisterObject(RenderableObject &object);
+
 private:
 	VkRenderPass renderPass;
 	VkRenderPassBeginInfo renderPassBeginInfo;
 
 	VkSemaphore renderFinishedSemaphore;
-	VkCommandBuffer renderBuffer;
+	CommandBuffer* renderBuffer;
 
 	std::vector<VkSubpassDescription> subpassDescriptions; //descriptions of the subpasses themselves.
 	std::vector<SubpassReferences> subpassReferences;//references to descriptions for each subpass.
@@ -58,10 +61,7 @@ private:
 	VkRect2D renderArea;
 	std::vector<VkClearValue> clearValues;
 
-	std::vector<Geometry*> registeredMeshes;
-
-	VkSubmitInfo bufferSubmitInfo;
-	VkPipelineStageFlags pipelineStage = VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	std::vector<RenderableObject*> registeredMeshes;
 
 	VkPresentInfoKHR bufferPresentInfo;
 

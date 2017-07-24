@@ -56,5 +56,7 @@ public:
 	CommandPool* GetComputeCommandPool() const { return computeCmdPool;  }
 	CommandPool* GetTransferCommandPool() const { return transferCmdPool; }
 	CommandPool* GetSparseCommandPool() const { return sparseCmdPool;   }
+
+	void WaitForDeviceIdle();
 };
 

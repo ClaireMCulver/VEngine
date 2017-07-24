@@ -75,6 +75,8 @@ void RenderableObject::SetUniform_Mat4x4(glm::mat4x4 &data, int uniformSet, int 
 	uniformWrite.pImageInfo = NULL;
 	uniformWrite.pBufferInfo = &uniformBufferInfo;
 	uniformWrite.pTexelBufferView = NULL;
+
+	vkBindBufferMemory(logicalDevice, uniformBuffer->GetVKBuffer(), uniformBuffer->GetBufferMemory(), 0);
 	
 	vkUpdateDescriptorSets(logicalDevice, 1, &uniformWrite, 0, NULL);
 }
