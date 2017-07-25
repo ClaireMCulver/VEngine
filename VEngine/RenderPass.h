@@ -38,16 +38,20 @@ public:
 
 	void RecordBuffer();
 	void SubmitBuffer();
+	void ResetBuffer();
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
 
 	void RegisterObject(RenderableObject &object);
 
+	//TODO: figure out how I want to handle this.
+	Image* GetRenderedImage();
+
 private:
 	VkRenderPass renderPass;
 	VkRenderPassBeginInfo renderPassBeginInfo;
 
-	VkSemaphore renderFinishedSemaphore;
+	VkFence renderFinishedFence;
 	CommandBuffer* renderBuffer;
 
 	std::vector<VkSubpassDescription> subpassDescriptions; //descriptions of the subpasses themselves.

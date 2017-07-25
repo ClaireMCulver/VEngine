@@ -75,7 +75,7 @@ void CommandBuffer::EndRecording()
 
 void CommandBuffer::SubmitBuffer()
 {
-	vkQueueSubmit(submitQueue, 1, &submitInfo, NULL);
+	vkQueueSubmit(submitQueue, 1, &submitInfo, vkFence == NULL ? NULL : *vkFence);
 }
 
 void CommandBuffer::ResetBuffer()

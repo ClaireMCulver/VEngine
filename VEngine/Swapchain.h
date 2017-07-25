@@ -10,6 +10,7 @@
 #include "Graphics.h"
 #include "Win32Window.h"
 #include "GameDefs.h"
+#include "Image.h"
 
 class SwapChain
 {
@@ -33,6 +34,9 @@ private:
 	VkSemaphore imageAcquireSignal;
 	VkSemaphore imageTransferedSignal;
 
+	//TODO: Remove this and figure out why the fuck the above semaphore isn't working when presenting. Because it fucking isn't.
+	VkFence imageFinishedFence;
+
 	//Windows surface
 	VkSurfaceKHR vkSurface;
 
@@ -46,12 +50,14 @@ private:
 
 public:
 	//Transfers the image passed to the swapchain as part of a command buffer.
-	void BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkImageLayout srcImageLayout);
+	void BlitToSwapChain(Image *srcImage);
 
 	//Present the next image in the swapchain
 	void PresentNextImage();
 
 private:
 	void InitializeSurface(GraphicsInstance* instance);
+
+	void SetSwapchainImageLayouts(VkDevice logicalDevice);
 
 };

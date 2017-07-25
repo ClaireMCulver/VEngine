@@ -2,6 +2,8 @@
 
 #include <assert.h>
 
+#include "glm\vec2.hpp"
+
 //vulkan definitions
 #ifndef VK_USE_PLATFORM_WIN32_KHR
 #define VK_USE_PLATFORM_WIN32_KHR
@@ -10,6 +12,7 @@
 
 #include "Graphics.h"
 #include "CommandBuffer.h"
+
 
 class Image
 {
@@ -22,6 +25,8 @@ public:
 	VkImage GetImage() const { return vkImage; }
 	VkImageView GetImageView() const { return vkImageView; }
 	VkClearValue GetClearValue() const { return vkClearColour; }
+	VkImageLayout GetImageLayout() const { return vkImageLayout; }
+	glm::vec2 GetImageSize() const { return imageSize; }
 
 private:
 	//Vulkan Handles
@@ -31,6 +36,7 @@ private:
 	VkClearValue vkClearColour;
 
 	//Image properties
+	glm::vec2 imageSize;
 	VkImageLayout vkImageLayout;
 	VkImageAspectFlags vkImageAspect;
 private:

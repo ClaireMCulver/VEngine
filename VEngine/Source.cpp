@@ -61,9 +61,17 @@ void main()
 	cube.SetUniform_Mat4x4(MVP, 0, 0);
 
 	mainRenderPass.RegisterObject(cube);
-	mainRenderPass.RecordBuffer();
-	mainRenderPass.SubmitBuffer();
 
+	while (true)
+	{
+		mainRenderPass.RecordBuffer();
+		mainRenderPass.SubmitBuffer();
+
+		swapchain.BlitToSwapChain(mainRenderPass.GetRenderedImage());
+
+		swapchain.PresentNextImage();
+		mainRenderPass.ResetBuffer();
+	}
 
 	graphicsSystem.WaitForDeviceIdle();
 	return;

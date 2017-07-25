@@ -141,6 +141,11 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 		result = vkCreateImageView(vkLogicalDevice, &imageViewCI, NULL, &swapchainImageViews[i]);
 		assert(result == VK_SUCCESS);
 	}
+
+	SetSwapchainImageLayouts(vkLogicalDevice);
+
+	windowSize[0] = (float)xResolution;
+	windowSize[1] = (float)yResolution;
 	
 	// Semaphore Creation //
 	VkSemaphoreCreateInfo imageAcquiredSignalInfo;
@@ -154,6 +159,12 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	imageTransferedSignalInfo.pNext = NULL;
 	imageTransferedSignalInfo.flags = 0;
 	vkCreateSemaphore(vkLogicalDevice, &imageTransferedSignalInfo, NULL, &imageTransferedSignal);
+
+	VkFenceCreateInfo fenceCI;
+	fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCI.pNext = NULL;
+	fenceCI.flags = 0;
+	vkCreateFence(vkLogicalDevice, &fenceCI, NULL, &imageFinishedFence);
 
 	// Presentation Information //
 	currentImage = 0;
@@ -171,6 +182,8 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	blitBuffer = new CommandBuffer(CommandBufferType::Transfer, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 	blitBuffer->AddWaitSemaphore(imageAcquireSignal);
 	blitBuffer->AddSignalSemaphore(imageTransferedSignal);
+	blitBuffer->SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT); //TODO: find out if this is correct;
+	blitBuffer->SetFence(&imageFinishedFence);
 }
 
 
@@ -181,8 +194,6 @@ SwapChain::~SwapChain()
 	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetVKLogicalDevice();
 
 	vkDeviceWaitIdle(vkLogicalDevice);
-
-	//Destroy swapchain images?
 
 	for (size_t i = 0, count = swapchainImageViews.size(); i < count; i++)
 	{
@@ -195,6 +206,7 @@ SwapChain::~SwapChain()
 
 	vkDestroySemaphore(vkLogicalDevice, imageAcquireSignal, NULL);
 	vkDestroySemaphore(vkLogicalDevice, imageTransferedSignal, NULL);
+	vkDestroyFence(vkLogicalDevice, imageFinishedFence, NULL);
 }
 
 
@@ -218,20 +230,30 @@ void SwapChain::InitializeSurface(GraphicsInstance* instance)
 void SwapChain::PresentNextImage()
 {
 	//This should actually be moved to where I blit the rendered buffer to the current image.
+	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetVKLogicalDevice();
 
 
+	vkWaitForFences(vkLogicalDevice, 1, &imageFinishedFence, VK_TRUE, UINT64_MAX);
+
+	vkResetFences(vkLogicalDevice, 1, &imageFinishedFence);
 	//Decided to have presentation within the swapchain rather than in a job system, since it's rather independant, given it's dependence on everything else being done. 
 	//If that makes any sense.
 	vkQueuePresentKHR(presentationQueue, &presentInfo);
+
+	//Restart command buffer 
+	blitBuffer->ResetBuffer();
 }
 
-void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkImageLayout srcImageLayout)
+void SwapChain::BlitToSwapChain(Image *srcImage)
 {
 	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetVKLogicalDevice();
+
 	vkAcquireNextImageKHR(vkLogicalDevice, vkSwapchain, UINT64_MAX, imageAcquireSignal, NULL, &currentImage);
 
 	VkImageBlit blitRegion;
-	blitRegion.srcSubresource = 
+
+	//Source region
+	blitRegion.srcSubresource =
 	{
 		VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, //aspectMask;
 		0, //mipLevel;
@@ -239,9 +261,12 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 		1  //layerCount;
 	};
 	blitRegion.srcOffsets[0] = { 0, 0, 0 };
-	//TODO: Image class? Framebuffer class?
-	blitRegion.srcOffsets[1] = { 0, 0, 1 };
-	blitRegion.dstSubresource = 
+
+	glm::vec2 imageDimensions = srcImage->GetImageSize();
+	blitRegion.srcOffsets[1] = { (int32_t)imageDimensions.x, (int32_t)imageDimensions.y, 1 };
+
+	//Destination region
+	blitRegion.dstSubresource =
 	{
 		VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, //aspectMask;
 		0, //mipLevel;
@@ -250,16 +275,75 @@ void SwapChain::BlitToSwapChain(VkCommandBuffer cmdBuffer, VkImage srcImage, VkI
 	};
 	blitRegion.dstOffsets[0] = { 0, 0, 0 };
 	blitRegion.dstOffsets[1] = { (int32_t)windowSize[0], (int32_t)windowSize[1], 1 };
-	
+
 	// Record command buffer and submit it //
 	blitBuffer->BeginRecording();
 
-	vkCmdBlitImage(blitBuffer->GetVKCommandBuffer(), srcImage, srcImageLayout, swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
+	vkCmdBlitImage(blitBuffer->GetVKCommandBuffer(), srcImage->GetImage(), srcImage->GetImageLayout(), swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
 
 	blitBuffer->EndRecording();
 
 	blitBuffer->SubmitBuffer();
+}
 
-	//Restart command buffer 
-	blitBuffer->ResetBuffer();
+void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)
+{
+	std::vector<VkImageMemoryBarrier> barriers;
+	barriers.resize(swapchainImages.size());
+
+	for (size_t i = 0, count = barriers.size(); i < count; i++)
+	{
+		barriers[i] =
+		{
+			VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			nullptr,
+			0,
+			VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT,
+			VK_IMAGE_LAYOUT_UNDEFINED,
+			VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+			0,
+			0,
+			swapchainImages[i],
+			{
+				VK_IMAGE_ASPECT_COLOR_BIT,
+				0,
+				1,
+				0,
+				1
+			}
+		};
+	}
+
+	CommandBuffer layoutBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+	VkFence fencyMcFenceFace;
+	VkFenceCreateInfo fenceCI;
+	fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCI.pNext = NULL;
+	fenceCI.flags = 0;
+	vkCreateFence(logicalDevice, &fenceCI, NULL, &fencyMcFenceFace);
+
+	layoutBuffer.SetFence(&fencyMcFenceFace);
+	layoutBuffer.SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
+
+	layoutBuffer.BeginRecording();
+
+	for (size_t i = 0, count = barriers.size(); i < count; i++)
+	{
+		vkCmdPipelineBarrier(
+			layoutBuffer.GetVKCommandBuffer(),
+			VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+			VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT,
+			0,
+			0, nullptr,
+			0, nullptr,
+			1, &barriers[i]);
+	}
+
+	layoutBuffer.EndRecording();
+	layoutBuffer.SubmitBuffer();
+
+	vkWaitForFences(logicalDevice, 1, &fencyMcFenceFace, VK_TRUE, UINT64_MAX);
+
+	vkDestroyFence(logicalDevice, fencyMcFenceFace, NULL);
 }

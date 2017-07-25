@@ -81,6 +81,8 @@ Image::Image(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageUsage
 	result = vkCreateImageView(logicalDevice, &imageViewCI, NULL, &vkImageView);
 	assert(result == VK_SUCCESS);
 
+	imageSize.x = (float)imageWidth;
+	imageSize.y = (float)imageHeight;
 	vkImageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 	vkImageAspect = imageAspect;
 }
@@ -191,6 +193,10 @@ void Image::ChangeImageLayout(VkImageLayout newLayout)
 		}
 		dst_mask = VK_ACCESS_SHADER_READ_BIT;
 		break;
+		
+	case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+		dst_mask = VK_ACCESS_MEMORY_READ_BIT;
+		break;
 	}
 
 	VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
@@ -227,6 +233,8 @@ void Image::ChangeImageLayout(VkImageLayout newLayout)
 		1, &imageMemoryBarrier);
 	layoutBuffer.EndRecording();
 	layoutBuffer.SubmitBuffer();
+
+	vkImageLayout = newLayout;
 }
 
 uint32_t Image::FindMemoryType(uint32_t typeBits, VkFlags requirements_mask)
