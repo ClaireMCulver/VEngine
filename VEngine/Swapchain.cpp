@@ -227,23 +227,6 @@ void SwapChain::InitializeSurface(GraphicsInstance* instance)
 	assert(result == VK_SUCCESS);
 }
 
-void SwapChain::PresentNextImage()
-{
-	//This should actually be moved to where I blit the rendered buffer to the current image.
-	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetVKLogicalDevice();
-
-
-	vkWaitForFences(vkLogicalDevice, 1, &imageFinishedFence, VK_TRUE, UINT64_MAX);
-
-	vkResetFences(vkLogicalDevice, 1, &imageFinishedFence);
-	//Decided to have presentation within the swapchain rather than in a job system, since it's rather independant, given it's dependence on everything else being done. 
-	//If that makes any sense.
-	vkQueuePresentKHR(presentationQueue, &presentInfo);
-
-	//Restart command buffer 
-	blitBuffer->ResetBuffer();
-}
-
 void SwapChain::BlitToSwapChain(Image *srcImage)
 {
 	const VkDevice vkLogicalDevice = pGraphicsSystem->GetLogicalDevice()->GetVKLogicalDevice();
@@ -284,6 +267,18 @@ void SwapChain::BlitToSwapChain(Image *srcImage)
 	blitBuffer->EndRecording();
 
 	blitBuffer->SubmitBuffer();
+
+
+	//Decided to have presentation within the swapchain rather than in a job system, since it's rather independant, given it's dependence on everything else being done. 
+	//If that makes any sense.
+	vkQueuePresentKHR(presentationQueue, &presentInfo);
+
+	//Wait for the buffer to finish.
+	vkWaitForFences(vkLogicalDevice, 1, &imageFinishedFence, VK_TRUE, UINT64_MAX);
+
+	//Restart command buffer 
+	blitBuffer->ResetBuffer();
+	vkResetFences(vkLogicalDevice, 1, &imageFinishedFence);
 }
 
 void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)

@@ -69,7 +69,6 @@ void main()
 
 		swapchain.BlitToSwapChain(mainRenderPass.GetRenderedImage());
 
-		swapchain.PresentNextImage();
 		mainRenderPass.ResetBuffer();
 	}
 

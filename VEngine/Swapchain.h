@@ -49,11 +49,9 @@ private:
 	GraphicsSystem* pGraphicsSystem;
 
 public:
-	//Transfers the image passed to the swapchain as part of a command buffer.
+	//Transfers the image passed to the swapchain as part of a command buffer and presents it to the screen.
 	void BlitToSwapChain(Image *srcImage);
 
-	//Present the next image in the swapchain
-	void PresentNextImage();
 
 private:
 	void InitializeSurface(GraphicsInstance* instance);

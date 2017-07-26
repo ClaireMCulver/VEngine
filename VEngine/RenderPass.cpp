@@ -66,7 +66,7 @@ void RenderPass::AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint3
 	colourAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	colourAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 	colourAttachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-	colourAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	colourAttachment.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 	colourAttachment.flags = 0;
 
 	//Reference to the attachment for the renderpass
@@ -88,7 +88,7 @@ void RenderPass::AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint3
 		depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		depthAttachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		depthAttachment.flags = 0;
 
 		VkAttachmentReference depthReference;

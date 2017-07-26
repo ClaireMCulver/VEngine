@@ -52,13 +52,12 @@ Image::Image(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageUsage
 	// Image View Creation //
 
 	//clear values for the image
-	VkClearValue clearColourValue;
-	clearColourValue.color.float32[0] = 0.0f;
-	clearColourValue.color.float32[1] = 0.0f;
-	clearColourValue.color.float32[2] = 0.0f;
-	clearColourValue.color.float32[3] = 0.0f;
-	clearColourValue.depthStencil.depth = 1.0;
-	clearColourValue.depthStencil.stencil = 0;
+	vkClearColour.color.float32[0] = 0.0f;
+	vkClearColour.color.float32[1] = 0.0f;
+	vkClearColour.color.float32[2] = 0.0f;
+	vkClearColour.color.float32[3] = 0.0f;
+	vkClearColour.depthStencil.depth = 1.0;
+	vkClearColour.depthStencil.stencil = 0;
 
 	//image view create info
 	VkImageViewCreateInfo imageViewCI;
@@ -98,9 +97,6 @@ Image::~Image()
 	vkDestroyImage(logicalDevice, vkImage, NULL);
 }
 
-// Written by Tobias Kruseborn
-// https://github.com/kruseborn/vulkan/blob/master/engine/engine/imageUtils.cpp
-// Editted because I simply don't need to specify the previous data, as I am storing said data.
 void Image::ChangeImageLayout(VkImageLayout newLayout) 
 {
 	VkFlags src_mask = 0, dst_mask = 0;
