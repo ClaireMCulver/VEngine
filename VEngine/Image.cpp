@@ -52,12 +52,18 @@ Image::Image(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageUsage
 	// Image View Creation //
 
 	//clear values for the image
-	vkClearColour.color.float32[0] = 0.0f;
-	vkClearColour.color.float32[1] = 0.0f;
-	vkClearColour.color.float32[2] = 0.0f;
-	vkClearColour.color.float32[3] = 0.0f;
-	vkClearColour.depthStencil.depth = 1.0;
-	vkClearColour.depthStencil.stencil = 0;
+	if ((usage & VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT) == VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT)
+	{
+		vkClearColour.depthStencil.depth = 1.0;
+		vkClearColour.depthStencil.stencil = 0;
+	}
+	else
+	{
+		vkClearColour.color.float32[0] = 0.0f;
+		vkClearColour.color.float32[1] = 0.0f;
+		vkClearColour.color.float32[2] = 0.0f;
+		vkClearColour.color.float32[3] = 0.0f;
+	}
 
 	//image view create info
 	VkImageViewCreateInfo imageViewCI;

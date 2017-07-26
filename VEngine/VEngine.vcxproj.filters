@@ -13,18 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Header Files\OLDGraphics">
-      <UniqueIdentifier>{ad5e881e-e0ef-4b2c-8adf-8dd48f0666ac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\OLDGraphics\Backend">
-      <UniqueIdentifier>{b2e358a7-3270-4674-a40e-ca90c1d9366b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\OLDGraphics">
-      <UniqueIdentifier>{4ec08f7a-b0dc-44b3-87fd-6b555b24169e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\OLDGraphics\Backend">
-      <UniqueIdentifier>{e917b9b6-19c6-4a41-bbc7-cf4fed203bb6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Graphics">
       <UniqueIdentifier>{64b0c3ca-c26a-4551-a396-58f023bd5b55}</UniqueIdentifier>
     </Filter>
@@ -102,12 +90,6 @@
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderableGeometry.cpp">
-      <Filter>Source Files\OLDGraphics</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsSystem.cpp">
-      <Filter>Source Files\OLDGraphics\Backend</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -164,17 +146,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RenderableGeometry.h">
-      <Filter>Header Files\OLDGraphics</Filter>
-    </ClInclude>
     <ClInclude Include="VEngineDefs.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
     <ClInclude Include="GameDefs.h">
       <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsSystem.h">
-      <Filter>Header Files\OLDGraphics\Backend</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsPhysicalDevice.h">
       <Filter>Header Files\Graphics\Dispatchable Handles</Filter>
