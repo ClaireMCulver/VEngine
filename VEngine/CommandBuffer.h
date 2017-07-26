@@ -39,9 +39,10 @@ public:
 	//Reset the buffer to begin recording again
 	void ResetBuffer();
 
-	//TODO: How the fuck do I want to do this?
+	//Adds external semaphore to wait on
 	void AddWaitSemaphore(VkSemaphore semaphore);
-	//TODO: How the fuck do I want to do this?
+
+	//Adds external semaphopre to signal when completed.
 	void AddSignalSemaphore(VkSemaphore semaphore);
 
 	void SetFence(VkFence* fence) { vkFence = fence; }

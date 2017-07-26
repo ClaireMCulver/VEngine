@@ -19,7 +19,7 @@ Image::Image(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageUsage
 	ImageCI.arrayLayers = 1;
 	ImageCI.samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
 	ImageCI.tiling = VkImageTiling::VK_IMAGE_TILING_OPTIMAL;
-	ImageCI.usage = usage;
+	ImageCI.usage = usage | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 	ImageCI.sharingMode = VkSharingMode::VK_SHARING_MODE_EXCLUSIVE;
 	ImageCI.queueFamilyIndexCount = 0;
 	ImageCI.pQueueFamilyIndices = NULL; //Ignorable because sharingMode is not concurrent.
@@ -44,7 +44,7 @@ Image::Image(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageUsage
 	result = vkAllocateMemory(logicalDevice, &imageMemoryCI, NULL, &vkDeviceMemory);
 	assert(result == VK_SUCCESS);
 
-	//Bind it in order to create the image view.
+	//Bind the image to the memory object
 	result = vkBindImageMemory(logicalDevice, vkImage, vkDeviceMemory, 0);
 	assert(result == VK_SUCCESS);
 
@@ -239,6 +239,138 @@ void Image::ChangeImageLayout(VkImageLayout newLayout)
 	vkImageLayout = newLayout;
 }
 
+void Image::ChangeImageLayout(CommandBuffer& commandBuffer, VkImageLayout newLayout)
+{
+	VkFlags src_mask = 0, dst_mask = 0;
+
+	// Source layouts (old)
+	// Source access mask controls actions that have to be finished on the old layout
+	// before it will be transitioned to the new layout
+	switch (vkImageLayout)
+	{
+	case VK_IMAGE_LAYOUT_UNDEFINED:
+		// Image layout is undefined (or does not matter)
+		// Only valid as initial layout
+		// No flags required, listed only for completeness
+		src_mask = 0;
+		break;
+
+	case VK_IMAGE_LAYOUT_PREINITIALIZED:
+		// Image is preinitialized
+		// Only valid as initial layout for linear images, preserves memory contents
+		// Make sure host writes have been finished
+		src_mask = VK_ACCESS_HOST_WRITE_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		// Image is a color attachment
+		// Make sure any writes to the color buffer have been finished
+		src_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+		// Image is a depth/stencil attachment
+		// Make sure any writes to the depth/stencil buffer have been finished
+		src_mask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+		// Image is a transfer source 
+		// Make sure any reads from the image have been finished
+		src_mask = VK_ACCESS_TRANSFER_READ_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		// Image is a transfer destination
+		// Make sure any writes to the image have been finished
+		src_mask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		// Image is read by a shader
+		// Make sure any shader reads from the image have been finished
+		src_mask = VK_ACCESS_SHADER_READ_BIT;
+		break;
+	}
+
+	// Target layouts (new)
+	// Destination access mask controls the dependency for the new image layout
+	switch (newLayout)
+	{
+	case VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL:
+		// Image will be used as a transfer destination
+		// Make sure any writes to the image have been finished
+		dst_mask = VK_ACCESS_TRANSFER_WRITE_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
+		// Image will be used as a transfer source
+		// Make sure any reads from and writes to the image have been finished
+		src_mask = src_mask | VK_ACCESS_TRANSFER_READ_BIT;
+		dst_mask = VK_ACCESS_TRANSFER_READ_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL:
+		// Image will be used as a color attachment
+		// Make sure any writes to the color buffer have been finished
+		dst_mask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL:
+		// Image layout will be used as a depth/stencil attachment
+		// Make sure any writes to depth/stencil buffer have been finished
+		dst_mask = dst_mask | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL:
+		// Image will be read in a shader (sampler, input attachment)
+		// Make sure any writes to the image have been finished
+		if (src_mask == 0)
+		{
+			src_mask = VK_ACCESS_HOST_WRITE_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+		}
+		dst_mask = VK_ACCESS_SHADER_READ_BIT;
+		break;
+
+	case VK_IMAGE_LAYOUT_PRESENT_SRC_KHR:
+		dst_mask = VK_ACCESS_MEMORY_READ_BIT;
+		break;
+	}
+
+	VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+	VkPipelineStageFlags destStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+
+	VkImageSubresourceRange subresourceRange = {};
+	subresourceRange.aspectMask = vkImageAspect;
+	subresourceRange.baseMipLevel = 0;
+	subresourceRange.levelCount = 1;
+	subresourceRange.layerCount = 1;
+
+	VkImageMemoryBarrier imageMemoryBarrier;
+	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	imageMemoryBarrier.pNext = NULL;
+	imageMemoryBarrier.srcAccessMask = src_mask;
+	imageMemoryBarrier.dstAccessMask = dst_mask;
+	imageMemoryBarrier.oldLayout = vkImageLayout;
+	imageMemoryBarrier.newLayout = newLayout;
+	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	imageMemoryBarrier.image = vkImage;
+	imageMemoryBarrier.subresourceRange = subresourceRange;
+
+
+	vkCmdPipelineBarrier(
+		commandBuffer.GetVKCommandBuffer(),
+		srcStageFlags,
+		destStageFlags,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &imageMemoryBarrier);
+
+	vkImageLayout = newLayout;
+}
+
 uint32_t Image::FindMemoryType(uint32_t typeBits, VkFlags requirements_mask)
 {
 	const VkPhysicalDeviceMemoryProperties memory_properties = GraphicsSystem::GetSingleton()->GetPhysicalDevice()->GetPhysicalDeviceMemoryPropertiess();
@@ -258,4 +390,29 @@ uint32_t Image::FindMemoryType(uint32_t typeBits, VkFlags requirements_mask)
 	}
 	// No memory types matched, return failure
 	return typeIndex;
+}
+
+void Image::CmdClearImage(CommandBuffer &commandBuffer)
+{
+	VkImageSubresourceRange imageResource;
+	imageResource.aspectMask = vkImageAspect;
+	imageResource.baseMipLevel = 0;
+	imageResource.levelCount = 1;
+	imageResource.baseArrayLayer = 0;
+	imageResource.layerCount = 1;
+
+	VkImageLayout currentLayout = vkImageLayout;
+
+	ChangeImageLayout(commandBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	if (vkImageAspect == VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT)
+	{
+		vkCmdClearColorImage(commandBuffer.GetVKCommandBuffer(), vkImage, vkImageLayout, &vkClearColour.color, 1, &imageResource);
+	}
+	else
+	{
+		vkCmdClearDepthStencilImage(commandBuffer.GetVKCommandBuffer(), vkImage, vkImageLayout, &vkClearColour.depthStencil, 1, &imageResource);
+	}
+
+	ChangeImageLayout(commandBuffer, currentLayout);
 }

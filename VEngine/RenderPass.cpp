@@ -215,6 +215,11 @@ void RenderPass::RecordBuffer()
 	vkCmdSetViewport(vkRenderBuffer, 0, 1, &viewport);
 	vkCmdSetScissor(vkRenderBuffer, 0, 1, &renderArea);
 
+	for (size_t i = 0, count = images.size(); i < count; i++)
+	{
+		images[i]->CmdClearImage(*renderBuffer);
+	}
+
 	//Render pass
 	vkCmdBeginRenderPass(vkRenderBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
