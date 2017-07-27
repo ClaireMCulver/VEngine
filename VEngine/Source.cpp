@@ -70,9 +70,9 @@ void main()
 		mainRenderPass.RecordBuffer();
 		mainRenderPass.SubmitBuffer();
 
-		swapchain.BlitToSwapChain(mainRenderPass.GetRenderedImage());
-
 		mainRenderPass.ResetBuffer();
+
+		swapchain.BlitToSwapChain(mainRenderPass.GetRenderedImage());
 	}
 
 	graphicsSystem.WaitForDeviceIdle();

@@ -44,14 +44,13 @@ public:
 
 	void RegisterObject(RenderableObject &object);
 
-	//TODO: figure out how I want to handle this.
+	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION. //TODO: Should change this some time later on to specify the image we want.
 	Image* GetRenderedImage();
 
 private:
 	VkRenderPass renderPass;
 	VkRenderPassBeginInfo renderPassBeginInfo;
 
-	VkFence renderFinishedFence;
 	CommandBuffer* renderBuffer;
 
 	std::vector<VkSubpassDescription> subpassDescriptions; //descriptions of the subpasses themselves.

@@ -45,9 +45,10 @@ public:
 	//Adds external semaphopre to signal when completed.
 	void AddSignalSemaphore(VkSemaphore semaphore);
 
-	void SetFence(VkFence* fence) { vkFence = fence; }
-
 	void SetDestinationStageMask(VkPipelineStageFlags stageMask);
+
+	//Blocks until the command buffer has finished execution. Do not use this in conjunction with ResetBuffer, as this is called within it.
+	void WaitForCompletion();
 
 
 private:
@@ -57,10 +58,13 @@ private:
 	VkCommandBufferBeginInfo beginInfo;
 
 	CommandPool* pCommandPool;
-	VkFence* vkFence = NULL;
+	VkFence vkFence;
 
 	std::vector<VkSemaphore> waitSemaphores;
 	std::vector<VkSemaphore> signalSemaphores;
 	VkPipelineStageFlags dstStageMask;
+
+	//Reference to the logical device to which the command buffer belongs. I don't want to have all the calls each frame to get it.
+	VkDevice logicalDevice;
 };
 

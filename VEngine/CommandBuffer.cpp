@@ -27,6 +27,8 @@ CommandBuffer::CommandBuffer(CommandBufferType bufferType, VkCommandBufferLevel 
 		pCommandPool = GraphicsSystem::GetSingleton()->GetGraphicsCommandPool();
 		break;
 	}
+	
+	logicalDevice = pCommandPool->GetVkLogicalDevice();
 
 	// Allocation //
 	VkCommandBufferAllocateInfo allocationInfo;
@@ -36,7 +38,7 @@ CommandBuffer::CommandBuffer(CommandBufferType bufferType, VkCommandBufferLevel 
 	allocationInfo.level = bufferLevel;
 	allocationInfo.commandBufferCount = 1;
 
-	vkAllocateCommandBuffers(pCommandPool->GetVkLogicalDevice(), &allocationInfo, &vkCommandBuffer);
+	vkAllocateCommandBuffers(logicalDevice, &allocationInfo, &vkCommandBuffer);
 	
 	// Begin Info //
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -54,13 +56,23 @@ CommandBuffer::CommandBuffer(CommandBufferType bufferType, VkCommandBufferLevel 
 	submitInfo.pCommandBuffers = &vkCommandBuffer;
 	submitInfo.signalSemaphoreCount = 0;
 	submitInfo.pSignalSemaphores = NULL;
+
+	//Fence
+	VkFenceCreateInfo fenceCI;
+	fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCI.pNext = NULL;
+	fenceCI.flags = 0;
+
+	vkCreateFence(logicalDevice, &fenceCI, NULL, &vkFence);
 }
 
 CommandBuffer::~CommandBuffer()
 {
 	vkQueueWaitIdle(submitQueue);
 
-	vkFreeCommandBuffers(pCommandPool->GetVkLogicalDevice(), pCommandPool->GetVKCommandPool(), 1, &vkCommandBuffer);
+	vkDestroyFence(logicalDevice, vkFence, NULL);
+
+	vkFreeCommandBuffers(logicalDevice, pCommandPool->GetVKCommandPool(), 1, &vkCommandBuffer);
 }
 
 void CommandBuffer::BeginRecording()
@@ -75,11 +87,14 @@ void CommandBuffer::EndRecording()
 
 void CommandBuffer::SubmitBuffer()
 {
-	vkQueueSubmit(submitQueue, 1, &submitInfo, vkFence == NULL ? NULL : *vkFence);
+	vkQueueSubmit(submitQueue, 1, &submitInfo, vkFence);
 }
 
 void CommandBuffer::ResetBuffer()
 {
+	//If the command buffer is already completed, than this call has no effect.
+	WaitForCompletion(); 
+	
 	vkResetCommandBuffer(vkCommandBuffer, 0);
 }
 
@@ -102,4 +117,11 @@ void CommandBuffer::AddSignalSemaphore(VkSemaphore semaphore)
 void CommandBuffer::SetDestinationStageMask(VkPipelineStageFlags stageMask)
 {
 	dstStageMask = stageMask;
+}
+
+void CommandBuffer::WaitForCompletion()
+{
+	vkWaitForFences(logicalDevice, 1, &vkFence, VK_TRUE, UINT64_MAX);
+
+	vkResetFences(logicalDevice, 1, &vkFence);
 }

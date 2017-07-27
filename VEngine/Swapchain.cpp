@@ -160,12 +160,6 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	imageTransferedSignalInfo.flags = 0;
 	vkCreateSemaphore(vkLogicalDevice, &imageTransferedSignalInfo, NULL, &imageTransferedSignal);
 
-	VkFenceCreateInfo fenceCI;
-	fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceCI.pNext = NULL;
-	fenceCI.flags = 0;
-	vkCreateFence(vkLogicalDevice, &fenceCI, NULL, &imageFinishedFence);
-
 	// Presentation Information //
 	currentImage = 0;
 	//The semaphores might change, but so I'll put all this here for a simple optimization.
@@ -183,7 +177,6 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	blitBuffer->AddWaitSemaphore(imageAcquireSignal);
 	blitBuffer->AddSignalSemaphore(imageTransferedSignal);
 	blitBuffer->SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT); //TODO: find out if this is correct;
-	blitBuffer->SetFence(&imageFinishedFence);
 }
 
 
@@ -206,7 +199,6 @@ SwapChain::~SwapChain()
 
 	vkDestroySemaphore(vkLogicalDevice, imageAcquireSignal, NULL);
 	vkDestroySemaphore(vkLogicalDevice, imageTransferedSignal, NULL);
-	vkDestroyFence(vkLogicalDevice, imageFinishedFence, NULL);
 }
 
 
@@ -268,17 +260,12 @@ void SwapChain::BlitToSwapChain(Image *srcImage)
 
 	blitBuffer->SubmitBuffer();
 
-
 	//Decided to have presentation within the swapchain rather than in a job system, since it's rather independant, given it's dependence on everything else being done. 
 	//If that makes any sense.
 	vkQueuePresentKHR(presentationQueue, &presentInfo);
 
-	//Wait for the buffer to finish.
-	vkWaitForFences(vkLogicalDevice, 1, &imageFinishedFence, VK_TRUE, UINT64_MAX);
-
 	//Restart command buffer 
 	blitBuffer->ResetBuffer();
-	vkResetFences(vkLogicalDevice, 1, &imageFinishedFence);
 }
 
 void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)
@@ -318,7 +305,6 @@ void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)
 	fenceCI.flags = 0;
 	vkCreateFence(logicalDevice, &fenceCI, NULL, &fencyMcFenceFace);
 
-	layoutBuffer.SetFence(&fencyMcFenceFace);
 	layoutBuffer.SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
 
 	layoutBuffer.BeginRecording();
@@ -338,7 +324,5 @@ void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)
 	layoutBuffer.EndRecording();
 	layoutBuffer.SubmitBuffer();
 
-	vkWaitForFences(logicalDevice, 1, &fencyMcFenceFace, VK_TRUE, UINT64_MAX);
-
-	vkDestroyFence(logicalDevice, fencyMcFenceFace, NULL);
+	layoutBuffer.WaitForCompletion();
 }

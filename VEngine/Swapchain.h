@@ -34,9 +34,6 @@ private:
 	VkSemaphore imageAcquireSignal;
 	VkSemaphore imageTransferedSignal;
 
-	//TODO: Remove this and figure out why the fuck the above semaphore isn't working when presenting. Because it fucking isn't.
-	VkFence imageFinishedFence;
-
 	//Windows surface
 	VkSurfaceKHR vkSurface;
 

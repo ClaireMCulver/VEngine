@@ -11,8 +11,6 @@ RenderPass::~RenderPass()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
-	vkDestroyFence(logicalDevice, renderFinishedFence, NULL);
-	
 	vkDestroyFramebuffer(logicalDevice, frameBuffer, NULL);
 	
 	vkDestroyRenderPass(logicalDevice, renderPass, NULL);
@@ -171,20 +169,9 @@ void RenderPass::CreateRenderPass()
 	renderPassBeginInfo.framebuffer = frameBuffer;
 	renderPassBeginInfo.clearValueCount = clearValues.size();
 	renderPassBeginInfo.pClearValues = clearValues.data();
-
-	//Create semaphore for completion of the renderpass
-	VkFenceCreateInfo fenceCI;
-	fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceCI.pNext = NULL;
-	fenceCI.flags = 0;
-
-	result = vkCreateFence(logicalDevice, &fenceCI, NULL, &renderFinishedFence);
-	assert(result == VK_SUCCESS);
-
 	
 	//Allocate command buffer
 	renderBuffer = new CommandBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	renderBuffer->SetFence(&renderFinishedFence);
 	renderBuffer->SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
 }
 
@@ -215,6 +202,7 @@ void RenderPass::RecordBuffer()
 	vkCmdSetViewport(vkRenderBuffer, 0, 1, &viewport);
 	vkCmdSetScissor(vkRenderBuffer, 0, 1, &renderArea);
 
+	//Clear the images.
 	for (size_t i = 0, count = images.size(); i < count; i++)
 	{
 		images[i]->CmdClearImage(*renderBuffer);
@@ -224,10 +212,10 @@ void RenderPass::RecordBuffer()
 	vkCmdBeginRenderPass(vkRenderBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
 	// Render pass contents //
-		for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
-		{
-			registeredMeshes[i]->Draw(*renderBuffer);
-		}
+	for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
+	{
+		registeredMeshes[i]->Draw(*renderBuffer);
+	}
 
 	//end render pass
 	vkCmdEndRenderPass(vkRenderBuffer);
@@ -269,14 +257,6 @@ void RenderPass::RegisterObject(RenderableObject &object)
 Image* RenderPass::GetRenderedImage()
 {
 	assert(images.size() > 0);
-	VkResult result;
-
-	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-
-	result = vkWaitForFences(logicalDevice, 1, &renderFinishedFence, VK_TRUE, UINT64_MAX);
-	assert(result == VK_SUCCESS);
-
-	vkResetFences(logicalDevice, 1, &renderFinishedFence);
-
+	
 	return images[0];
 }
