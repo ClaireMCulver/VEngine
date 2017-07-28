@@ -37,8 +37,11 @@ private:
 	VkDescriptorSetLayout resourceSetLayout;
 
 private:
-	//TODO: This currently does not take in a file path, but the actual shader text. Fix that.
-	bool LoadShaderFromFile(const char* filePath, VkShaderStageFlagBits shaderType);
+	//Loads the file and places the text within the given string.
+	void LoadShaderFromFile(const char* filePath, std::string &fileText);
+
+	//Takes the text and creates a shader module
+	bool CreateShaderModule(const char* fileText, VkShaderStageFlagBits shaderType);
 
 	//Finds the number of uniforms in the shader and creates relevant bindings for them.
 	bool CreateResourceSetLayout(const std::string* fileData, VkShaderStageFlagBits shaderType);

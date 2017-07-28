@@ -6,10 +6,11 @@ Shader::Shader(const char* filePath, VkShaderStageFlagBits shaderType)
 {
 	vkShaderType = shaderType;
 
-	//This is here for the sake of 'I don't load shaders in text files currently.'
-	std::string fileText(filePath);
+	std::string fileText;
 
-	LoadShaderFromFile(filePath, shaderType);
+	LoadShaderFromFile(filePath, fileText);
+
+	CreateShaderModule(fileText.data(), shaderType);
 
 	CreateResourceSetLayout(&fileText, shaderType);
 }
@@ -18,15 +19,29 @@ Shader::Shader(const char* filePath, VkShaderStageFlagBits shaderType)
 Shader::~Shader()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-
-
+	
 	vkDestroyDescriptorSetLayout(logicalDevice, resourceSetLayout, NULL);
 
 	vkDestroyShaderModule(logicalDevice, vkShaderModule, NULL);
 }
 
+void Shader::LoadShaderFromFile(const char* filePath, std::string &fileText)
+{
+	FILE* shaderFile;
+	fopen_s(&shaderFile, filePath, "r");
 
-bool Shader::LoadShaderFromFile(const char* filePath, VkShaderStageFlagBits shaderType)
+	fseek(shaderFile, 0, SEEK_END);
+	long fileSize = ftell(shaderFile);
+	rewind(shaderFile);
+
+	fileText.resize((size_t)fileSize);
+	
+	fread((void*)fileText.data(), 1, fileSize, shaderFile);
+
+	fclose(shaderFile);
+}
+
+bool Shader::CreateShaderModule(const char* fileText, VkShaderStageFlagBits shaderType)
 {
 	std::vector<unsigned int> shaderSPIRV;
 
@@ -34,7 +49,7 @@ bool Shader::LoadShaderFromFile(const char* filePath, VkShaderStageFlagBits shad
 	glslang::InitializeProcess();
 	TBuiltInResource resources;
 	init_resources(resources);
-	GLSLtoSPV(shaderType, filePath, "NewShader", shaderSPIRV);
+	GLSLtoSPV(shaderType, fileText, "NewShader", shaderSPIRV);
 	glslang::FinalizeProcess(); //This will either go here or at the end of the function, after loading the shader module. Probably just here.
 
 	VkPipelineShaderStageCreateInfo newShader;

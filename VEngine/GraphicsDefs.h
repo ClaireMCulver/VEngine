@@ -192,32 +192,3 @@ static std::vector<Triangle> g_vb_texture_Data = {
 	  XYZ1(1, 1, 1),    UV(0.f, 1.f),    // rgt-btm-back
 	  XYZ1(1, -1, 1),   UV(0.f, 0.f) },   // rgt-top-back
 };
-
-static const std::string vertShaderText =
-"#version 400\n"
-"#extension GL_ARB_separate_shader_objects : enable\n"
-"#extension GL_ARB_shading_language_420pack : enable\n"
-"layout (std140, binding = 0) uniform bufferVals {\n"
-"    mat4 mvp;\n"
-"} myBufferVals;\n"
-"layout (location = 0) in vec4 pos;\n"
-"layout (location = 1) in vec2 inUV;\n"
-"layout (location = 0) out vec4 outColor;\n"
-"out gl_PerVertex { \n"
-"    vec4 gl_Position;\n"
-"};\n"
-"void main() {\n"
-"   outColor = vec4(inUV, 0.0, 1.0);\n"
-"   gl_Position = myBufferVals.mvp * pos;\n"
-"}\n";
-
-
-static const std::string fragShaderText =
-"#version 400\n"
-"#extension GL_ARB_separate_shader_objects : enable\n"
-"#extension GL_ARB_shading_language_420pack : enable\n"
-"layout (location = 0) in vec4 color;\n"
-"layout (location = 0) out vec4 outColor;\n"
-"void main() {\n"
-"   outColor = color;\n"
-"}\n";

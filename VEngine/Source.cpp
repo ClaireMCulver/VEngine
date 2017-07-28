@@ -32,9 +32,9 @@ void main()
 	Geometry cubeMesh;
 	cubeMesh.LoadMesh(g_vb_texture_Data);
 	
-	Shader standardVertShader(vertShaderText.data(), VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-	Shader standardFragShader(fragShaderText.data(), VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
-	
+	Shader standardVertShader("../Assets/Shaders/StandardShader.Vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader standardFragShader("../Assets/Shaders/StandardShader.Frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
 	standardMaterial.AddShader(standardFragShader);
@@ -60,7 +60,7 @@ void main()
 
 	mainRenderPass.RegisterObject(cube);
 
-	//while (true)
+	while (true)
 	{
 		Model = glm::rotate(Model, 0.0005f, glm::vec3(0, 1, 0));
 		MVP = Clip * Projection * View * Model;
