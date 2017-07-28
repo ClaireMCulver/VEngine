@@ -11,6 +11,8 @@ RenderPass::~RenderPass()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
+	delete renderBuffer;
+
 	vkDestroyFramebuffer(logicalDevice, frameBuffer, NULL);
 	
 	vkDestroyRenderPass(logicalDevice, renderPass, NULL);

@@ -60,7 +60,7 @@ void main()
 
 	mainRenderPass.RegisterObject(cube);
 
-	while (true)
+	//while (true)
 	{
 		Model = glm::rotate(Model, 0.0005f, glm::vec3(0, 1, 0));
 		MVP = Clip * Projection * View * Model;

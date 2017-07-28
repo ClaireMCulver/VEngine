@@ -188,6 +188,8 @@ SwapChain::~SwapChain()
 
 	vkDeviceWaitIdle(vkLogicalDevice);
 
+	delete blitBuffer;
+
 	for (size_t i = 0, count = swapchainImageViews.size(); i < count; i++)
 	{
 		vkDestroyImageView(vkLogicalDevice, swapchainImageViews[i], NULL);
@@ -297,14 +299,7 @@ void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)
 	}
 
 	CommandBuffer layoutBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-
-	VkFence fencyMcFenceFace;
-	VkFenceCreateInfo fenceCI;
-	fenceCI.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceCI.pNext = NULL;
-	fenceCI.flags = 0;
-	vkCreateFence(logicalDevice, &fenceCI, NULL, &fencyMcFenceFace);
-
+	
 	layoutBuffer.SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT);
 
 	layoutBuffer.BeginRecording();
