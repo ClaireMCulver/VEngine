@@ -27,8 +27,11 @@ Shader::~Shader()
 
 void Shader::LoadShaderFromFile(const char* filePath, std::string &fileText)
 {
+	int result = 0;
+
 	FILE* shaderFile;
-	fopen_s(&shaderFile, filePath, "r");
+	result = fopen_s(&shaderFile, filePath, "r");
+	assert(result == 0);
 
 	fseek(shaderFile, 0, SEEK_END);
 	long fileSize = ftell(shaderFile);
