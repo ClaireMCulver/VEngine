@@ -6,7 +6,7 @@
 #include "vulkan\vulkan.h"
 #include <vector>
 
-#include "glm\vec4.hpp"
+#include "glm\vec3.hpp"
 #include "glm\vec2.hpp"
 
 #define NUM_DESCRIPTOR_SETS 1
@@ -56,139 +56,139 @@ struct VertexUV {
 
 struct Triangle
 {
-	glm::vec4 vertexA;
+	glm::vec3 vertexA;
+	glm::vec3 normalA;
 	glm::vec2 uvA;
-	glm::vec4 vertexB;
-	glm::vec2 uvB;
-	glm::vec4 vertexC;
-	glm::vec2 uvC;
-
-	//Removed until I get file loading in. Either one works.
-	//glm::vec3 normalA;
-	//glm::vec3 normalB;
-	//glm::vec3 normalC;
-};
-
-#define XYZ1(_x_, _y_, _z_) glm::vec4(_x_, _y_, _z_, 1.f)
-#define UV(_u_, _v_) glm::vec2(_u_, _v_)
-
-static const Triangle g_vbData[] = {
-	{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 0.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },
-	{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(1, 1, -1),   XYZ1(1.f, 1.f, 0.f) },
-																										   
-	{ XYZ1(-1, -1, 1),  XYZ1(0.f, 0.f, 1.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },
-	{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(1, 1, 1),    XYZ1(1.f, 1.f, 1.f) },
-					    									     										   
-	{ XYZ1(1, 1, 1),    XYZ1(1.f, 1.f, 1.f) },{ XYZ1(1, 1, -1),  XYZ1(1.f, 1.f, 0.f) },{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },
-	{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },{ XYZ1(1, 1, -1),  XYZ1(1.f, 1.f, 0.f) },{ XYZ1(1, -1, -1),  XYZ1(1.f, 0.f, 0.f) },
-					    
-	{ XYZ1(-1, 1, 1),   XYZ1(0.f, 1.f, 1.f) },{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },
-	{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 0.f) },
-					    
-	{ XYZ1(1, 1, 1),    XYZ1(1.f, 1.f, 1.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(1, 1, -1),   XYZ1(1.f, 1.f, 0.f) },
-	{ XYZ1(1, 1, -1),   XYZ1(1.f, 1.f, 0.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },
-
-	{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(-1, -1, 1),  XYZ1(0.f, 0.f, 1.f) },
-	{ XYZ1(-1, -1, 1),  XYZ1(0.f, 0.f, 1.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 0.f) },
-};
-
-static const Triangle g_vb_solid_face_colors_Data[] = {
-	// red face
-	{ XYZ1(-1, -1, 1), XYZ1(1.f, 0.f, 0.f) },
-	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 0.f) },
-	{ XYZ1(1, -1, 1), XYZ1(1.f, 0.f, 0.f) },
-	{ XYZ1(1, -1, 1), XYZ1(1.f, 0.f, 0.f) },
-	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 0.f) },
-	{ XYZ1(1, 1, 1), XYZ1(1.f, 0.f, 0.f) },
-	// green face
-	{ XYZ1(-1, -1, -1), XYZ1(0.f, 1.f, 0.f) },
-	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 0.f) },
-	{ XYZ1(-1, 1, -1), XYZ1(0.f, 1.f, 0.f) },
-	{ XYZ1(-1, 1, -1), XYZ1(0.f, 1.f, 0.f) },
-	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 0.f) },
-	{ XYZ1(1, 1, -1), XYZ1(0.f, 1.f, 0.f) },
-	// blue face
-	{ XYZ1(-1, 1, 1), XYZ1(0.f, 0.f, 1.f) },
-	{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },
-	{ XYZ1(-1, 1, -1), XYZ1(0.f, 0.f, 1.f) },
-	{ XYZ1(-1, 1, -1), XYZ1(0.f, 0.f, 1.f) },
-	{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },
-	{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 1.f) },
-	// yellow face
-	{ XYZ1(1, 1, 1), XYZ1(1.f, 1.f, 0.f) },
-	{ XYZ1(1, 1, -1), XYZ1(1.f, 1.f, 0.f) },
-	{ XYZ1(1, -1, 1), XYZ1(1.f, 1.f, 0.f) },
-	{ XYZ1(1, -1, 1), XYZ1(1.f, 1.f, 0.f) },
-	{ XYZ1(1, 1, -1), XYZ1(1.f, 1.f, 0.f) },
-	{ XYZ1(1, -1, -1), XYZ1(1.f, 1.f, 0.f) },
-	// magenta face
-	{ XYZ1(1, 1, 1), XYZ1(1.f, 0.f, 1.f) },
-	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 1.f) },
-	{ XYZ1(1, 1, -1), XYZ1(1.f, 0.f, 1.f) },
-	{ XYZ1(1, 1, -1), XYZ1(1.f, 0.f, 1.f) },
-	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 1.f) },
-	{ XYZ1(-1, 1, -1), XYZ1(1.f, 0.f, 1.f) },
-	// cyan face
-	{ XYZ1(1, -1, 1), XYZ1(0.f, 1.f, 1.f) },
-	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 1.f) },
-	{ XYZ1(-1, -1, 1), XYZ1(0.f, 1.f, 1.f) },
-	{ XYZ1(-1, -1, 1), XYZ1(0.f, 1.f, 1.f) },
-	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 1.f) },
-	{ XYZ1(-1, -1, -1), XYZ1(0.f, 1.f, 1.f) },
-};
-
-static std::vector<Triangle> g_vb_texture_Data = {
-	// left face
-	{ XYZ1(-1, -1, -1), UV(1.f, 0.f) ,  // lft-top-front
-	  XYZ1(-1, 1, 1),   UV(0.f, 1.f) ,    // lft-btm-back
-	  XYZ1(-1, -1, 1),  UV(0.f, 0.f) },   // lft-top-back
-
-	{ XYZ1(-1, 1, 1),   UV(0.f, 1.f) ,    // lft-btm-back
-	  XYZ1(-1, -1, -1), UV(1.f, 0.f) ,  // lft-top-front
-	  XYZ1(-1, 1, -1),  UV(1.f, 1.f) },   // lft-btm-front
-
-	// front face
-	{ XYZ1(-1, -1, -1), UV(0.f, 0.f) ,  // lft-top-front
-	  XYZ1(1, -1, -1),  UV(1.f, 0.f) ,   // rgt-top-front
-	  XYZ1(1, 1, -1),   UV(1.f, 1.f) }, // rgt-btm-front
-
-	{ XYZ1(-1, -1, -1), UV(0.f, 0.f) ,  // lft-top-front
-	  XYZ1(1, 1, -1),   UV(1.f, 1.f) ,    // rgt-btm-front
-	  XYZ1(-1, 1, -1),  UV(0.f, 1.f) },   // lft-btm-front
-
-	// top face
-	{ XYZ1(-1, -1, -1), UV(0.f, 1.f) ,  // lft-top-front
-	  XYZ1(1, -1, 1),   UV(1.f, 0.f)  ,    // rgt-top-back
-	  XYZ1(1, -1, -1),  UV(1.f, 1.f) },   // rgt-top-front
-
-	{ XYZ1(-1, -1, -1), UV(0.f, 1.f),  // lft-top-front
-	  XYZ1(-1, -1, 1),  UV(0.f, 0.f),   // lft-top-back
-	  XYZ1(1, -1, 1),   UV(1.f, 0.f) },    // rgt-top-back
 	
-	// bottom face
-	{ XYZ1(-1, 1, -1),  UV(0.f, 0.f),  // lft-btm-front
-	  XYZ1(1, 1, 1),    UV(1.f, 1.f),    // rgt-btm-back
-	  XYZ1(-1, 1, 1),   UV(0.f, 1.f) },   // lft-btm-back
+	glm::vec3 vertexB;
+	glm::vec3 normalB;
+	glm::vec2 uvB;
 
-	{ XYZ1(-1, 1, -1),  UV(0.f, 0.f),  // lft-btm-front
-	  XYZ1(1, 1, -1),   UV(1.f, 0.f),   // rgt-btm-front
-	  XYZ1(1, 1, 1),    UV(1.f, 1.f) },    // rgt-btm-back
-					    
-	// right face	    
-	{ XYZ1(1, 1, -1),   UV(0.f, 1.f),   // rgt-btm-front
-	  XYZ1(1, -1, 1),   UV(1.f, 0.f),   // rgt-top-back
-	  XYZ1(1, 1, 1),    UV(1.f, 1.f) },    // rgt-btm-back
-					    
-	{ XYZ1(1, -1, 1),   UV(1.f, 0.f),   // rgt-top-back
-	  XYZ1(1, 1, -1),   UV(0.f, 1.f),   // rgt-btm-front
-	  XYZ1(1, -1, -1),  UV(0.f, 0.f) },  // rgt-top-front
-
-	// back face
-	{ XYZ1(-1, 1, 1),   UV(1.f, 1.f),   // lft-btm-back
-	  XYZ1(1, 1, 1),    UV(0.f, 1.f),    // rgt-btm-back
-	  XYZ1(-1, -1, 1),  UV(1.f, 0.f) },  // lft-top-back
-					    
-	{ XYZ1(-1, -1, 1),  UV(1.f, 0.f),  // lft-top-back
-	  XYZ1(1, 1, 1),    UV(0.f, 1.f),    // rgt-btm-back
-	  XYZ1(1, -1, 1),   UV(0.f, 0.f) },   // rgt-top-back
+	glm::vec3 vertexC;
+	glm::vec3 normalC;
+	glm::vec2 uvC;
 };
+
+//#define XYZ1(_x_, _y_, _z_) glm::vec4(_x_, _y_, _z_, 1.f)
+//#define UV(_u_, _v_) glm::vec2(_u_, _v_)
+//
+//static const Triangle g_vbData[] = {
+//	{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 0.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },
+//	{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(1, 1, -1),   XYZ1(1.f, 1.f, 0.f) },
+//																										   
+//	{ XYZ1(-1, -1, 1),  XYZ1(0.f, 0.f, 1.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },
+//	{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(1, 1, 1),    XYZ1(1.f, 1.f, 1.f) },
+//					    									     										   
+//	{ XYZ1(1, 1, 1),    XYZ1(1.f, 1.f, 1.f) },{ XYZ1(1, 1, -1),  XYZ1(1.f, 1.f, 0.f) },{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },
+//	{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },{ XYZ1(1, 1, -1),  XYZ1(1.f, 1.f, 0.f) },{ XYZ1(1, -1, -1),  XYZ1(1.f, 0.f, 0.f) },
+//					    
+//	{ XYZ1(-1, 1, 1),   XYZ1(0.f, 1.f, 1.f) },{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },
+//	{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 0.f) },
+//					    
+//	{ XYZ1(1, 1, 1),    XYZ1(1.f, 1.f, 1.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(1, 1, -1),   XYZ1(1.f, 1.f, 0.f) },
+//	{ XYZ1(1, 1, -1),   XYZ1(1.f, 1.f, 0.f) },{ XYZ1(-1, 1, 1),  XYZ1(0.f, 1.f, 1.f) },{ XYZ1(-1, 1, -1),  XYZ1(0.f, 1.f, 0.f) },
+//
+//	{ XYZ1(1, -1, 1),   XYZ1(1.f, 0.f, 1.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(-1, -1, 1),  XYZ1(0.f, 0.f, 1.f) },
+//	{ XYZ1(-1, -1, 1),  XYZ1(0.f, 0.f, 1.f) },{ XYZ1(1, -1, -1), XYZ1(1.f, 0.f, 0.f) },{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 0.f) },
+//};
+//
+//static const Triangle g_vb_solid_face_colors_Data[] = {
+//	// red face
+//	{ XYZ1(-1, -1, 1), XYZ1(1.f, 0.f, 0.f) },
+//	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 0.f) },
+//	{ XYZ1(1, -1, 1), XYZ1(1.f, 0.f, 0.f) },
+//	{ XYZ1(1, -1, 1), XYZ1(1.f, 0.f, 0.f) },
+//	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 0.f) },
+//	{ XYZ1(1, 1, 1), XYZ1(1.f, 0.f, 0.f) },
+//	// green face
+//	{ XYZ1(-1, -1, -1), XYZ1(0.f, 1.f, 0.f) },
+//	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 0.f) },
+//	{ XYZ1(-1, 1, -1), XYZ1(0.f, 1.f, 0.f) },
+//	{ XYZ1(-1, 1, -1), XYZ1(0.f, 1.f, 0.f) },
+//	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 0.f) },
+//	{ XYZ1(1, 1, -1), XYZ1(0.f, 1.f, 0.f) },
+//	// blue face
+//	{ XYZ1(-1, 1, 1), XYZ1(0.f, 0.f, 1.f) },
+//	{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },
+//	{ XYZ1(-1, 1, -1), XYZ1(0.f, 0.f, 1.f) },
+//	{ XYZ1(-1, 1, -1), XYZ1(0.f, 0.f, 1.f) },
+//	{ XYZ1(-1, -1, 1), XYZ1(0.f, 0.f, 1.f) },
+//	{ XYZ1(-1, -1, -1), XYZ1(0.f, 0.f, 1.f) },
+//	// yellow face
+//	{ XYZ1(1, 1, 1), XYZ1(1.f, 1.f, 0.f) },
+//	{ XYZ1(1, 1, -1), XYZ1(1.f, 1.f, 0.f) },
+//	{ XYZ1(1, -1, 1), XYZ1(1.f, 1.f, 0.f) },
+//	{ XYZ1(1, -1, 1), XYZ1(1.f, 1.f, 0.f) },
+//	{ XYZ1(1, 1, -1), XYZ1(1.f, 1.f, 0.f) },
+//	{ XYZ1(1, -1, -1), XYZ1(1.f, 1.f, 0.f) },
+//	// magenta face
+//	{ XYZ1(1, 1, 1), XYZ1(1.f, 0.f, 1.f) },
+//	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 1.f) },
+//	{ XYZ1(1, 1, -1), XYZ1(1.f, 0.f, 1.f) },
+//	{ XYZ1(1, 1, -1), XYZ1(1.f, 0.f, 1.f) },
+//	{ XYZ1(-1, 1, 1), XYZ1(1.f, 0.f, 1.f) },
+//	{ XYZ1(-1, 1, -1), XYZ1(1.f, 0.f, 1.f) },
+//	// cyan face
+//	{ XYZ1(1, -1, 1), XYZ1(0.f, 1.f, 1.f) },
+//	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 1.f) },
+//	{ XYZ1(-1, -1, 1), XYZ1(0.f, 1.f, 1.f) },
+//	{ XYZ1(-1, -1, 1), XYZ1(0.f, 1.f, 1.f) },
+//	{ XYZ1(1, -1, -1), XYZ1(0.f, 1.f, 1.f) },
+//	{ XYZ1(-1, -1, -1), XYZ1(0.f, 1.f, 1.f) },
+//};
+//
+//static std::vector<Triangle> g_vb_texture_Data = {
+//	// left face
+//	{ XYZ1(-1, -1, -1), UV(1.f, 0.f) ,  // lft-top-front
+//	  XYZ1(-1, 1, 1),   UV(0.f, 1.f) ,    // lft-btm-back
+//	  XYZ1(-1, -1, 1),  UV(0.f, 0.f) },   // lft-top-back
+//
+//	{ XYZ1(-1, 1, 1),   UV(0.f, 1.f) ,    // lft-btm-back
+//	  XYZ1(-1, -1, -1), UV(1.f, 0.f) ,  // lft-top-front
+//	  XYZ1(-1, 1, -1),  UV(1.f, 1.f) },   // lft-btm-front
+//
+//	// front face
+//	{ XYZ1(-1, -1, -1), UV(0.f, 0.f) ,  // lft-top-front
+//	  XYZ1(1, -1, -1),  UV(1.f, 0.f) ,   // rgt-top-front
+//	  XYZ1(1, 1, -1),   UV(1.f, 1.f) }, // rgt-btm-front
+//
+//	{ XYZ1(-1, -1, -1), UV(0.f, 0.f) ,  // lft-top-front
+//	  XYZ1(1, 1, -1),   UV(1.f, 1.f) ,    // rgt-btm-front
+//	  XYZ1(-1, 1, -1),  UV(0.f, 1.f) },   // lft-btm-front
+//
+//	// top face
+//	{ XYZ1(-1, -1, -1), UV(0.f, 1.f) ,  // lft-top-front
+//	  XYZ1(1, -1, 1),   UV(1.f, 0.f)  ,    // rgt-top-back
+//	  XYZ1(1, -1, -1),  UV(1.f, 1.f) },   // rgt-top-front
+//
+//	{ XYZ1(-1, -1, -1), UV(0.f, 1.f),  // lft-top-front
+//	  XYZ1(-1, -1, 1),  UV(0.f, 0.f),   // lft-top-back
+//	  XYZ1(1, -1, 1),   UV(1.f, 0.f) },    // rgt-top-back
+//	
+//	// bottom face
+//	{ XYZ1(-1, 1, -1),  UV(0.f, 0.f),  // lft-btm-front
+//	  XYZ1(1, 1, 1),    UV(1.f, 1.f),    // rgt-btm-back
+//	  XYZ1(-1, 1, 1),   UV(0.f, 1.f) },   // lft-btm-back
+//
+//	{ XYZ1(-1, 1, -1),  UV(0.f, 0.f),  // lft-btm-front
+//	  XYZ1(1, 1, -1),   UV(1.f, 0.f),   // rgt-btm-front
+//	  XYZ1(1, 1, 1),    UV(1.f, 1.f) },    // rgt-btm-back
+//					    
+//	// right face	    
+//	{ XYZ1(1, 1, -1),   UV(0.f, 1.f),   // rgt-btm-front
+//	  XYZ1(1, -1, 1),   UV(1.f, 0.f),   // rgt-top-back
+//	  XYZ1(1, 1, 1),    UV(1.f, 1.f) },    // rgt-btm-back
+//					    
+//	{ XYZ1(1, -1, 1),   UV(1.f, 0.f),   // rgt-top-back
+//	  XYZ1(1, 1, -1),   UV(0.f, 1.f),   // rgt-btm-front
+//	  XYZ1(1, -1, -1),  UV(0.f, 0.f) },  // rgt-top-front
+//
+//	// back face
+//	{ XYZ1(-1, 1, 1),   UV(1.f, 1.f),   // lft-btm-back
+//	  XYZ1(1, 1, 1),    UV(0.f, 1.f),    // rgt-btm-back
+//	  XYZ1(-1, -1, 1),  UV(1.f, 0.f) },  // lft-top-back
+//					    
+//	{ XYZ1(-1, -1, 1),  UV(1.f, 0.f),  // lft-top-back
+//	  XYZ1(1, 1, 1),    UV(0.f, 1.f),    // rgt-btm-back
+//	  XYZ1(1, -1, 1),   UV(0.f, 0.f) },   // rgt-top-back
+//};

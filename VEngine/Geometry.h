@@ -31,16 +31,17 @@ public:
 
 private: 
 	GPUBuffer* vertexBuffer;
+	GPUBuffer* indexBuffer;
 
 	uint32_t numVertices;
 
 public: 
 	void LoadMeshFromDae(char* filePath);
-	void LoadMesh(std::vector<Triangle> &geometry);
 	
 	void Draw(VkCommandBuffer commandBuffer);
 
 private:
+	void LoadMesh(std::vector<Triangle> &geometry, std::vector<uint32_t> &indices);
 	std::vector<glm::vec3> loadVertices(rapidxml::xml_node<> *sourceNode);
 	std::vector<glm::vec2> loadUVs(rapidxml::xml_node<> *sourceNode);
 };

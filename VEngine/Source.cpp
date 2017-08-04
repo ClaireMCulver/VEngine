@@ -30,7 +30,6 @@ void main()
 	DeferredRenderPass mainRenderPass;
 	
 	Geometry cubeMesh;
-	//cubeMesh.LoadMesh(g_vb_texture_Data);
 	cubeMesh.LoadMeshFromDae("../Assets/Models/box.dae");
 	
 	Shader standardVertShader("../Assets/Shaders/StandardShader.Vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);

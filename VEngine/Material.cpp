@@ -3,9 +3,10 @@
 
 Material::Material()
 {
+	int sizeOfVertex = sizeof(glm::vec3), sizeOfNormals = sizeof(glm::vec3), sizeOfUVs = sizeof(glm::vec2);
 	//Description of binding and attributes for pipeline
  	viBinding.binding = 0; //Index of the array
- 	viBinding.stride = (sizeof(float) * 4) + (sizeof(float) * 2); //Number of bytes from one vertex data set to the next
+ 	viBinding.stride = sizeOfVertex + sizeOfNormals + sizeOfUVs; //Number of bytes from one vertex data set to the next
  	viBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //As apposed to instance rendering.
  
  
@@ -15,19 +16,29 @@ Material::Material()
  		{									//VkVertexInputBindingDescription
  			0,								//location	//Location value in vertex shader. Because we need that.
  			0,								//binding	//Which binding the per-vertex data comes from.
- 			VK_FORMAT_R32G32B32A32_SFLOAT,	//format	//Format of the data. float3
+ 			VK_FORMAT_R32G32B32_SFLOAT,		//format	//Format of the data. float3
  			0								//offset	//Number of bytes from the start of the data to begin.
  		}
- 	);												   
+ 	);		
+
+	viAttribs.push_back
+	(
+		{
+			1,
+			0,
+			VK_FORMAT_R32G32B32_SFLOAT,
+			(uint32_t)sizeOfVertex
+		}
+	);
  
  	//UVs
  	viAttribs.push_back
  	(
- 		{								//VkVertexInputBindingDescription
- 			1,							//location	
- 			0,							//binding	
- 			VK_FORMAT_R32G32_SFLOAT,	//format	
- 			(sizeof(float) * 4)			//offset	
+ 		{								
+ 			2,							
+ 			0,							
+ 			VK_FORMAT_R32G32_SFLOAT,	
+			(uint32_t)(sizeOfVertex + sizeOfNormals)
  		}
  	);			
 }
