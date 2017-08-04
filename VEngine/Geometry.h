@@ -31,7 +31,7 @@ public:
 
 private: 
 	GPUBuffer* vertexBuffer;
-	GPUBuffer* indexBuffer;
+	//GPUBuffer* indexBuffer; //Not doing index buffers yet. It's stupid.
 
 	uint32_t numVertices;
 

@@ -14,10 +14,10 @@ Geometry::~Geometry()
 		delete vertexBuffer;
 	}
 
-	if (indexBuffer != NULL)
-	{
-		delete indexBuffer;
-	}
+	//if (indexBuffer != NULL)
+	//{
+	//	delete indexBuffer;
+	//}
 }
 
 void Geometry::LoadMeshFromDae(char* filePath)
@@ -108,7 +108,7 @@ void Geometry::LoadMesh(std::vector<Triangle> &geometry, std::vector<uint32_t> &
 	vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, geometry.data(), sizeof(Triangle) * geometry.size());
 
 	// Store the index buffer device side //
-	indexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_INDEX_BUFFER_BIT, indices.data(), sizeof(uint32_t) * indices.size());
+	//indexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_INDEX_BUFFER_BIT, indices.data(), sizeof(uint32_t) * indices.size());
 }
 
 void Geometry::Draw(VkCommandBuffer commandBuffer)
