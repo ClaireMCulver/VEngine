@@ -18,6 +18,7 @@
 #include "DeferredRenderPass.h"
 #include "RenderableObject.h"
 #include "Material.h"
+#include "Texture.h"
 
 #include "GraphicsDefs.h"
 

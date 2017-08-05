@@ -34,7 +34,7 @@ public:
 
 	void CmdClearImage(CommandBuffer &commandBuffer);
 
-private:
+protected:
 	//Vulkan Handles
 	VkImage vkImage;
 	VkImageView vkImageView;
@@ -45,6 +45,7 @@ private:
 	glm::vec2 imageSize;
 	VkImageLayout vkImageLayout;
 	VkImageAspectFlags vkImageAspect;
+
 private:
 	uint32_t FindMemoryType(uint32_t typeBits, VkFlags requirements_mask);
 };

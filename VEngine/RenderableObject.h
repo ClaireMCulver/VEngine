@@ -14,6 +14,7 @@
 #include "CommandBuffer.h"
 #include "GPUBuffer.h"
 #include "DescriptorPool.h"
+#include "Texture.h"
 
 class RenderableObject
 {
@@ -27,6 +28,8 @@ public:
 
 	//Updates the uniform in uniformSet at binding
 	void SetUniform_Mat4x4(glm::mat4x4 &data, int uniformSet, int binding);
+
+	void SetTexture(Texture& texture, int uniformSet, int binding);
 
 private:
 	Geometry* geometry;

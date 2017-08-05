@@ -144,6 +144,9 @@
     <ClCompile Include="Image.cpp">
       <Filter>Source Files\Graphics\Objects\Images</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Graphics\Objects\Images</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VEngineDefs.h">
@@ -207,6 +210,9 @@
       <Filter>Header Files\Graphics\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Image.h">
+      <Filter>Header Files\Graphics\Objects\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
       <Filter>Header Files\Graphics\Objects\Images</Filter>
     </ClInclude>
   </ItemGroup>

@@ -78,3 +78,28 @@ void RenderableObject::SetUniform_Mat4x4(glm::mat4x4 &data, int uniformSet, int 
 
 	vkUpdateDescriptorSets(logicalDevice, 1, &uniformWrite, 0, NULL);
 }
+
+void RenderableObject::SetTexture(Texture& texture, int uniformSet, int binding)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	//Image infor the describes the image to 
+	VkDescriptorImageInfo imageInfo;
+	imageInfo.sampler = texture.GetSampler();
+	imageInfo.imageView = texture.GetImageView();
+	imageInfo.imageLayout = texture.GetImageLayout();
+
+	//Descriptor write that tells Vulkan what we're updating and what we're updating it with
+	uniformWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	uniformWrite.pNext = NULL;
+	uniformWrite.dstSet = uniforms[uniformSet];
+	uniformWrite.dstBinding = binding;
+	uniformWrite.dstArrayElement = 0;
+	uniformWrite.descriptorCount = 1;
+	uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	uniformWrite.pImageInfo = &imageInfo;
+	uniformWrite.pBufferInfo = NULL;
+	uniformWrite.pTexelBufferView = NULL;
+
+	vkUpdateDescriptorSets(logicalDevice, 1, &uniformWrite, 0, NULL);
+}
