@@ -24,9 +24,11 @@
 
 void main()
 {
+	FreeImage_Initialise();
 	GraphicsSystem graphicsSystem;
 	SwapChain swapchain = SwapChain(graphicsSystem, 800, 600, false);
 	DescriptorPool descriptorPool;
+
 
 	DeferredRenderPass mainRenderPass;
 	
@@ -35,6 +37,7 @@ void main()
 	
 	Shader standardVertShader("../Assets/Shaders/StandardShader.Vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
 	Shader standardFragShader("../Assets/Shaders/StandardShader.Frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+	Texture renderTex("../Assets/Textures/CyclesRender.png", 1920, 1080);
 
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
@@ -42,6 +45,7 @@ void main()
 	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass());
 	
 	RenderableObject cube(&cubeMesh, &standardMaterial);
+	cube.SetTexture(renderTex, 1, 0);
 
 	glm::mat4x4 Projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
 	glm::mat4x4 View = glm::lookAt(glm::vec3(-5, 3, -10),  // Camera is at (-5,3,-10), in World Space

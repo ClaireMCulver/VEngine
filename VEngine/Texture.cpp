@@ -2,7 +2,7 @@
 
 
 
-Texture::Texture(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageUsageFlags usage, VkImageAspectFlags imageAspect) : Image(imageWidth, imageHeight, imageFormat, usage, imageAspect)
+Texture::Texture(const char* fileName, int textureWidth, int textureHeight) : Image(textureWidth, textureHeight, VkFormat::VK_FORMAT_R8G8B8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT)
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
@@ -28,6 +28,44 @@ Texture::Texture(int imageWidth, int imageHeight, VkFormat imageFormat, VkImageU
 	samplerCI.unnormalizedCoordinates = VK_FALSE;
 
 	vkCreateSampler(logicalDevice, &samplerCI, NULL, &textureSampler);
+
+	FIBITMAP* textureBMP;
+	textureBMP = FreeImage_Load(FIF_PNG, fileName);
+
+	//The size of the image in bytes = (number of bytes per pixel) times image dimensions.
+	uint64_t BytesPerPixel = ((uint64_t)FreeImage_GetBPP(textureBMP) / 8),
+		ImageWidth = FreeImage_GetWidth(textureBMP),
+		ImageHeight = FreeImage_GetHeight(textureBMP);
+	assert(textureHeight == ImageHeight && textureWidth == ImageWidth);
+	
+	uint64_t ImageSizeInBytes =  BytesPerPixel * (textureHeight * textureWidth);
+
+	CommandBuffer loadBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+	GPUBuffer storageBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_SRC_BIT, FreeImage_GetBits(textureBMP), ImageSizeInBytes);
+
+	VkBufferImageCopy imageRegion;
+	imageRegion.bufferOffset = 0;
+	imageRegion.bufferRowLength = 0;
+	imageRegion.bufferImageHeight = 0;
+	imageRegion.imageSubresource.aspectMask = vkImageAspect;
+	imageRegion.imageSubresource.mipLevel = 0;
+	imageRegion.imageSubresource.baseArrayLayer = 0;
+	imageRegion.imageSubresource.layerCount = 1;
+	imageRegion.imageOffset = { 0, 0, 0 };
+	imageRegion.imageExtent = { (uint32_t)textureWidth, (uint32_t)textureHeight, 1 };
+
+	loadBuffer.BeginRecording();
+
+	ChangeImageLayout(loadBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	vkCmdCopyBufferToImage(loadBuffer.GetVKCommandBuffer(), storageBuffer.GetVKBuffer(), vkImage, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &imageRegion);
+
+	ChangeImageLayout(loadBuffer, VkImageLayout::VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	loadBuffer.EndRecording();
+	loadBuffer.SubmitBuffer();
+	loadBuffer.WaitForCompletion();
 }
 
 
