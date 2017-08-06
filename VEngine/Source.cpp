@@ -35,9 +35,9 @@ void main()
 	Geometry cubeMesh;
 	cubeMesh.LoadMeshFromDae("../Assets/Models/box.dae");
 	
-	Shader standardVertShader("../Assets/Shaders/StandardShader.Vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-	Shader standardFragShader("../Assets/Shaders/StandardShader.Frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
-	Texture renderTex("../Assets/Textures/CyclesRender.png", 1920, 1080);
+	Shader standardVertShader("../Assets/Shaders/StandardVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader standardFragShader("../Assets/Shaders/StandardFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+	Texture renderTex("../Assets/Textures/box.png", 512, 512);
 
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
@@ -48,7 +48,7 @@ void main()
 	cube.SetTexture(renderTex, 1, 0);
 
 	glm::mat4x4 Projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-	glm::mat4x4 View = glm::lookAt(glm::vec3(-5, 3, -10),  // Camera is at (-5,3,-10), in World Space
+	glm::mat4x4 View = glm::lookAt(glm::vec3(-3, 3, -8),  // Camera is at (-5,3,-10), in World Space
 		glm::vec3(0, 0, 0),     // and looks at the origin
 		glm::vec3(0, 1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
 	);
