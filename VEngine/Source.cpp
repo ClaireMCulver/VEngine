@@ -13,6 +13,7 @@
 #endif
 #include "vulkan\vulkan.h"
 
+#include "GraphicsDefs.h"
 #include "Graphics.h"
 #include "SwapChain.h"
 #include "DeferredRenderPass.h"
@@ -20,16 +21,19 @@
 #include "Material.h"
 #include "Texture.h"
 
-#include "GraphicsDefs.h"
+#include "WinKeyboard.h"
 
 void main()
 {
-	FreeImage_Initialise();
+	// Input //
+	WinKeyboard keyboard;
+
+	// Vulkan graphics //
 	GraphicsSystem graphicsSystem;
 	SwapChain swapchain = SwapChain(graphicsSystem, 800, 600, false);
 	DescriptorPool descriptorPool;
 
-
+	// Objects //
 	DeferredRenderPass mainRenderPass;
 	
 	Geometry cubeMesh;
@@ -45,6 +49,8 @@ void main()
 	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass());
 	
 	RenderableObject cube(&cubeMesh, &standardMaterial);
+
+	// Object variable setting //
 	cube.SetTexture(renderTex, 1, 0);
 
 	glm::mat4x4 Projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
@@ -65,13 +71,19 @@ void main()
 
 	mainRenderPass.RegisterObject(cube);
 
+	// Main loop //
 	while (true)
 	{
+		 //Physical update
+		keyboard.UpdateKeyboardState();
+
 		Model = glm::rotate(Model, 0.0005f, glm::vec3(0, 1, 0));
 		MVP = Clip * Projection * View * Model;
 
 		cube.SetUniform_Mat4x4(MVP, 0, 0);
 
+
+		//Render update
 		mainRenderPass.RecordBuffer();
 		mainRenderPass.SubmitBuffer();
 
@@ -81,5 +93,6 @@ void main()
 	}
 
 	graphicsSystem.WaitForDeviceIdle();
+
 	return;
 }

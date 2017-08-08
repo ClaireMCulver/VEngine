@@ -85,6 +85,12 @@
     <Filter Include="Header Files\Graphics\Objects\Images\FrameBuffer">
       <UniqueIdentifier>{4d378957-d9c8-4d93-937a-c3d701fc0fbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Input">
+      <UniqueIdentifier>{56a546b7-8f1f-485c-a717-8e7ce743378a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Input">
+      <UniqueIdentifier>{f22511b1-ad6b-4866-b083-492d58a43ed8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -146,6 +152,9 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Source Files\Graphics\Objects\Images</Filter>
+    </ClCompile>
+    <ClCompile Include="WinKeyboard.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -214,6 +223,9 @@
     </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Header Files\Graphics\Objects\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="WinKeyboard.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
