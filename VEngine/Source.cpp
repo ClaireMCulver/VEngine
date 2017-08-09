@@ -74,6 +74,12 @@ void main()
 	// Main loop //
 	while (true)
 	{
+		//Window update
+		MSG msg;
+		GetMessage(&msg, nullptr, 0, 0);
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+
 		 //Physical update
 		keyboard.UpdateKeyboardState();
 
