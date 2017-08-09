@@ -21,12 +21,12 @@
 #include "Material.h"
 #include "Texture.h"
 
-#include "WinKeyboard.h"
+#include "Input.h"
 
 void main()
 {
 	// Input //
-	WinKeyboard keyboard;
+	Input inputSystem;
 
 	// Vulkan graphics //
 	GraphicsSystem graphicsSystem;
@@ -75,14 +75,9 @@ void main()
 	while (true)
 	{
 		//Window update
-		MSG msg;
-		GetMessage(&msg, nullptr, 0, 0);
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		inputSystem.UpdateInput();
 
 		 //Physical update
-		keyboard.UpdateKeyboardState();
-
 		Model = glm::rotate(Model, 0.0005f, glm::vec3(0, 1, 0));
 		MVP = Clip * Projection * View * Model;
 

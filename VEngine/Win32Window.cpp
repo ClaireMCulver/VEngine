@@ -31,9 +31,6 @@ Win32Window::Win32Window(std::string WindowName, int xResolution, int yResolutio
 	windowData.window = CreateWindowEx(0, windowClass.lpszClassName, WindowName.c_str(), WS_VISIBLE | WS_SYSMENU | WS_OVERLAPPEDWINDOW, 100, 100, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, windowData.connection, NULL);
 	
 	assert(windowData.window);
-
-	SetFocus(windowData.window);
-	SetActiveWindow(windowData.window);
 }
 
 Win32Window::~Win32Window()

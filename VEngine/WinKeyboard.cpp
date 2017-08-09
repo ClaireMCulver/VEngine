@@ -18,5 +18,6 @@ void WinKeyboard::UpdateKeyboardState()
 
 bool WinKeyboard::IsKeyDown(char key)
 {
-	return (GetKeyState(key) == 128);
+	USHORT value = GetKeyState(VkKeyScan(key)) & 128;
+	return (value == 128);
 }
