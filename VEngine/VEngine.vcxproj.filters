@@ -91,6 +91,12 @@
     <Filter Include="Source Files\Input">
       <UniqueIdentifier>{f22511b1-ad6b-4866-b083-492d58a43ed8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Time">
+      <UniqueIdentifier>{feb1ba5e-ec10-425f-ab18-8e9e07e97446}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Time">
+      <UniqueIdentifier>{d6f9d28f-9bf6-4059-9af9-0109db269bf0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -154,7 +160,13 @@
       <Filter>Source Files\Graphics\Objects\Images</Filter>
     </ClCompile>
     <ClCompile Include="WinKeyboard.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Clock.cpp">
+      <Filter>Source Files\Time</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -225,7 +237,13 @@
       <Filter>Header Files\Graphics\Objects\Images</Filter>
     </ClInclude>
     <ClInclude Include="WinKeyboard.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Clock.h">
+      <Filter>Header Files\Time</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

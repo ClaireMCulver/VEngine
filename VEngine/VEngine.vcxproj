@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Clock.cpp" />
     <ClCompile Include="DeferredRenderPass.cpp" />
     <ClCompile Include="GPUBuffer.cpp" />
     <ClCompile Include="CommandBuffer.cpp" />
@@ -141,6 +142,7 @@
     <ClCompile Include="GraphicsLogicalDevice.cpp" />
     <ClCompile Include="GraphicsPhysicalDevice.cpp" />
     <ClCompile Include="Image.cpp" />
+    <ClCompile Include="Input.cpp" />
     <ClCompile Include="Material.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -164,6 +166,7 @@
     <ClCompile Include="WinKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Clock.h" />
     <ClInclude Include="DeferredRenderPass.h" />
     <ClInclude Include="GPUBuffer.h" />
     <ClInclude Include="CommandBuffer.h" />
@@ -184,6 +187,7 @@
     <ClInclude Include="GraphicsLogicalDevice.h" />
     <ClInclude Include="GraphicsPhysicalDevice.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="Input.h" />
     <ClInclude Include="Material.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

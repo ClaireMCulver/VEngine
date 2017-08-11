@@ -22,9 +22,13 @@
 #include "Texture.h"
 
 #include "Input.h"
+#include "Clock.h"
 
 void main()
 {
+	// Clock //
+	Clock clock;
+
 	// Input //
 	Input inputSystem;
 
@@ -74,6 +78,9 @@ void main()
 	// Main loop //
 	while (true)
 	{
+		//Clock update
+		clock.Tick();
+
 		//Window update
 		inputSystem.UpdateInput();
 

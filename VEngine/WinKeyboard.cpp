@@ -21,3 +21,9 @@ bool WinKeyboard::IsKeyDown(char key)
 	USHORT value = GetKeyState(VkKeyScan(key)) & 128;
 	return (value == 128);
 }
+
+bool WinKeyboard::IsKeyUp(char key)
+{
+	USHORT value = GetKeyState(VkKeyScan(key)) & 128;
+	return (value != 128);
+}
