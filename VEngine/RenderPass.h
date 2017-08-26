@@ -14,7 +14,7 @@
 #include "FrameBuffer.h"
 
 #include "CommandBuffer.h"
-#include "RenderableObject.h"
+#include "GameObject.h"
 
 struct SubpassReferences
 {
@@ -42,7 +42,7 @@ public:
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
 
-	void RegisterObject(RenderableObject &object);
+	void RegisterObject(GameObject *object);
 
 	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION. //TODO: Should change this some time later on to specify the image we want.
 	Image* GetRenderedImage();
@@ -64,7 +64,7 @@ private:
 	VkRect2D renderArea;
 	std::vector<VkClearValue> clearValues;
 
-	std::vector<RenderableObject*> registeredMeshes;
+	std::vector<GameObject*> registeredMeshes;
 
 	VkPresentInfoKHR bufferPresentInfo;
 

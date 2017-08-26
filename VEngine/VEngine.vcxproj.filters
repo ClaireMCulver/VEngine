@@ -97,6 +97,18 @@
     <Filter Include="Source Files\Time">
       <UniqueIdentifier>{d6f9d28f-9bf6-4059-9af9-0109db269bf0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Objects">
+      <UniqueIdentifier>{67f754b6-27b4-4fbd-a5a2-39cdb77c3790}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Objects">
+      <UniqueIdentifier>{5facc182-744b-428f-aca5-db0565bebb75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts">
+      <UniqueIdentifier>{4f405760-018a-4f65-b8d8-3b3692d24aa7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\Cube">
+      <UniqueIdentifier>{3259b17c-f7c7-4b60-bcf6-7ce6dd474b4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -150,9 +162,6 @@
     <ClCompile Include="DeferredRenderPass.cpp">
       <Filter>Source Files\Graphics\Objects\RenderPass</Filter>
     </ClCompile>
-    <ClCompile Include="RenderableObject.cpp">
-      <Filter>Source Files\Graphics\Objects</Filter>
-    </ClCompile>
     <ClCompile Include="Image.cpp">
       <Filter>Source Files\Graphics\Objects\Images</Filter>
     </ClCompile>
@@ -167,6 +176,15 @@
     </ClCompile>
     <ClCompile Include="Clock.cpp">
       <Filter>Source Files\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Rotate.cpp">
+      <Filter>Resource Files\Scripts\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Source Files\Graphics\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -227,9 +245,6 @@
     <ClInclude Include="GraphicsDefs.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderableObject.h">
-      <Filter>Header Files\Graphics\Objects</Filter>
-    </ClInclude>
     <ClInclude Include="Image.h">
       <Filter>Header Files\Graphics\Objects\Images</Filter>
     </ClInclude>
@@ -244,6 +259,12 @@
     </ClInclude>
     <ClInclude Include="Clock.h">
       <Filter>Header Files\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Header Files\Graphics\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

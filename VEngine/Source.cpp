@@ -17,12 +17,15 @@
 #include "Graphics.h"
 #include "SwapChain.h"
 #include "DeferredRenderPass.h"
-#include "RenderableObject.h"
+#include "GameObject.h"
 #include "Material.h"
 #include "Texture.h"
+#include "ObjectManager.h"
 
 #include "Input.h"
 #include "Clock.h"
+
+#include "Rotate.cpp"
 
 void main()
 {
@@ -38,6 +41,8 @@ void main()
 	DescriptorPool descriptorPool;
 
 	// Objects //
+	ObjectManager objectManager;
+
 	DeferredRenderPass mainRenderPass;
 	
 	Geometry cubeMesh;
@@ -52,28 +57,15 @@ void main()
 	standardMaterial.AddShader(standardFragShader);
 	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass());
 	
-	RenderableObject cube(&cubeMesh, &standardMaterial);
+	GameObject cube(&cubeMesh, &standardMaterial);
 
 	// Object variable setting //
 	cube.SetTexture(renderTex, 1, 0);
 
-	glm::mat4x4 Projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 100.0f);
-	glm::mat4x4 View = glm::lookAt(glm::vec3(-3, 3, -8),  // Camera is at (-5,3,-10), in World Space
-		glm::vec3(0, 0, 0),     // and looks at the origin
-		glm::vec3(0, 1, 0)     // Head is up (set to 0,-1,0 to look upside-down)
-	);
-	glm::mat4x4 Model = glm::mat4(1.0f);
+	cube.AddComponent(new RotateScript());
 
-	// Vulkan clip space has inverted Y and half Z.
-	glm::mat4x4 Clip = glm::mat4(1.0f, 0.0f, 0.0f, 0.0f,
-		0.0f, -1.0f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.5f, 0.0f,
-		0.0f, 0.0f, 0.5f, 1.0f);
-	glm::mat4x4 MVP = Clip * Projection * View * Model;
-	
-	cube.SetUniform_Mat4x4(MVP, 0, 0);
-
-	mainRenderPass.RegisterObject(cube);
+	mainRenderPass.RegisterObject(&cube);
+	objectManager.AddObject(&cube);
 
 	// Main loop //
 	while (true)
@@ -85,11 +77,7 @@ void main()
 		inputSystem.UpdateInput();
 
 		 //Physical update
-		Model = glm::rotate(Model, 0.0005f, glm::vec3(0, 1, 0));
-		MVP = Clip * Projection * View * Model;
-
-		cube.SetUniform_Mat4x4(MVP, 0, 0);
-
+		objectManager.UpdateObjects();
 
 		//Render update
 		mainRenderPass.RecordBuffer();

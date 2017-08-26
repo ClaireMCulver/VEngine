@@ -251,9 +251,9 @@ void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeig
 	}
 }
 
-void RenderPass::RegisterObject(RenderableObject &object)
+void RenderPass::RegisterObject(GameObject *object)
 {
-	registeredMeshes.push_back(&object);
+	registeredMeshes.push_back(object);
 }
 
 Image* RenderPass::GetRenderedImage()
