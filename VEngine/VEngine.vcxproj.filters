@@ -109,6 +109,9 @@
     <Filter Include="Resource Files\Scripts\Cube">
       <UniqueIdentifier>{3259b17c-f7c7-4b60-bcf6-7ce6dd474b4b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Scripts\Core">
+      <UniqueIdentifier>{4226b02f-8e62-4f86-8442-23e58827cf48}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -180,11 +183,11 @@
     <ClCompile Include="ObjectManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Rotate.cpp">
-      <Filter>Resource Files\Scripts\Cube</Filter>
-    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Graphics\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Rotate.scr">
+      <Filter>Resource Files\Scripts\Cube</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +268,9 @@
     </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Header Files\Graphics\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Resource Files\Scripts\Core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

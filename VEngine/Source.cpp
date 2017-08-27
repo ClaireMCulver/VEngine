@@ -25,7 +25,7 @@
 #include "Input.h"
 #include "Clock.h"
 
-#include "Rotate.cpp"
+#include "Rotate.scr"
 
 void main()
 {

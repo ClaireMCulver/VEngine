@@ -1,7 +1,7 @@
 #pragma once
 
 //GLM
-#include "glm\mat4x4.hpp"
+#include "glm\glm.hpp"
 
 //vulkan definitions
 #ifndef VK_USE_PLATFORM_WIN32_KHR
