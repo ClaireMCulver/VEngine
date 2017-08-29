@@ -112,6 +112,12 @@
     <Filter Include="Resource Files\Scripts\Core">
       <UniqueIdentifier>{4226b02f-8e62-4f86-8442-23e58827cf48}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Scripts\Core\Physics">
+      <UniqueIdentifier>{b4232ef0-4b51-4454-a828-967d9749c716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\Core\Camera">
+      <UniqueIdentifier>{4356b56b-5356-478a-8e46-afc832415d82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -270,7 +276,13 @@
       <Filter>Header Files\Graphics\Objects</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
-      <Filter>Resource Files\Scripts\Core</Filter>
+      <Filter>Resource Files\Scripts\Core\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Header Files\Graphics\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

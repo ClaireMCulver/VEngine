@@ -16,13 +16,19 @@
 #include "DescriptorPool.h"
 #include "Texture.h"
 
-class Component;
+#include "Component.h"
+#include "Transform.h"
 
 class GameObject
 {
 public:
 	GameObject(Geometry *mesh, Material *material);
 	~GameObject();
+
+	// Get/Set //
+	Transform* getTransform() { return transform; }
+
+	// Updates //
 
 	void Draw(CommandBuffer &commandBuffer);
 
@@ -39,6 +45,8 @@ public:
 	void SetTexture(Texture& texture, int uniformSet, int binding);
 
 private:
+	Transform* transform;
+
 	Geometry* geometry;
 	Material* material;
 
@@ -52,21 +60,3 @@ private:
 	std::vector<Component*> components;
 };
 
-
-class Component
-{
-public:
-	Component() {};
-	~Component() {};
-
-	//Function is called when the component is added to the game object.
-	virtual void Start() = 0;
-
-	//Function is called once each frame
-	virtual void Update() = 0;
-
-	void SetOwner(GameObject* object) { owner = object; }
-
-protected:
-	GameObject* owner;
-};

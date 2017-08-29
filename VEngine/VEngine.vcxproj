@@ -168,7 +168,9 @@
     <ClCompile Include="WinKeyboard.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Clock.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="DeferredRenderPass.h" />
     <ClInclude Include="GPUBuffer.h" />
     <ClInclude Include="CommandBuffer.h" />
