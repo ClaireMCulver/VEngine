@@ -27,10 +27,15 @@ public:
 	// Get/Set //
 	glm::vec3 GetPosition() { return position; }
 
-	inline void UpdateModelMatrix() { modelMatrix; }
-
 	void Translate(glm::vec3 translation) { position += translation; }
 
 	glm::mat4 GetModelMat() { return modelMatrix; }
+
+	// Update //
+	void UpdateModelMatrix()
+	{
+		modelMatrix = glm::mat4x4(0.0f);
+	}
+
 };
 
