@@ -16,6 +16,8 @@
 #include "CommandBuffer.h"
 #include "GameObject.h"
 
+#include "Camera.h"
+
 struct SubpassReferences
 {
 	std::vector<VkAttachmentReference> colourReferences;

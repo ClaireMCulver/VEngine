@@ -24,6 +24,11 @@ GameObject::GameObject(Geometry *mesh, Material *mat)
 
 	// Uniform Buffer //
 	uniformBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, sizeof(glm::mat4x4));
+
+	// Components //
+	transform = new Transform();
+	transform->SetOwner(this);
+
 }
 
 
@@ -31,6 +36,8 @@ GameObject::~GameObject()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 	const VkDescriptorPool descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
+
+	delete transform;
 
 	for (int i = 0, count = components.size(); i < count; i++)
 	{
@@ -60,6 +67,8 @@ void GameObject::Update()
 	{
 		components[i]->Update();
 	}
+
+	transform->Update(); //Transform must be the last component to update.
 }
 
 void GameObject::AddComponent(Component* component)

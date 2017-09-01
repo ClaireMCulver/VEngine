@@ -24,18 +24,23 @@ public:
 	{
 	}
 
+	void Start() {}
+
+	void Update() 
+	{
+		glm::mat4x4 rotationMatrix(localRotation);
+		modelMatrix = glm::mat4x4(glm::translate(rotationMatrix, position));
+	}
+
 	// Get/Set //
 	glm::vec3 GetPosition() { return position; }
 
-	void Translate(glm::vec3 translation) { position += translation; }
-
 	glm::mat4 GetModelMat() { return modelMatrix; }
 
-	// Update //
-	void UpdateModelMatrix()
-	{
-		modelMatrix = glm::mat4x4(0.0f);
-	}
+	// Movement //
+	void Translate(glm::vec3 translation) { position += translation; }
 
+	//TODO: figure out whether the degrees passede should be changed to radians or not.
+	void rotate(float degrees, glm::vec3 axis = glm::vec3(0.0f, 1.0f, 0.0f)) { localRotation *= glm::angleAxis(glm::radians(degrees), axis); }
 };
 

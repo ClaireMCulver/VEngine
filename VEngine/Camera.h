@@ -3,10 +3,15 @@
 #include "glm\glm.hpp"
 #include "glm\gtc\matrix_transform.hpp"
 
+#include "GameObject.h"
 #include "Component.h"
+
 class Camera : public Component
 {
 private:
+
+	glm::vec3 lookPoint = glm::vec3(0.f);
+	glm::vec3 UpVector = glm::vec3(0.f, 1.f, 0.f);
 	
 	//This definition exist to serve as a reminder of the lookat function and how the view matrix works.
 	glm::mat4x4 view = glm::lookAt(
@@ -65,12 +70,26 @@ public:
 	{
 		view = glm::lookAt
 		(
-			owner->getTransform()->GetPosition(),
+			owner->GetTransform()->GetPosition(),
 			point,
 			up
 		);
 	}
 
+	void UpdateMatrices()
+	{
+		view = glm::lookAt
+		(
+			owner->GetTransform()->GetPosition(),
+			lookPoint,
+			UpVector
+		);
+
+		VPMatrix = clip * projection * view;
+	}
+
+	void Start() {}
+	void Update() {}
+
 };
 
-Camera* Camera::mainCamera = NULL;

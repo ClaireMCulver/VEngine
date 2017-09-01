@@ -26,6 +26,7 @@
 #include "Clock.h"
 
 #include "Rotate.scr"
+#include "Camera.h"
 
 void main()
 {
@@ -66,6 +67,13 @@ void main()
 
 	mainRenderPass.RegisterObject(&cube);
 	objectManager.AddObject(&cube);
+
+
+	GameObject mainCamera(&cubeMesh, &standardMaterial);
+	Camera camera;
+	mainCamera.AddComponent(&camera);
+	mainCamera.GetTransform()->Translate(glm::vec3(-1.0f, -1.0f, -1.0f));
+	mainCamera.GetTransform()->Translate(glm::vec3(-3.0f, 3.0f, -8.0f));
 
 	// Main loop //
 	while (true)

@@ -216,6 +216,11 @@ void RenderPass::RecordBuffer()
 	// Render pass contents //
 	for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
 	{
+		//Update mvp matrix.
+		Camera::GetMain()->UpdateMatrices();
+		registeredMeshes[i]->SetUniform_Mat4x4(Camera::GetMain()->GetVPMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), 0, 0);
+
+		//Draw the model in the buffer.
 		registeredMeshes[i]->Draw(*renderBuffer);
 	}
 

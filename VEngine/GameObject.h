@@ -27,7 +27,7 @@ public:
 	~GameObject();
 
 	// Get/Set //
-	Transform* getTransform() { return transform; }
+	Transform* GetTransform() { return transform; }
 
 	// Updates //
 
