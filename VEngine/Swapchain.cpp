@@ -106,7 +106,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	VkSurfaceCapabilitiesKHR surfaceCapabilities;
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(vkPhysicalDevice, vkSurface, &surfaceCapabilities);
 
-	// Do validation on the swapchain creation //
+	//TODO: do validation on the swapchain creation //
 	//nah
 
 	result = vkCreateSwapchainKHR(vkLogicalDevice, &swapchainCI, NULL, &vkSwapchain);
@@ -160,6 +160,12 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	imageTransferedSignalInfo.flags = 0;
 	vkCreateSemaphore(vkLogicalDevice, &imageTransferedSignalInfo, NULL, &imageTransferedSignal);
 
+	// Blit buffer creation //
+	blitBuffer = new CommandBuffer(CommandBufferType::Transfer, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	blitBuffer->AddWaitSemaphore(imageAcquireSignal);
+	blitBuffer->AddSignalSemaphore(imageTransferedSignal);
+	blitBuffer->SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT); //TODO: find out if this is correct;
+
 	// Presentation Information //
 	currentImage = 0;
 	//The semaphores might change, but so I'll put all this here for a simple optimization.
@@ -172,11 +178,6 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	presentInfo.pImageIndices = &currentImage;
 	presentInfo.pResults = NULL;
 
-	// Blit buffer creation //
-	blitBuffer = new CommandBuffer(CommandBufferType::Transfer, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	blitBuffer->AddWaitSemaphore(imageAcquireSignal);
-	blitBuffer->AddSignalSemaphore(imageTransferedSignal);
-	blitBuffer->SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_TRANSFER_BIT); //TODO: find out if this is correct;
 }
 
 
@@ -279,16 +280,16 @@ void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)
 	{
 		barriers[i] =
 		{
-			VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
-			nullptr,
-			0,
-			VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT,
-			VK_IMAGE_LAYOUT_UNDEFINED,
-			VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-			0,
-			0,
-			swapchainImages[i],
-			{
+			VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,							//sType;
+			nullptr,														//pNext;
+			0,																//srcAccessMask;
+			0,//VK_ACCESS_MEMORY_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT,		//dstAccessMask;
+			VK_IMAGE_LAYOUT_UNDEFINED,										//oldLayout;
+			VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,								//newLayout;
+			0,																//srcQueueFamilyIndex;
+			0,																//dstQueueFamilyIndex;
+			swapchainImages[i],												//image;
+			{																//subresourceRange;
 				VK_IMAGE_ASPECT_COLOR_BIT,
 				0,
 				1,

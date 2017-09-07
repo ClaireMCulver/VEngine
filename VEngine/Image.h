@@ -48,5 +48,15 @@ protected:
 
 private:
 	uint32_t FindMemoryType(uint32_t typeBits, VkFlags requirements_mask);
+
+	struct ImageAccessData
+	{
+		VkFlags srcMask = 0; 
+		VkPipelineStageFlags srcStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+		VkFlags dstMask = 0;
+		VkPipelineStageFlags dstStageFlags = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+	};
+
+	ImageAccessData FetchImageAccessAndStage(VkImageLayout newLayout);
 };
 
