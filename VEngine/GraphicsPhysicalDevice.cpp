@@ -53,7 +53,7 @@ GraphicsPhysicalDevice::GraphicsPhysicalDevice(GraphicsInstance &instance)
 	{
 		if (physicalDeviceProperties[i].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 		{
-			descreetGPUIndex = i;
+			discreteGPUIndex = i;
 			break;
 		}
 	}
