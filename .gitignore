@@ -268,7 +268,7 @@ __pycache__/
 
 # VEngine Assets folder
 Assets/
-*.dae
-*.png
-*.glsl
-*.scr
+#*.dae
+#*.png
+#*.glsl
+#*.scr

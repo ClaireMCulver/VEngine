@@ -70,13 +70,12 @@ void main()
 
 
 	GameObject mainCamera(&cubeMesh, &standardMaterial);
-	Camera camera;
-	mainCamera.AddComponent(&camera);
+	mainCamera.AddComponent(new Camera());
 	mainCamera.GetTransform()->Translate(glm::vec3(-1.0f, -1.0f, -1.0f));
 	mainCamera.GetTransform()->Translate(glm::vec3(-3.0f, 3.0f, -8.0f));
 
 	// Main loop //
-	while (true)
+	while (!inputSystem.keyboard.IsKeyDown('q'))
 	{
 		//Clock update
 		clock.Tick();
