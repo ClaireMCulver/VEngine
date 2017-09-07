@@ -27,12 +27,12 @@ public:
 		uint32_t queuesNeeded;
 	} QueueFamilyIndices;
 
-	VkPhysicalDevice				 GetPhysicalDevice() const					{ return physicalDevices[0]; }
-	VkPhysicalDeviceProperties		 GetPhysicalDeviceProperties() const		{ return physicalDeviceProperties[0]; }
-	VkPhysicalDeviceFeatures		 GetPhysicalDeviceFeatures() const			{ return physicalDeviceFeatures[0]; }
-	VkPhysicalDeviceMemoryProperties GetPhysicalDeviceMemoryPropertiess() const { return physicalDeviceMemoryProperties[0]; }
-	VkQueueFamilyProperties*		 GetQueueFamilyProperties()					{ return physicalDeviceQueueFamilyProperties[0].data(); }
-	QueueFamilyIndices				 GetQueueFamilyIndices() const				{ return physicalDeviceQueueFamilyIndices[0]; }
+	VkPhysicalDevice				 GetPhysicalDevice() const					{ return physicalDevices[discreteGPUIndex]; }
+	VkPhysicalDeviceProperties		 GetPhysicalDeviceProperties() const		{ return physicalDeviceProperties[discreteGPUIndex]; }
+	VkPhysicalDeviceFeatures		 GetPhysicalDeviceFeatures() const			{ return physicalDeviceFeatures[discreteGPUIndex]; }
+	VkPhysicalDeviceMemoryProperties GetPhysicalDeviceMemoryPropertiess() const { return physicalDeviceMemoryProperties[discreteGPUIndex]; }
+	VkQueueFamilyProperties*		 GetQueueFamilyProperties()					{ return physicalDeviceQueueFamilyProperties[discreteGPUIndex].data(); }
+	QueueFamilyIndices				 GetQueueFamilyIndices() const				{ return physicalDeviceQueueFamilyIndices[discreteGPUIndex]; }
 
 
 
@@ -51,6 +51,8 @@ private:
 	std::vector<QueueFamilyIndices> physicalDeviceQueueFamilyIndices;
 
 	int queuesNeeded = 0;
+
+	int discreteGPUIndex = 0;
 private:
 	void FindQueueFamilyIndices();
 };

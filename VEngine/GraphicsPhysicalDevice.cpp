@@ -47,6 +47,16 @@ GraphicsPhysicalDevice::GraphicsPhysicalDevice(GraphicsInstance &instance)
 	}
 
 	GetQueueFamilyIndices();
+
+	// Fetch the discrete GPU's index in the physical device list //
+	for (size_t i = 0, count = physicalDeviceProperties.size(); i < count; i++)
+	{
+		if (physicalDeviceProperties[i].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+		{
+			descreetGPUIndex = i;
+			break;
+		}
+	}
 }
 
 
@@ -58,7 +68,7 @@ void GraphicsPhysicalDevice::FindQueueFamilyIndices()
 {
 	bool graphicsFound = false, computeFound = false, transferFound = false, sparseFound = false;
 	//I've decided to just get the queues from the first device for now. There's just no point for now in having multiple queues from multiple devices.
-	for (size_t i = 0, count = 1/* physicalDeviceQueueFamilyIndices.size()*/; i < count; i++)
+	for (size_t i = 0, count = physicalDeviceQueueFamilyIndices.size(); i < count; i++)
 	{
 		for (size_t j = 0, countb = physicalDeviceQueueFamilyProperties[i].size(); j < countb; j++)
 		{
