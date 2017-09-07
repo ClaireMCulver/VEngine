@@ -267,7 +267,7 @@ __pycache__/
 *.idb
 
 # VEngine Assets folder
-Assets/
+#Assets/
 #*.dae
 #*.png
 #*.glsl
