@@ -116,6 +116,43 @@ bool Shader::CreateResourceSetLayout(const std::string* fileData, VkShaderStageF
 					NULL									//pImmutableSamplers
 				}
 			);
+
+			//Fetch size of uniform structure;
+			std::string uniformStructure;
+			std::string uniformType;
+			size_t uniformTypeStart = fileData->find("{", uniformNameStart) + 6;
+			size_t uniformTypeEnd = fileData->find("}", uniformNameStart);
+			size_t currentLine;
+
+			uniformStructure = fileData->substr(uniformTypeStart, uniformTypeEnd + 1 - uniformTypeStart);
+
+			uniformType = uniformStructure.substr(0, uniformStructure.find(" ", 0));
+			currentLine = uniformStructure.find(";");
+			while (currentLine != std::string::npos)
+			{
+				//Massive if statement block in order to determine what size to make each uniform buffer.
+				if (uniformType == "mat4")
+				{
+					uniformBytes.push_back(sizeof(glm::mat4));
+				}
+				else if (uniformType == "float")
+				{
+					uniformBytes.push_back(sizeof(float));
+				}
+				else if (uniformType == "int")
+				{
+					uniformBytes.push_back(sizeof(int));
+				}
+				else
+				{
+					std::exception e("Invalid Uniform type in shader");
+					throw e;
+				}
+
+				//Get next line
+				uniformType = uniformStructure.substr(currentLine + 2, uniformStructure.find(" ", currentLine + 2));
+				currentLine = uniformStructure.find(";", currentLine + 1);
+			}
 		}
 
 		currentPosition = fileData->find("uniform", currentPosition + 1);

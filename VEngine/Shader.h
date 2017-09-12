@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "glm\glm.hpp"
 
 //vulkan definitions
 #ifndef VK_USE_PLATFORM_WIN32_KHR
@@ -25,6 +26,7 @@ public:
 
 	VkShaderModule GetVKShaderModule() const { return vkShaderModule; }
 	VkShaderStageFlags GetVKShaderStage() const { return vkShaderType; }
+	std::vector<size_t> GetUniformBytes() const { return uniformBytes; }
 	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return resourceSetLayout; }
 
 private:
@@ -32,7 +34,7 @@ private:
 	VkShaderModule vkShaderModule;
 	VkShaderStageFlags vkShaderType;
 
-
+	std::vector<size_t> uniformBytes;
 
 	VkDescriptorSetLayout resourceSetLayout;
 

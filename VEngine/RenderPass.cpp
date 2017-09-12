@@ -213,12 +213,25 @@ void RenderPass::RecordBuffer()
 	//Render pass
 	vkCmdBeginRenderPass(vkRenderBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
+	glm::mat4 modelMatrix;
+	Material* currentMaterial;
+
 	// Render pass contents //
 	for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
 	{
-		//Update mvp matrix.
+		//Update matrices.
 		Camera::GetMain()->UpdateMatrices();
-		registeredMeshes[i]->SetUniform_Mat4x4(Camera::GetMain()->GetVPMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), 0, 0);
+
+		currentMaterial = registeredMeshes[i]->GetMaterial();
+
+		modelMatrix = registeredMeshes[i]->GetTransform()->GetModelMat();
+
+		//MV matrix
+		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetViewMatrix() * modelMatrix, 1, 1);
+
+		//MVP matrix
+		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetVPMatrix() * modelMatrix, 0, 0);
+
 
 		//Draw the model in the buffer.
 		registeredMeshes[i]->Draw(*renderBuffer);
