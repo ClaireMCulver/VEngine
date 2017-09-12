@@ -9,9 +9,9 @@ layout (location = 2) in vec2 inUV;
 layout (location = 0) out vec3 outNormal;
 layout (location = 1) out vec2 outUV;
 
-layout (set = 0, binding = 0) uniform Matrix_ModelViewProjection 
+layout (push_constant) uniform Matrix_ModelViewProjection 
 {
-    mat4 data;
+    layout(offset = 0) mat4 data;
 } mvp_matrix;
 
 out gl_PerVertex 

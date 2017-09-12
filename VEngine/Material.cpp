@@ -97,14 +97,19 @@ void Material::FinalizeMaterial(VkRenderPass renderPass)
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	// Pipeline Layout //
+	VkPushConstantRange pushConstantRange;
+	pushConstantRange.stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
+	pushConstantRange.offset = 0;
+	pushConstantRange.size = 128; //Guaranteed minimum size for the push constant range for a single pipeline layout.
+
 	VkPipelineLayoutCreateInfo pipelineLayoutCI;
 	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutCI.pNext = NULL;
 	pipelineLayoutCI.flags = 0;
 	pipelineLayoutCI.setLayoutCount = layoutDescriptors.size();
 	pipelineLayoutCI.pSetLayouts = layoutDescriptors.data();
-	pipelineLayoutCI.pushConstantRangeCount = 0;
-	pipelineLayoutCI.pPushConstantRanges = NULL;
+	pipelineLayoutCI.pushConstantRangeCount = 1;
+	pipelineLayoutCI.pPushConstantRanges = &pushConstantRange;
 
 	res = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineData.pipelineLayout);
 	assert(res == VK_SUCCESS);

@@ -10,14 +10,14 @@ layout (location = 1) in vec2 inUV;
 layout (location = 0) out vec4 outColor;
 
 layout (set = 1, binding = 0) uniform sampler2D albedo; 
-layout (set = 1, binding = 1) uniform Matrix_ModelView 
+layout (push_constant) uniform Matrix_ModelView 
 {
-    mat4 data;
+    layout(offset = 64) mat4 data;
 } mv_matrix;
 
 void main() 
 {
-    vec3 normal = vec4(inNormal, 0.0).xyz;
-    //outColor = vec4(normal, 1.0);
-    outColor = texture(albedo, inUV);
+    vec3 normal = (mv_matrix.data * vec4(inNormal, 0.0)).xyz;
+    outColor = vec4(normal, 1.0);
+    //outColor = texture(albedo, inUV);
 }
