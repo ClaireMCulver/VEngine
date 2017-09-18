@@ -165,6 +165,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
     <ClCompile Include="Win32Window.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -213,6 +214,7 @@
     </ClInclude>
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Transform.h" />
+    <ClInclude Include="UniformBuffer.h" />
     <ClInclude Include="VEngineDefs.h" />
     <ClInclude Include="Win32Window.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>

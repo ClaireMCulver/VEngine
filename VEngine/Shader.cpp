@@ -11,8 +11,6 @@ Shader::Shader(const char* filePath, VkShaderStageFlagBits shaderType)
 	LoadShaderFromFile(filePath, fileText);
 
 	CreateShaderModule(fileText.data(), shaderType);
-
-	CreateResourceSetLayout(&fileText, shaderType);
 }
 
 
@@ -20,8 +18,6 @@ Shader::~Shader()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 	
-	vkDestroyDescriptorSetLayout(logicalDevice, resourceSetLayout, NULL);
-
 	vkDestroyShaderModule(logicalDevice, vkShaderModule, NULL);
 }
 
@@ -72,63 +68,6 @@ bool Shader::CreateShaderModule(const char* fileText, VkShaderStageFlagBits shad
 
 	//Actually create the shader vulkan side:
 	VkResult result = vkCreateShaderModule(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), &moduleCI, NULL, &vkShaderModule);
-	assert(result == VK_SUCCESS);
-
-	return true;
-}
-
-bool Shader::CreateResourceSetLayout(const std::string* fileData, VkShaderStageFlagBits shaderType)
-{
-	std::vector<VkDescriptorSetLayoutBinding> resourceSetLayoutBindings;
-
-	size_t currentPosition = 0;
-	currentPosition = fileData->find("uniform", currentPosition + 1);
-
-	while (currentPosition != std::string::npos)
-	{
-		size_t uniformNameStart = fileData->find(" ", currentPosition) + 1;
-		size_t uniformNameEnd = fileData->find(" ", uniformNameStart);
-		std::string uniformName = fileData->substr(uniformNameStart, uniformNameEnd - uniformNameStart);
-
-		if (uniformName == "sampler2D")
-		{
-			resourceSetLayoutBindings.push_back
-			(
-				{
-					resourceSetLayoutBindings.size(),
-					VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-					1,
-					vkShaderType,
-					NULL
-				}
-			);
-		}
-		else
-		{
-			//Determine type of uniform.
-			resourceSetLayoutBindings.push_back
-			(
-				{											//VkDescriptorSetLayoutBinding
-					resourceSetLayoutBindings.size(),		//binding			//Binding of the resource in the shader
-					VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,		//descriptorType	//Type of resource in the shader
-					1,										//descriptorCount	//Make one descriptor. Multiple descriptors would be for an array of resources in the shader.
-					vkShaderType,							//stageFlags		//Which stage of the pipeline CAN access the uniform.
-					NULL									//pImmutableSamplers
-				}
-			);
-		}
-
-		currentPosition = fileData->find("uniform", currentPosition + 1);
-	}
-
-	VkDescriptorSetLayoutCreateInfo resourceSetLayoutCI;
-	resourceSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	resourceSetLayoutCI.pNext = NULL;
-	resourceSetLayoutCI.flags = 0;
-	resourceSetLayoutCI.bindingCount = resourceSetLayoutBindings.size();
-	resourceSetLayoutCI.pBindings = resourceSetLayoutBindings.data();
-
-	VkResult result = vkCreateDescriptorSetLayout(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), &resourceSetLayoutCI, NULL, &resourceSetLayout);
 	assert(result == VK_SUCCESS);
 
 	return true;

@@ -43,12 +43,6 @@
     <Filter Include="Source Files\Graphics\Objects\Presentation">
       <UniqueIdentifier>{a68f612a-be5c-4fa4-a133-42f9f8fbd0e5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphics\Objects\UniformBuffer">
-      <UniqueIdentifier>{bf8e1438-1061-439e-ad61-e05ab464453c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Graphics\Objects\UniformBuffer">
-      <UniqueIdentifier>{f16e32f5-4a9b-4378-a2d3-6b8346a176b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Graphics\Objects\Buffers">
       <UniqueIdentifier>{bc7e4b72-af05-4bbc-b462-7cebce60a8b7}</UniqueIdentifier>
     </Filter>
@@ -118,6 +112,18 @@
     <Filter Include="Resource Files\Scripts\Core\Camera">
       <UniqueIdentifier>{4356b56b-5356-478a-8e46-afc832415d82}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Objects\Buffers\UniformBuffer">
+      <UniqueIdentifier>{046d31ba-0729-4c79-9360-9eb0cf30e9be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Graphics\Objects\DescriptorPool">
+      <UniqueIdentifier>{bf8e1438-1061-439e-ad61-e05ab464453c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\DescriptorPool">
+      <UniqueIdentifier>{f16e32f5-4a9b-4378-a2d3-6b8346a176b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Graphics\Objects\Buffers\UniformBuffer">
+      <UniqueIdentifier>{3df98956-a74e-4318-8f65-1d3a126ca095}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -148,7 +154,7 @@
       <Filter>Source Files\Graphics\Objects\Presentation</Filter>
     </ClCompile>
     <ClCompile Include="DescriptorPool.cpp">
-      <Filter>Source Files\Graphics\Objects\UniformBuffer</Filter>
+      <Filter>Source Files\Graphics\Objects\DescriptorPool</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files\Graphics\Objects\Shaders</Filter>
@@ -195,6 +201,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </ClCompile>
+    <ClCompile Include="UniformBuffer.cpp">
+      <Filter>Source Files\Graphics\Objects\Buffers\UniformBuffer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VEngineDefs.h">
@@ -225,7 +234,7 @@
       <Filter>Header Files\Graphics\Objects\Presentation</Filter>
     </ClInclude>
     <ClInclude Include="DescriptorPool.h">
-      <Filter>Header Files\Graphics\Objects\UniformBuffer</Filter>
+      <Filter>Header Files\Graphics\Objects\DescriptorPool</Filter>
     </ClInclude>
     <ClInclude Include="Graphics.h">
       <Filter>Header Files\Graphics</Filter>
@@ -286,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="Rotate.scr">
       <Filter>Resource Files\Scripts\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="UniformBuffer.h">
+      <Filter>Header Files\Graphics\Objects\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

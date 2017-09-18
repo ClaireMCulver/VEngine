@@ -25,16 +25,11 @@ public:
 
 	VkShaderModule GetVKShaderModule() const { return vkShaderModule; }
 	VkShaderStageFlags GetVKShaderStage() const { return vkShaderType; }
-	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return resourceSetLayout; }
 
 private:
 	//Shader module
 	VkShaderModule vkShaderModule;
 	VkShaderStageFlags vkShaderType;
-
-
-
-	VkDescriptorSetLayout resourceSetLayout;
 
 private:
 	//Loads the file and places the text within the given string.
@@ -42,9 +37,6 @@ private:
 
 	//Takes the text and creates a shader module
 	bool CreateShaderModule(const char* fileText, VkShaderStageFlagBits shaderType);
-
-	//Finds the number of uniforms in the shader and creates relevant bindings for them.
-	bool CreateResourceSetLayout(const std::string* fileData, VkShaderStageFlagBits shaderType);
 
 private:
 	bool GLSLtoSPV(const VkShaderStageFlagBits shader_type, const char *pshader, const char* shaderName, std::vector<unsigned int> &spirv);

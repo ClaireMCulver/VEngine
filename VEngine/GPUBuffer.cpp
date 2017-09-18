@@ -85,8 +85,8 @@ GPUBuffer::GPUBuffer(VkBufferUsageFlags bufferUsage, void* data, uint64_t memory
 	vkBindBufferMemory(logicalDevice, vkBuffer, vkMemory, 0);
 
 	void* deviceData;
-	vkMapMemory(logicalDevice, vkMemory, 0, bufferCI.size, 0, &deviceData);
-	memcpy(deviceData, data, (size_t)bufferCI.size);
+	vkMapMemory(logicalDevice, vkMemory, 0, memorySize, 0, &deviceData);
+	memcpy(deviceData, data, (size_t)memorySize);
 	vkUnmapMemory(logicalDevice, vkMemory);
 }
 

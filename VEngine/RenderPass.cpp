@@ -4,18 +4,29 @@ RenderPass::RenderPass()
 {
 	renderArea.extent = { 0, 0 };
 	renderArea.offset = { 0, 0 };
+
+	perFrameUniformBuffer = new UniformBuffer();
 }
 
 
 RenderPass::~RenderPass()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+	const VkDescriptorPool descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
 
 	delete renderBuffer;
+
+	delete perFrameUniformBuffer;
 
 	vkDestroyFramebuffer(logicalDevice, frameBuffer, NULL);
 	
 	vkDestroyRenderPass(logicalDevice, renderPass, NULL);
+
+	vkFreeDescriptorSets(logicalDevice, descriptorPool, 1, &descriptorSet);
+
+	vkDestroyPipelineLayout(logicalDevice, pipelineLayout, NULL);
+
+	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, NULL);
 
 	for (size_t i = 0, count = images.size(); i < count; i++)
 	{
@@ -175,6 +186,101 @@ void RenderPass::CreateRenderPass()
 	//Allocate command buffer
 	renderBuffer = new CommandBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 	renderBuffer->SetDestinationStageMask(VkPipelineStageFlagBits::VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT);
+
+	// Descriptor Set Bindings //
+	std::vector<VkDescriptorSetLayoutBinding> descriptorBindings;
+
+	//Per-Frame Data
+	descriptorBindings.push_back
+	(
+	{	//VkDescriptorSetLayoutBinding
+		0,											//binding;				//Binding within the descriptor set
+		VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
+		1,											//descriptorCount;		//For use with an array of objects
+		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			//Stages of the shader that CAN access the descriptor
+		NULL										//pImmutableSamplers;
+	}
+	);
+
+	//Per-Pass Data
+	descriptorBindings.push_back
+	(
+	{	//VkDescriptorSetLayoutBinding
+		1,											//binding;				
+		VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
+		1,											//descriptorCount;		
+		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
+		NULL										//pImmutableSamplers;
+	}
+	);
+
+	//Per-Draw Data
+	descriptorBindings.push_back
+	(
+	{	//VkDescriptorSetLayoutBinding
+		2,											//binding;				
+		VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
+		1,											//descriptorCount;		
+		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
+		NULL										//pImmutableSamplers;
+	}
+	);
+
+	//Passed Textures
+	descriptorBindings.push_back
+	(
+	{	//VkDescriptorSetLayoutBinding
+		3,											//binding;				
+		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
+		1,											//descriptorCount;		
+		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
+		NULL										//pImmutableSamplers;
+	}
+	);
+
+	// Descriptor Set Layout //
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCI;
+	descriptorSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCI.pNext = NULL;
+	descriptorSetLayoutCI.flags = 0;
+	descriptorSetLayoutCI.bindingCount = descriptorBindings.size();
+	descriptorSetLayoutCI.pBindings = descriptorBindings.data();
+
+	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI, NULL, &descriptorSetLayout);
+	assert(result == VK_SUCCESS);
+
+	//Allocate descriptor set
+	VkDescriptorSetAllocateInfo descirptorSetAlloc;
+	descirptorSetAlloc.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	descirptorSetAlloc.pNext = NULL;
+	descirptorSetAlloc.descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
+	descirptorSetAlloc.descriptorSetCount = 1;
+	descirptorSetAlloc.pSetLayouts = &descriptorSetLayout;
+
+	result = vkAllocateDescriptorSets(logicalDevice, &descirptorSetAlloc, &descriptorSet);
+	assert(result == VK_SUCCESS);
+
+	//Update the descriptor set with nothing to make vulklan stop complaining;
+	vkUpdateDescriptorSets(logicalDevice, 0, NULL, 0, NULL);
+
+	//Push Constant Ranges
+	VkPushConstantRange pushConstantRange;
+	pushConstantRange.stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_ALL;
+	pushConstantRange.offset = 0;
+	pushConstantRange.size = 128; //Minimum guaranteed size of a push constant. Probably should use more than this anyway.
+
+	// Pipeline Layout //
+	VkPipelineLayoutCreateInfo pipelineLayoutCI;
+	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	pipelineLayoutCI.pNext = NULL;
+	pipelineLayoutCI.flags = 0;
+	pipelineLayoutCI.setLayoutCount = 1;
+	pipelineLayoutCI.pSetLayouts = &descriptorSetLayout;
+	pipelineLayoutCI.pushConstantRangeCount = 1;
+	pipelineLayoutCI.pPushConstantRanges = &pushConstantRange;
+
+	result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineLayout);
+	assert(result == VK_SUCCESS);
 }
 
 void RenderPass::BindRenderPass(VkCommandBuffer &cmdBuffer)
@@ -213,12 +319,55 @@ void RenderPass::RecordBuffer()
 	//Render pass
 	vkCmdBeginRenderPass(vkRenderBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
+	Camera* currentCamera = Camera::GetMain();
+	size_t mat4Size = sizeof(glm::mat4);
+	currentCamera->UpdateMatrices();
+
+	//Update the PerFrameUniformBuffer : TODO: Move this into it's own function.
+	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetViewMatrix(), mat4Size, 0);
+	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetProjectionMatrix(), mat4Size, mat4Size);
+	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetVPMatrix(), mat4Size, mat4Size + mat4Size);
+
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+	VkDescriptorBufferInfo perFrameBufferInfo;
+	perFrameBufferInfo.buffer = perFrameUniformBuffer->GetVKBuffer();
+	perFrameBufferInfo.offset = 0;
+	perFrameBufferInfo.range = VK_WHOLE_SIZE;
+
+	VkWriteDescriptorSet descriptorWrite;
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.pNext = NULL;
+	descriptorWrite.dstSet = descriptorSet;
+	descriptorWrite.dstBinding = 0;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrite.pImageInfo = NULL;
+	descriptorWrite.pBufferInfo = &perFrameBufferInfo;
+	descriptorWrite.pTexelBufferView = NULL;
+
+	vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
+
+	Material* currentMaterial;
+
+	vkCmdBindDescriptorSets(vkRenderBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
+
 	// Render pass contents //
 	for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
 	{
-		//Update mvp matrix.
-		Camera::GetMain()->UpdateMatrices();
-		registeredMeshes[i]->SetUniform_Mat4x4(Camera::GetMain()->GetVPMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), 0, 0);
+		currentMaterial = registeredMeshes[i]->GetMaterial();
+
+		//Model Matrix
+		currentMaterial->SetUniform_Mat4x4(registeredMeshes[i]->GetTransform()->GetModelMat(), 0);
+
+		//Model View Matrix
+		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetViewMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), sizeof(glm::mat4));
+
+		//Model View Projection Matrix
+		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetVPMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), sizeof(glm::mat4) + sizeof(glm::mat4));
+
+		//
+		currentMaterial->UpdateDescriptorSet(descriptorSet);
 
 		//Draw the model in the buffer.
 		registeredMeshes[i]->Draw(*renderBuffer);

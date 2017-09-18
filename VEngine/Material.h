@@ -3,15 +3,19 @@
 #include <vector>
 
 #include "GraphicsDefs.h"
+#include "VEngineDefs.h"
 #include "vulkan\vulkan.h"
 
 #include "Graphics.h"
 #include "Shader.h"
+#include "UniformBuffer.h"
+#include "Texture.h"
+
+#include "glm\glm.hpp"
 
 struct PipelineData
 {
 	VkPipeline pipeline; //Graphics Pipeline
-	VkPipelineLayout pipelineLayout; //Layout of the pipeline
 };
 
 class Material
@@ -25,7 +29,7 @@ public:
 	void AddShader(Shader &newShader);
 
 	//Finalizes the material pipeline on the GPU side.
-	void FinalizeMaterial(VkRenderPass renderPass);
+	void FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout);
 
 
 	//Binds the pipeline
@@ -33,7 +37,15 @@ public:
 
 	//Returns the pipeline and pipeline layout handles
 	PipelineData GetPipelineData() const { return pipelineData; }
-	std::vector<VkDescriptorSetLayout> GetDescriptorLayout() const { return layoutDescriptors; }
+
+	void UpdateDescriptorSet(VkDescriptorSet &descriptorSet);
+
+	// Uniform updates //
+
+	//Updates the uniform in uniformSet at binding
+	void SetUniform_Mat4x4(glm::mat4x4 &data, int offset);
+
+	void SetTexture(Texture& texture, int offset);
 
 private:
 	//Pipeline handles
@@ -45,5 +57,10 @@ private:
 
 	//Pipeline information
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages; //Stages in the shader pipeline
-	std::vector<VkDescriptorSetLayout> layoutDescriptors; //uniform layout bindings for the shaders.
+
+	//Descriptor Updating
+	UniformBuffer* uniformBuffer = NULL;
+	VkWriteDescriptorSet uniformWrite;
+
+	std::vector<Texture*> textures;
 };

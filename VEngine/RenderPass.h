@@ -43,6 +43,8 @@ public:
 	void ResetBuffer();
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
+	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout; }
+	VkPipelineLayout GetVKPipelineLayout() const { return pipelineLayout; }
 
 	void RegisterObject(GameObject *object);
 
@@ -69,6 +71,12 @@ private:
 	std::vector<GameObject*> registeredMeshes;
 
 	VkPresentInfoKHR bufferPresentInfo;
+
+	VkPipelineLayout pipelineLayout;
+	VkDescriptorSetLayout descriptorSetLayout;
+	VkDescriptorSet descriptorSet;
+
+	UniformBuffer* perFrameUniformBuffer;
 
 private:
 	void CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat, bool hasDepthBuffer);
