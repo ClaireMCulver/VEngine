@@ -41,13 +41,19 @@ Material::Material()
 			(uint32_t)(sizeOfVertex + sizeOfNormals)
  		}
  	);			
+
+	// Uniforms 
+	uniformBuffer = new UniformBuffer();
+
+	//Textures
+	textures.reserve(5);
 }
 
 Material::~Material()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
-	vkDestroyPipelineLayout(logicalDevice, pipelineData.pipelineLayout, NULL);
+	delete uniformBuffer;
 
 	vkDestroyPipeline(logicalDevice, pipelineData.pipeline, NULL);
 }
@@ -64,27 +70,12 @@ void Material::AddShader(Shader &newShader)
 	shaderStage.pSpecializationInfo = NULL;
 
 	shaderStages.push_back(shaderStage);
-
-	layoutDescriptors.push_back(newShader.GetVKDescriptorSetLayout());
 }
 
-void Material::FinalizeMaterial(VkRenderPass renderPass)
+void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout)
 {
 	VkResult res;
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-
-	// Pipeline Layout //
-	VkPipelineLayoutCreateInfo pipelineLayoutCI;
-	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-	pipelineLayoutCI.pNext = NULL;
-	pipelineLayoutCI.flags = 0;
-	pipelineLayoutCI.setLayoutCount = layoutDescriptors.size();
-	pipelineLayoutCI.pSetLayouts = layoutDescriptors.data();
-	pipelineLayoutCI.pushConstantRangeCount = 0;
-	pipelineLayoutCI.pPushConstantRanges = NULL;
-
-	res = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineData.pipelineLayout);
-	assert(res == VK_SUCCESS);
 
 	// Graphics Pipeline Description //
 	VkDynamicState dynamicStateEnables[VK_DYNAMIC_STATE_RANGE_SIZE];
@@ -194,7 +185,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass)
 	VkGraphicsPipelineCreateInfo pipelineInfo;
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.pNext = NULL;
-	pipelineInfo.layout = pipelineData.pipelineLayout;
+	pipelineInfo.layout = pipelineLayout;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.basePipelineIndex = 0;
 	pipelineInfo.flags = 0;
@@ -212,7 +203,6 @@ void Material::FinalizeMaterial(VkRenderPass renderPass)
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 
-
 	res = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipelineData.pipeline);
 	assert(res == VK_SUCCESS);
 }
@@ -220,7 +210,68 @@ void Material::FinalizeMaterial(VkRenderPass renderPass)
 void Material::BindPipeline(CommandBuffer &commandBuffer)
 {
 	const VkCommandBuffer buffer = commandBuffer.GetVKCommandBuffer();
-	vkCmdBindPipeline(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
 
-	//vkCmdBindDescriptorSets(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipelineLayout, 0, descriptors.size(), descriptors.data(), 0, NULL);
+	vkCmdBindPipeline(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
 }
+
+void Material::UpdateDescriptorSet(VkDescriptorSet &descriptorSet)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	VkDescriptorBufferInfo bufferInfo;
+	bufferInfo.buffer = uniformBuffer->GetVKBuffer();
+	bufferInfo.offset = 0;
+	bufferInfo.range = VK_WHOLE_SIZE;
+
+	VkWriteDescriptorSet descriptorWrite;
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.pNext = NULL;
+	descriptorWrite.dstSet = descriptorSet;
+	descriptorWrite.dstBinding = 2;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrite.pImageInfo = NULL;
+	descriptorWrite.pBufferInfo = &bufferInfo;
+	descriptorWrite.pTexelBufferView = NULL;
+
+	vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
+
+	VkDescriptorImageInfo imageInfo;
+	for (size_t i = 0, count = textures.size(); i < count; i++)
+	{
+		//Image infor the describes the image to 
+		imageInfo.sampler = textures[i]->GetSampler();
+		imageInfo.imageView = textures[i]->GetImageView();
+		imageInfo.imageLayout = textures[i]->GetImageLayout();
+
+		//Descriptor write that tells Vulkan what we're updating and what we're updating it with
+		uniformWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		uniformWrite.pNext = NULL;
+		uniformWrite.dstSet = descriptorSet;
+		uniformWrite.dstBinding = PerDrawUniformTextureBinding;
+		uniformWrite.dstArrayElement = i; //TODO: Figure out what the fuck.
+		uniformWrite.descriptorCount = 1;
+		uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		uniformWrite.pImageInfo = &imageInfo;
+		uniformWrite.pBufferInfo = NULL;
+		uniformWrite.pTexelBufferView = NULL;
+
+		vkUpdateDescriptorSets(logicalDevice, 1, &uniformWrite, 0, NULL);
+	}
+}
+
+
+void Material::SetUniform_Mat4x4(glm::mat4x4 &data, int offset)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	//Place the data into the uniform buffer
+	uniformBuffer->SetBufferData(&data, sizeof(data), offset);
+}
+
+void Material::SetTexture(Texture& texture, int offset)
+{
+	textures.push_back(&texture);
+}
+

@@ -56,12 +56,12 @@ void main()
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
 	standardMaterial.AddShader(standardFragShader);
-	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass());
+	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout());
 	
 	GameObject cube(&cubeMesh, &standardMaterial);
 
 	// Object variable setting //
-	cube.SetTexture(renderTex, 1, 0);
+	cube.GetMaterial()->SetTexture(renderTex, 0);
 
 	cube.AddComponent(new RotateScript());
 

@@ -272,3 +272,4 @@ __pycache__/
 #*.png
 #*.glsl
 #*.scr
+/.project

@@ -21,7 +21,7 @@ public:
 	//Copies data into the buffer
 	void CopyMemoryIntoBuffer(void* data, uint64_t memorySize);
 
-private:
+protected:
 	VkBuffer vkBuffer;
 	VkDeviceMemory vkMemory;
 	uint64_t bufferSize;
