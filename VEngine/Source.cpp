@@ -61,7 +61,7 @@ void main()
 	GameObject cube(&cubeMesh, &standardMaterial);
 
 	// Object variable setting //
-	cube.GetMaterial()->SetTexture(renderTex, 1, 0);
+	cube.SetTexture(renderTex, 1, 0);
 
 	cube.AddComponent(new RotateScript());
 

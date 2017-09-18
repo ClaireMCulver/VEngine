@@ -21,7 +21,6 @@ Material::Material()
  		}
  	);		
 
-	//Normals
 	viAttribs.push_back
 	(
 		{
@@ -47,21 +46,10 @@ Material::Material()
 Material::~Material()
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-	const VkDescriptorPool descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
 
 	vkDestroyPipelineLayout(logicalDevice, pipelineData.pipelineLayout, NULL);
 
 	vkDestroyPipeline(logicalDevice, pipelineData.pipeline, NULL);
-
-	for (size_t i = 0, countI = uniformBuffers.size(); i < countI; i++)
-	{
-		for (size_t k = 0, countK = uniformBuffers[i].size(); i < countK; i++)
-		{
-			delete uniformBuffers[i][k];
-		}
-	}
-
-	vkFreeDescriptorSets(logicalDevice, descriptorPool, uniformSets.size(), uniformSets.data());
 }
 
 void Material::AddShader(Shader &newShader)
@@ -78,17 +66,6 @@ void Material::AddShader(Shader &newShader)
 	shaderStages.push_back(shaderStage);
 
 	layoutDescriptors.push_back(newShader.GetVKDescriptorSetLayout());
-
-	// Uniform Buffer Creation //
-	std::vector<size_t> uniformBufferSizes = newShader.GetUniformBytes();
-
-	uniformBuffers.push_back(std::vector<GPUBuffer*>());
-	uniformBuffers.back().reserve(uniformBufferSizes.size());
-
-	for (size_t i = 0, count = uniformBufferSizes.size(); i < count; i++)
-	{
-		uniformBuffers.back().push_back(new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uniformBufferSizes[i]));
-	}
 }
 
 void Material::FinalizeMaterial(VkRenderPass renderPass)
@@ -235,21 +212,9 @@ void Material::FinalizeMaterial(VkRenderPass renderPass)
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 
+
 	res = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipelineData.pipeline);
 	assert(res == VK_SUCCESS);
-
-
-	// Uniform allocations //
-	uniformSets.resize(layoutDescriptors.size());
-
-	VkDescriptorSetAllocateInfo descriptorSetCI;
-	descriptorSetCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	descriptorSetCI.pNext = NULL;
-	descriptorSetCI.descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
-	descriptorSetCI.descriptorSetCount = layoutDescriptors.size();
-	descriptorSetCI.pSetLayouts = layoutDescriptors.data();
-
-	vkAllocateDescriptorSets(logicalDevice, &descriptorSetCI, uniformSets.data());
 }
 
 void Material::BindPipeline(CommandBuffer &commandBuffer)
@@ -257,62 +222,5 @@ void Material::BindPipeline(CommandBuffer &commandBuffer)
 	const VkCommandBuffer buffer = commandBuffer.GetVKCommandBuffer();
 	vkCmdBindPipeline(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
 
-	vkCmdBindDescriptorSets(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipelineLayout, 0, uniformSets.size(), uniformSets.data(), 0, NULL);
-}
-
-void Material::SetUniform_Mat4x4(glm::mat4x4 &data, int uniformSet, int binding)
-{
-	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-
-	uint64_t bufferSize = sizeof(data);
-
-	//Place the data into the uniform buffer
-	GPUBuffer* uniformBuffer = uniformBuffers[uniformSet][binding];
-
-	uniformBuffer->CopyMemoryIntoBuffer(&data, bufferSize);
-
-	//Buffer info that describes how to use the buffer to update the uniform
-	VkDescriptorBufferInfo uniformBufferInfo;
-	uniformBufferInfo.buffer = uniformBuffer->GetVKBuffer();
-	uniformBufferInfo.offset = 0;
-	uniformBufferInfo.range = bufferSize;
-
-	//Descriptor write that tells Vulkan what we're updating and what we're updating it with
-	uniformWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	uniformWrite.pNext = NULL;
-	uniformWrite.dstSet = uniformSets[uniformSet];
-	uniformWrite.dstBinding = binding;
-	uniformWrite.dstArrayElement = 0;
-	uniformWrite.descriptorCount = 1;
-	uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	uniformWrite.pImageInfo = NULL;
-	uniformWrite.pBufferInfo = &uniformBufferInfo;
-	uniformWrite.pTexelBufferView = NULL;
-
-	vkUpdateDescriptorSets(logicalDevice, 1, &uniformWrite, 0, NULL);
-}
-
-void Material::SetTexture(Texture& texture, int uniformSet, int binding)
-{
-	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
-
-	//Image infor the describes the image to 
-	VkDescriptorImageInfo imageInfo;
-	imageInfo.sampler = texture.GetSampler();
-	imageInfo.imageView = texture.GetImageView();
-	imageInfo.imageLayout = texture.GetImageLayout();
-
-	//Descriptor write that tells Vulkan what we're updating and what we're updating it with
-	uniformWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-	uniformWrite.pNext = NULL;
-	uniformWrite.dstSet = uniformSets[uniformSet];
-	uniformWrite.dstBinding = binding;
-	uniformWrite.dstArrayElement = 0;
-	uniformWrite.descriptorCount = 1;
-	uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	uniformWrite.pImageInfo = &imageInfo;
-	uniformWrite.pBufferInfo = NULL;
-	uniformWrite.pTexelBufferView = NULL;
-
-	vkUpdateDescriptorSets(logicalDevice, 1, &uniformWrite, 0, NULL);
+	//vkCmdBindDescriptorSets(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipelineLayout, 0, descriptors.size(), descriptors.data(), 0, NULL);
 }

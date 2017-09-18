@@ -186,14 +186,14 @@
     <ClCompile Include="Clock.cpp">
       <Filter>Source Files\Time</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Graphics\Objects</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
-    </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
-      <Filter>Source Files\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -269,6 +269,9 @@
     <ClInclude Include="Clock.h">
       <Filter>Header Files\Time</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Header Files\Graphics\Objects</Filter>
     </ClInclude>
@@ -283,9 +286,6 @@
     </ClInclude>
     <ClInclude Include="Rotate.scr">
       <Filter>Resource Files\Scripts\Cube</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectManager.h">
-      <Filter>Header Files\Objects</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
