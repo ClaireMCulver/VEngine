@@ -47,7 +47,7 @@ void main()
 	DeferredRenderPass mainRenderPass;
 	
 	Geometry cubeMesh;
-	cubeMesh.LoadMeshFromDae("../Assets/Models/box.dae");
+	cubeMesh.LoadMeshFromDae("../Assets/Models/monkey.dae");
 	
 	Shader standardVertShader("../Assets/Shaders/StandardVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
 	Shader standardFragShader("../Assets/Shaders/StandardFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);

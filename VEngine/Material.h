@@ -42,8 +42,17 @@ public:
 
 	// Uniform updates //
 
-	//Updates the uniform in uniformSet at binding
+	//Set the model, model view and model view projection matrices in the per draw uniform buffer.
+	void SetDrawMatrices(glm::mat4 &modelMat, glm::mat4 &viewMat, glm::mat4 &viewProjoectionMat);
+
+	//Updates the matrix uniform at the offset
 	void SetUniform_Mat4x4(glm::mat4x4 &data, int offset);
+
+	//Updates the integer uniform at the offset
+	void SetUniform_Int32(int &data, int offset);
+
+	//Updates the float uniform at the offset
+	void SetUniform_Float32(float &data, int offset);
 
 	void SetTexture(Texture& texture, int offset);
 

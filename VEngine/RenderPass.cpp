@@ -357,16 +357,8 @@ void RenderPass::RecordBuffer()
 	{
 		currentMaterial = registeredMeshes[i]->GetMaterial();
 
-		//Model Matrix
-		currentMaterial->SetUniform_Mat4x4(registeredMeshes[i]->GetTransform()->GetModelMat(), 0);
-
-		//Model View Matrix
-		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetViewMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), sizeof(glm::mat4));
-
-		//Model View Projection Matrix
-		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetVPMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), sizeof(glm::mat4) + sizeof(glm::mat4));
-
-		//
+		currentMaterial->SetDrawMatrices(registeredMeshes[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
+		
 		currentMaterial->UpdateDescriptorSet(descriptorSet);
 
 		//Draw the model in the buffer.

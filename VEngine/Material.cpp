@@ -261,8 +261,37 @@ void Material::UpdateDescriptorSet(VkDescriptorSet &descriptorSet)
 	}
 }
 
+void Material::SetDrawMatrices(glm::mat4 &modelMat, glm::mat4 &viewMat, glm::mat4 &viewProjoectionMat)
+{
+	size_t mat4Size = sizeof(glm::mat4);
+
+	//Model Matrix
+	SetUniform_Mat4x4(modelMat, 0);
+
+	//Model View Matrix
+	SetUniform_Mat4x4(viewMat * modelMat, mat4Size);
+
+	//Model View Projection Matrix
+	SetUniform_Mat4x4(viewProjoectionMat * modelMat, mat4Size + mat4Size);
+}
 
 void Material::SetUniform_Mat4x4(glm::mat4x4 &data, int offset)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	//Place the data into the uniform buffer
+	uniformBuffer->SetBufferData(&data, sizeof(data), offset);
+}
+
+void Material::SetUniform_Int32(int &data, int offset)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	//Place the data into the uniform buffer
+	uniformBuffer->SetBufferData(&data, sizeof(data), offset);
+}
+
+void Material::SetUniform_Float32(float &data, int offset)
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
