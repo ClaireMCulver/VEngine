@@ -92,8 +92,9 @@ public:
 	}
 
 	// Get/Set //
-	void SetLookPoint(glm::vec3 point) { viewPoint = point; }
+	void SetLookPoint(glm::vec3 point) { viewPoint = point; viewVector = glm::normalize(point - owner->GetTransform()->GetPosition()); }
 	glm::vec3 GetViewVector() { return viewVector; }
+	glm::vec3 GetViewPoint() { return viewPoint; }
 
 	// Component Functions //
 	void Start() {}

@@ -28,6 +28,7 @@
 
 #include "Rotate.scr"
 #include "Boid.scr"
+#include "FirstPersonControls.scr"
 
 void main()
 {
@@ -139,6 +140,8 @@ void main()
 	mainCamera.AddComponent(new Camera());
 	mainCamera.GetTransform()->Translate(glm::vec3(-10.0f, 80, 0.0f));
 	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
+	mainCamera.AddComponent(new FirstPersonControls());
+	objectManager.AddObject(&mainCamera);
 
 	// Main loop //
 	while (!inputSystem.keyboard.IsKeyDown('q'))
