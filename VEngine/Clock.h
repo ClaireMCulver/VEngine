@@ -10,9 +10,10 @@ public:
 
 	void Tick();
 
+	static float fixedDeltaTime;
+
 private:
 	double currentClock;
 	double previousClock;
 	double deltaTime;
 };
-

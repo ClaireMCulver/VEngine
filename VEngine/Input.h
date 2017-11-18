@@ -12,5 +12,6 @@ public:
 
 public:
 	WinKeyboard keyboard;
+	static Input* Singleton;
 };
 

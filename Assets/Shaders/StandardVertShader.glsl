@@ -15,14 +15,14 @@ layout(set = 0, binding = 1) uniform PerPassData
     int data;
 } perPassData;
 
-layout (set = 0, binding = 2) uniform PerDrawData
+layout (set = 1, binding = 0) uniform PerDrawData
 {
     mat4 modelMatrix;
     mat4 mvMatrix;
     mat4 mvpMatrix;
 } perDrawData;
 
-layout(set = 0, binding = 3) uniform sampler2D albedo;
+layout(set = 1, binding = 1) uniform sampler2D albedo;
 
 // Per Vertex Data //
 layout (location = 0) in vec3 pos;

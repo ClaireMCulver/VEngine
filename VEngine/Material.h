@@ -38,24 +38,6 @@ public:
 	//Returns the pipeline and pipeline layout handles
 	PipelineData GetPipelineData() const { return pipelineData; }
 
-	void UpdateDescriptorSet(VkDescriptorSet &descriptorSet);
-
-	// Uniform updates //
-
-	//Set the model, model view and model view projection matrices in the per draw uniform buffer.
-	void SetDrawMatrices(glm::mat4 &modelMat, glm::mat4 &viewMat, glm::mat4 &viewProjoectionMat);
-
-	//Updates the matrix uniform at the offset
-	void SetUniform_Mat4x4(glm::mat4x4 &data, int offset);
-
-	//Updates the integer uniform at the offset
-	void SetUniform_Int32(int &data, int offset);
-
-	//Updates the float uniform at the offset
-	void SetUniform_Float32(float &data, int offset);
-
-	void SetTexture(Texture& texture, int offset);
-
 private:
 	//Pipeline handles
 	PipelineData pipelineData;
@@ -66,10 +48,4 @@ private:
 
 	//Pipeline information
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages; //Stages in the shader pipeline
-
-	//Descriptor Updating
-	UniformBuffer* uniformBuffer = NULL;
-	VkWriteDescriptorSet uniformWrite;
-
-	std::vector<Texture*> textures;
 };

@@ -43,7 +43,7 @@ public:
 	void ResetBuffer();
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
-	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout; }
+	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout[0]; }
 	VkPipelineLayout GetVKPipelineLayout() const { return pipelineLayout; }
 
 	void RegisterObject(GameObject *object);
@@ -73,7 +73,7 @@ private:
 	VkPresentInfoKHR bufferPresentInfo;
 
 	VkPipelineLayout pipelineLayout;
-	VkDescriptorSetLayout descriptorSetLayout;
+	VkDescriptorSetLayout descriptorSetLayout[2];
 	VkDescriptorSet descriptorSet;
 
 	UniformBuffer* perFrameUniformBuffer;

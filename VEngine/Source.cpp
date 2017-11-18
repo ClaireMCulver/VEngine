@@ -24,9 +24,10 @@
 
 #include "Input.h"
 #include "Clock.h"
+#include "Camera.h"
 
 #include "Rotate.scr"
-#include "Camera.h"
+#include "Boid.scr"
 
 void main()
 {
@@ -51,28 +52,93 @@ void main()
 	
 	Shader standardVertShader("../Assets/Shaders/StandardVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
 	Shader standardFragShader("../Assets/Shaders/StandardFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
-	Texture renderTex("../Assets/Textures/box.png", 512, 512);
+	Texture blueTribeTex("../Assets/Textures/box.png", 512, 512);
+	Texture redTribeTex("../Assets/Textures/CyclesRender.png", 1920, 1080);
 
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
 	standardMaterial.AddShader(standardFragShader);
 	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout());
+
+	//Obstacles
+	GameObject* Obstacles[5];
+	Geometry ObstacleMesh;
+	ObstacleMesh.LoadMeshFromDae("../Assets/Models/tree.dae");
+	for (int i = 0; i < 5; i++)
+	{
+		Obstacles[i] = new GameObject(&ObstacleMesh, &standardMaterial);
+		Obstacles[i]->SetTexture(blueTribeTex, 0);
+		Obstacles[i]->GetTransform()->SetPosition({ 10 * i - 20, 0, 10 * i - 20 });
+
+		mainRenderPass.RegisterObject(Obstacles[i]);
+		objectManager.AddObject(Obstacles[i]);
+	}
+
+	//BlueTribe
+	GameObject* blueTribe[5];
+	for (int i = 0; i < 5; i++)
+	{
+		blueTribe[i] = new GameObject(&cubeMesh, &standardMaterial);
+		blueTribe[i]->SetTexture(blueTribeTex, 0);
 	
-	GameObject cube(&cubeMesh, &standardMaterial);
+		blueTribe[i]->GetTransform()->SetPosition({ (10 * i) - 25, 0, -25 });
+	
+		blueTribe[i]->AddComponent(new Boid());
+		blueTribe[i]->GetComponent<Boid>()->SetGoal({ 0, 0, 25 });
 
-	// Object variable setting //
-	cube.GetMaterial()->SetTexture(renderTex, 0);
+		mainRenderPass.RegisterObject(blueTribe[i]);
+		objectManager.AddObject(blueTribe[i]);
+	}
 
-	cube.AddComponent(new RotateScript());
 
-	mainRenderPass.RegisterObject(&cube);
-	objectManager.AddObject(&cube);
+	//RedTribe
+	GameObject* redTribe[5];
+	for (int i = 0; i < 5; i++)
+	{
+		redTribe[i] = new GameObject(&cubeMesh, &standardMaterial);
+		redTribe[i]->SetTexture(redTribeTex, 0);
 
+		redTribe[i]->GetTransform()->SetPosition({ (12.7 * (float)i) - 25, 0, 25 });
+
+		redTribe[i]->AddComponent(new Boid());
+		redTribe[i]->GetComponent<Boid>()->SetGoal({ 0, 0, -25 });
+
+		mainRenderPass.RegisterObject(redTribe[i]);
+		objectManager.AddObject(redTribe[i]);
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			blueTribe[i]->GetComponent<Boid>()->AddObstacle(Obstacles[j]->GetTransform());
+			blueTribe[i]->GetComponent<Boid>()->AddOtherTribeMember(redTribe[j]->GetComponent<Boid>());
+			if (blueTribe[i] == blueTribe[j])
+			{
+				continue;
+			}
+			blueTribe[i]->GetComponent<Boid>()->AddFellowTribeMember(blueTribe[j]->GetComponent<Boid>());
+		}
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			redTribe[i]->GetComponent<Boid>()->AddObstacle(Obstacles[j]->GetTransform());
+			redTribe[i]->GetComponent<Boid>()->AddOtherTribeMember(blueTribe[j]->GetComponent<Boid>());
+			if (redTribe[i] == redTribe[j])
+			{
+				continue;
+			}
+			redTribe[i]->GetComponent<Boid>()->AddFellowTribeMember(redTribe[j]->GetComponent<Boid>());
+		}
+	}
 
 	GameObject mainCamera(&cubeMesh, &standardMaterial);
 	mainCamera.AddComponent(new Camera());
-	mainCamera.GetTransform()->Translate(glm::vec3(-1.0f, -1.0f, -1.0f));
-	mainCamera.GetTransform()->Translate(glm::vec3(-3.0f, 3.0f, -8.0f));
+	mainCamera.GetTransform()->Translate(glm::vec3(-10.0f, 80, 0.0f));
+	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
 
 	// Main loop //
 	while (!inputSystem.keyboard.IsKeyDown('q'))
@@ -93,6 +159,13 @@ void main()
 		mainRenderPass.ResetBuffer();
 
 		swapchain.BlitToSwapChain(mainRenderPass.GetRenderedImage());
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		delete blueTribe[i];
+		delete redTribe[i];
+		delete Obstacles[i];
 	}
 
 	graphicsSystem.WaitForDeviceIdle();

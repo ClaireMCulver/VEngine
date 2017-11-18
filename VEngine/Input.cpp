@@ -1,9 +1,13 @@
 #include "Input.h"
 
-
+Input* Input::Singleton = nullptr;
 
 Input::Input()
 {
+	if (!Singleton)
+	{
+		Singleton = this;
+	}
 }
 
 

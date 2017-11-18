@@ -26,7 +26,8 @@ RenderPass::~RenderPass()
 
 	vkDestroyPipelineLayout(logicalDevice, pipelineLayout, NULL);
 
-	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, NULL);
+	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout[0], NULL);
+	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout[1], NULL);
 
 	for (size_t i = 0, count = images.size(); i < count; i++)
 	{
@@ -189,6 +190,7 @@ void RenderPass::CreateRenderPass()
 
 	// Descriptor Set Bindings //
 	std::vector<VkDescriptorSetLayoutBinding> descriptorBindings;
+	std::vector<VkDescriptorSetLayoutBinding> perDrawDescriptorBindings;
 
 	//Per-Frame Data
 	descriptorBindings.push_back
@@ -215,10 +217,10 @@ void RenderPass::CreateRenderPass()
 	);
 
 	//Per-Draw Data
-	descriptorBindings.push_back
+	perDrawDescriptorBindings.push_back
 	(
 	{	//VkDescriptorSetLayoutBinding
-		2,											//binding;				
+		0,											//binding;				
 		VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
 		1,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
@@ -227,10 +229,10 @@ void RenderPass::CreateRenderPass()
 	);
 
 	//Passed Textures
-	descriptorBindings.push_back
+	perDrawDescriptorBindings.push_back
 	(
 	{	//VkDescriptorSetLayoutBinding
-		3,											//binding;				
+		1,											//binding;				
 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
 		1,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
@@ -239,14 +241,21 @@ void RenderPass::CreateRenderPass()
 	);
 
 	// Descriptor Set Layout //
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCI;
-	descriptorSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCI.pNext = NULL;
-	descriptorSetLayoutCI.flags = 0;
-	descriptorSetLayoutCI.bindingCount = descriptorBindings.size();
-	descriptorSetLayoutCI.pBindings = descriptorBindings.data();
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCI[2];
+	descriptorSetLayoutCI[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCI[0].pNext = NULL;
+	descriptorSetLayoutCI[0].flags = 0;
+	descriptorSetLayoutCI[0].bindingCount = descriptorBindings.size();
+	descriptorSetLayoutCI[0].pBindings = descriptorBindings.data();
 
-	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI, NULL, &descriptorSetLayout);
+	descriptorSetLayoutCI[1].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCI[1].pNext = NULL;
+	descriptorSetLayoutCI[1].flags = 0;
+	descriptorSetLayoutCI[1].bindingCount = perDrawDescriptorBindings.size();
+	descriptorSetLayoutCI[1].pBindings = perDrawDescriptorBindings.data();
+
+	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI[0], NULL, &descriptorSetLayout[0]);
+	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI[1], NULL, &descriptorSetLayout[1]);
 	assert(result == VK_SUCCESS);
 
 	//Allocate descriptor set
@@ -255,7 +264,7 @@ void RenderPass::CreateRenderPass()
 	descirptorSetAlloc.pNext = NULL;
 	descirptorSetAlloc.descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
 	descirptorSetAlloc.descriptorSetCount = 1;
-	descirptorSetAlloc.pSetLayouts = &descriptorSetLayout;
+	descirptorSetAlloc.pSetLayouts = &descriptorSetLayout[0];
 
 	result = vkAllocateDescriptorSets(logicalDevice, &descirptorSetAlloc, &descriptorSet);
 	assert(result == VK_SUCCESS);
@@ -274,8 +283,8 @@ void RenderPass::CreateRenderPass()
 	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutCI.pNext = NULL;
 	pipelineLayoutCI.flags = 0;
-	pipelineLayoutCI.setLayoutCount = 1;
-	pipelineLayoutCI.pSetLayouts = &descriptorSetLayout;
+	pipelineLayoutCI.setLayoutCount = 2;
+	pipelineLayoutCI.pSetLayouts = descriptorSetLayout;
 	pipelineLayoutCI.pushConstantRangeCount = 1;
 	pipelineLayoutCI.pPushConstantRanges = &pushConstantRange;
 
@@ -357,12 +366,12 @@ void RenderPass::RecordBuffer()
 	{
 		currentMaterial = registeredMeshes[i]->GetMaterial();
 
-		currentMaterial->SetDrawMatrices(registeredMeshes[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
+		registeredMeshes[i]->SetDrawMatrices(registeredMeshes[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
 		
-		currentMaterial->UpdateDescriptorSet(descriptorSet);
+		registeredMeshes[i]->UpdateDescriptorSet();
 
 		//Draw the model in the buffer.
-		registeredMeshes[i]->Draw(*renderBuffer);
+		registeredMeshes[i]->Draw(*renderBuffer, pipelineLayout);
 	}
 
 	//end render pass

@@ -94,7 +94,7 @@ void Geometry::LoadMeshFromDae(char* filePath)
 
 		geometry[i].uvC = UVs[polyList[k++]];
 	}
-
+	
 	//Create the buffers
 	LoadMesh(geometry, polyList);
 }

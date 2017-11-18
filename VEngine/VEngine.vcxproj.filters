@@ -124,6 +124,9 @@
     <Filter Include="Source Files\Graphics\Objects\Buffers\UniformBuffer">
       <UniqueIdentifier>{3df98956-a74e-4318-8f65-1d3a126ca095}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Scripts\AI">
+      <UniqueIdentifier>{7f76dcba-2fe7-4e94-b63c-39241ace67e5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -299,5 +302,13 @@
     <ClInclude Include="UniformBuffer.h">
       <Filter>Header Files\Graphics\Objects\Buffers</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Boid.scr">
+      <Filter>Resource Files\Scripts\AI</Filter>
+    </None>
+    <None Include="FirstPersonControls.scr">
+      <Filter>Resource Files\Scripts\Core\Camera</Filter>
+    </None>
   </ItemGroup>
 </Project>
