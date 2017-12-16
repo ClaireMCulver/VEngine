@@ -5,9 +5,15 @@ Material::Material()
 {
 	int sizeOfVertex = sizeof(glm::vec3), sizeOfNormals = sizeof(glm::vec3), sizeOfUVs = sizeof(glm::vec2);
 	//Description of binding and attributes for pipeline
- 	viBinding.binding = 0; //Index of the array
- 	viBinding.stride = sizeOfVertex + sizeOfNormals + sizeOfUVs; //Number of bytes from one vertex data set to the next
- 	viBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //As apposed to instance rendering.
+	viBindings.push_back(VkVertexInputBindingDescription()); //PerVertexData
+ 	viBindings[0].binding = 0; //Index of the array
+ 	viBindings[0].stride = sizeOfVertex + sizeOfNormals + sizeOfUVs; //Number of bytes from one vertex data set to the next
+ 	viBindings[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //As apposed to instance rendering.
+
+	viBindings.push_back(VkVertexInputBindingDescription()); //PerInstanceData
+	viBindings[1].binding = 1; //Index of the array
+	viBindings[1].stride = sizeof(glm::vec3) + sizeof(glm::quat); //Number of bytes from one vertex data set to the next
+	viBindings[1].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE; //As apposed to instance rendering.
  
  
     //Vertices
@@ -41,6 +47,29 @@ Material::Material()
 			(uint32_t)(sizeOfVertex + sizeOfNormals)
  		}
  	);			
+
+
+	// local position
+	viAttribs.push_back
+	(
+		{
+			3,
+			1,
+			VK_FORMAT_R32G32B32_SFLOAT,
+			0
+		}
+	);
+
+	// local rotation
+	viAttribs.push_back
+	(
+		{
+			4,
+			1,
+			VK_FORMAT_R32G32B32A32_SFLOAT,
+			(uint32_t)sizeOfVertex
+		}
+	);
 }
 
 Material::~Material()
@@ -83,8 +112,8 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vi.pNext = NULL;
 	vi.flags = 0;
-	vi.vertexBindingDescriptionCount = 1;
-	vi.pVertexBindingDescriptions = &viBinding;
+	vi.vertexBindingDescriptionCount = viBindings.size();
+	vi.pVertexBindingDescriptions = viBindings.data();
 	vi.vertexAttributeDescriptionCount = viAttribs.size();
 	vi.pVertexAttributeDescriptions = viAttribs.data();
 
@@ -100,7 +129,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	rs.pNext = NULL;
 	rs.flags = 0;
 	rs.polygonMode = VK_POLYGON_MODE_FILL;
-	rs.cullMode = VK_CULL_MODE_BACK_BIT;
+	rs.cullMode = VK_CULL_MODE_NONE;// VK_CULL_MODE_BACK_BIT;
 	rs.frontFace = VK_FRONT_FACE_CLOCKWISE;
 	rs.depthClampEnable = VK_FALSE;
 	rs.rasterizerDiscardEnable = VK_FALSE;
@@ -116,13 +145,13 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	cb.flags = 0;
 	VkPipelineColorBlendAttachmentState att_state[1];
 	att_state[0].colorWriteMask = 0xf;
-	att_state[0].blendEnable = VK_FALSE;
-	att_state[0].alphaBlendOp = VK_BLEND_OP_ADD;
+	att_state[0].blendEnable = VK_TRUE;
+	att_state[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_COLOR;
+	att_state[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_COLOR;
 	att_state[0].colorBlendOp = VK_BLEND_OP_ADD;
-	att_state[0].srcColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-	att_state[0].dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;
-	att_state[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
-	att_state[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+	att_state[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	att_state[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+	att_state[0].alphaBlendOp = VK_BLEND_OP_ADD;
 	cb.attachmentCount = 1;
 	cb.pAttachments = att_state;
 	cb.logicOpEnable = VK_FALSE;
@@ -177,7 +206,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	VkGraphicsPipelineCreateInfo pipelineInfo;
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.pNext = NULL;
-	pipelineInfo.layout = pipelineLayout;
+	pipelineInfo.layout = pipelineData.layout = pipelineLayout;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.basePipelineIndex = 0;
 	pipelineInfo.flags = 0;
@@ -201,7 +230,5 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 
 void Material::BindPipeline(CommandBuffer &commandBuffer)
 {
-	const VkCommandBuffer buffer = commandBuffer.GetVKCommandBuffer();
-
-	vkCmdBindPipeline(buffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
+	vkCmdBindPipeline(commandBuffer.GetVKCommandBuffer(), VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
 }

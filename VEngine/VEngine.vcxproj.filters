@@ -127,6 +127,12 @@
     <Filter Include="Resource Files\Scripts\AI">
       <UniqueIdentifier>{7f76dcba-2fe7-4e94-b63c-39241ace67e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Scripts\Core\Rendering">
+      <UniqueIdentifier>{fb808681-ab39-4fe8-bf94-9fac46bc6410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\Core\Particles">
+      <UniqueIdentifier>{5b81f30c-46ea-4c09-adfa-f3c18d44190e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -206,6 +212,9 @@
     </ClCompile>
     <ClCompile Include="UniformBuffer.cpp">
       <Filter>Source Files\Graphics\Objects\Buffers\UniformBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -309,6 +318,18 @@
     </None>
     <None Include="FirstPersonControls.scr">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
+    </None>
+    <None Include="Particle.scr">
+      <Filter>Resource Files\Scripts\Core\Particles</Filter>
+    </None>
+    <None Include="Renderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="MeshRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="ParticleEmitter.scr">
+      <Filter>Resource Files\Scripts\Core\Particles</Filter>
     </None>
   </ItemGroup>
 </Project>

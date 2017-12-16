@@ -40,6 +40,10 @@ public:
 	
 	void Draw(VkCommandBuffer commandBuffer);
 
+	GPUBuffer* GetVertexBuffer() { return vertexBuffer; }
+
+	uint32_t GetNumVertices() { return numVertices; }
+
 private:
 	void LoadMesh(std::vector<Triangle> &geometry, std::vector<uint32_t> &indices);
 	std::vector<glm::vec3> loadVertices(rapidxml::xml_node<> *sourceNode);

@@ -29,6 +29,9 @@
 #include "Rotate.scr"
 #include "Boid.scr"
 #include "FirstPersonControls.scr"
+#include "ParticleRenderer.scr"
+#include "ParticleEmitter.scr"
+#include "MeshRenderer.scr"
 
 void main()
 {
@@ -51,8 +54,8 @@ void main()
 	Geometry cubeMesh;
 	cubeMesh.LoadMeshFromDae("../Assets/Models/monkey.dae");
 	
-	Shader standardVertShader("../Assets/Shaders/StandardVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-	Shader standardFragShader("../Assets/Shaders/StandardFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+	Shader standardVertShader("../Assets/Shaders/StandardParticleVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader standardFragShader("../Assets/Shaders/StandardParticleFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
 	Texture boxTex("../Assets/Textures/box.png", 512, 512);
 
 	Material standardMaterial;
@@ -62,15 +65,17 @@ void main()
 
 	GameObject mainCamera(&cubeMesh, &standardMaterial);
 	mainCamera.AddComponent(new Camera());
-	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 1, -10.0f));
-	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 2, 0 });
+	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 15, -40.0f));
+	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 15, 0 });
 	mainCamera.AddComponent(new FirstPersonControls());
 	objectManager.AddObject(&mainCamera);
 
-	GameObject monkey(&cubeMesh, &standardMaterial);
-	monkey.SetTexture(boxTex, 0);
-	mainRenderPass.RegisterObject(&monkey);
-	objectManager.AddObject(&monkey);
+	GameObject particleSystem(&cubeMesh, &standardMaterial);
+	particleSystem.SetTexture(boxTex, 0);
+	particleSystem.AddComponent(new ParticleEmitter(1000));
+	particleSystem.AddComponent(new ParticleRenderer());
+	mainRenderPass.RegisterObject(&particleSystem);
+	objectManager.AddObject(&particleSystem);
 
 	// Main loop //
 	while (!inputSystem.keyboard.IsKeyDown('q'))

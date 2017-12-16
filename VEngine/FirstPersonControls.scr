@@ -24,11 +24,11 @@ public:
 
 	void Update()
 	{
-		float rightMovement = moveSpeed * input->keyboard.IsKeyDown('d');
-		float leftMovement = -moveSpeed * input->keyboard.IsKeyDown('a');
+		float rightMovement = moveSpeed * input->keyboard.IsKeyDown('w');
+		float leftMovement = -moveSpeed * input->keyboard.IsKeyDown('s');
 
-		float upMovement = moveSpeed * input->keyboard.IsKeyDown('w');
-		float downMovement = -moveSpeed * input->keyboard.IsKeyDown('s');
+		float upMovement = moveSpeed * input->keyboard.IsKeyDown('a');
+		float downMovement = -moveSpeed * input->keyboard.IsKeyDown('d');
 
 		float forwardMovement = -moveSpeed * input->keyboard.IsKeyDown(VK_LSHIFT);
 		float backwardMovement = moveSpeed * input->keyboard.IsKeyDown(VK_SPACE);
@@ -44,5 +44,5 @@ private:
 	Input* input;
 	Camera* camera;
 
-	float moveSpeed = 0.1f;
+	float moveSpeed = 0.05f;
 };

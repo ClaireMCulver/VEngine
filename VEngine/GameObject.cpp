@@ -61,6 +61,10 @@ GameObject::GameObject(Geometry *mesh, Material *mat)
 	//Textures
 	textures.reserve(5);
 
+	//Instance buffer.
+	//This solution is a temporary one. I'd like to organize this better.
+	instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, sizeof(glm::vec3) + sizeof(glm::quat));
+
 }
 
 
@@ -78,6 +82,8 @@ GameObject::~GameObject()
 	{
 		delete element.second;
 	}
+
+	delete instanceBuffer;
 
 	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, NULL);
 }
@@ -177,6 +183,10 @@ void GameObject::SetDrawMatrices(glm::mat4 &modelMat, glm::mat4 &viewMat, glm::m
 
 	//Model View Projection Matrix
 	SetUniform_Mat4x4(viewProjoectionMat * modelMat, mat4Size + mat4Size);
+
+	instanceData.position = transform->GetPosition();
+	instanceData.rotation = glm::toQuat(modelMat);
+	instanceBuffer->CopyMemoryIntoBuffer(&instanceData, sizeof(InstanceData));
 }
 
 void GameObject::SetUniform_Mat4x4(glm::mat4x4 &data, int offset)

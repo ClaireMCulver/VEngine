@@ -12,10 +12,12 @@
 #include "Texture.h"
 
 #include "glm\glm.hpp"
+#include "glm\gtc\quaternion.hpp"
 
 struct PipelineData
 {
 	VkPipeline pipeline; //Graphics Pipeline
+	VkPipelineLayout layout; //Layout of descriptors in the layout
 };
 
 class Material
@@ -43,7 +45,7 @@ private:
 	PipelineData pipelineData;
 
 	//Vertex binding and per-vertex attribute info
-	VkVertexInputBindingDescription viBinding;//Binding of the vertices within the shaders
+	std::vector<VkVertexInputBindingDescription> viBindings;//Binding of the vertices within the shaders
 	std::vector<VkVertexInputAttributeDescription> viAttribs;//Bindings for the attributes of the vertices.
 
 	//Pipeline information

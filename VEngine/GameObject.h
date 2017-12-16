@@ -2,6 +2,8 @@
 
 //GLM
 #include "glm\glm.hpp"
+#include "glm\gtc\quaternion.hpp"
+#include "glm\gtx\quaternion.hpp"
 
 //vulkan definitions
 #ifndef VK_USE_PLATFORM_WIN32_KHR
@@ -11,6 +13,7 @@
 
 #include "Geometry.h"
 #include "Material.h"
+#include "Renderer.scr"
 #include "CommandBuffer.h"
 #include "GPUBuffer.h"
 #include "DescriptorPool.h"
@@ -27,8 +30,13 @@ public:
 	~GameObject();
 
 	// Get/Set //
-	Transform* GetTransform() { return transform; }
-	Material* GetMaterial() { return material; }
+	inline Transform* GetTransform() { return transform; }
+	inline Geometry* GetGeometry() { return geometry; }
+	inline Material* GetMaterial() { return material; }
+	inline Renderer* GetRenderer() { return renderer; }
+	inline GPUBuffer* GetInstanceBuffer() { return instanceBuffer; }
+
+	inline void SetRenderer(Renderer* givenRenderer) { renderer = givenRenderer; }
 
 	// Updates //
 
@@ -75,8 +83,9 @@ public:
 private:
 	Transform* transform;
 
-	Geometry* geometry;
-	Material* material;
+	Geometry* geometry = nullptr;
+	Material* material = nullptr;
+	Renderer* renderer = nullptr;
 
 	glm::mat4x4 MVPMatrix;
 
@@ -88,6 +97,13 @@ private:
 	VkWriteDescriptorSet uniformWrite;
 	std::vector<VkDescriptorSetLayoutBinding> descriptorBindings;
 	VkDescriptorSetLayout descriptorSetLayout;
+
+	GPUBuffer* instanceBuffer;
+	struct InstanceData 
+	{
+		glm::vec3 position;
+		glm::quat rotation;
+	} instanceData;
 
 	std::vector<Texture*> textures;
 };

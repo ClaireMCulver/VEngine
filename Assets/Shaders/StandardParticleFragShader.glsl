@@ -33,14 +33,12 @@ layout (location = 0) out vec4 outColor;
 
 void main() 
 {
-    vec3 lightDirection = (perFrameData.viewMatrix * vec4(normalize(vec3(-1, 1, -1)), 0.0)).xyz;
-    vec3 normal = (perDrawData.mvMatrix * vec4(inNormal, 0.0)).xyz;
-    vec3 texSample = texture(albedo, inUV).rgb;
-    vec3 diffuseColour = texSample * dot(normal, lightDirection);
+    //vec3 lightDirection = (perFrameData.viewMatrix * vec4(normalize(vec3(-1, 1, -1)), 0.0)).xyz;
+    //vec3 normal = (perDrawData.mvMatrix * vec4(inNormal, 0.0)).xyz;
+    vec4 texSample = texture(albedo, inUV);
+    //vec3 diffuseColour = texSample * dot(normal, lightDirection);
 
-    outColor.rgb = texSample;
-    outColor.r = 1.0;
-    outColor.a = 1.0;
-    //outColor = vec4(normal, 1.0);
+    outColor = texSample;
+    //outColor = vec4(inNormal, 1.0);
     //outColor = vec4(inUV, 0.0, 1.0);
 }

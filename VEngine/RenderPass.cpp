@@ -357,21 +357,24 @@ void RenderPass::RecordBuffer()
 
 	vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
 
-	Material* currentMaterial;
 
 	vkCmdBindDescriptorSets(vkRenderBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
 	// Render pass contents //
 	for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
 	{
-		currentMaterial = registeredMeshes[i]->GetMaterial();
-
 		registeredMeshes[i]->SetDrawMatrices(registeredMeshes[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
 		
 		registeredMeshes[i]->UpdateDescriptorSet();
 
+		//Bind the material
+		registeredMeshes[i]->GetMaterial()->BindPipeline(*renderBuffer);
+
+		//Bind uniforms
+		registeredMeshes[i]->BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
+
 		//Draw the model in the buffer.
-		registeredMeshes[i]->Draw(*renderBuffer, pipelineLayout);
+		registeredMeshes[i]->GetRenderer()->Draw(renderBuffer->GetVKCommandBuffer());
 	}
 
 	//end render pass
@@ -408,6 +411,7 @@ void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeig
 
 void RenderPass::RegisterObject(GameObject *object)
 {
+	assert(object->GetRenderer() != nullptr);
 	registeredMeshes.push_back(object);
 }
 
