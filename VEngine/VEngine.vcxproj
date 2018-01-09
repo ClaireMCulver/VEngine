@@ -150,12 +150,12 @@
     </ClCompile>
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="ParticleRenderer.scr" />
+    <ClCompile Include="ParticleRenderer.cpp" />
     <ClCompile Include="RenderPass.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClInclude Include="Rotate.scr">
+    <ClInclude Include="Rotate.cpp">
       <DeploymentContent>false</DeploymentContent>
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -224,12 +224,12 @@
     <ClInclude Include="WinKeyboard.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Boid.scr" />
-    <None Include="FirstPersonControls.scr" />
-    <None Include="MeshRenderer.scr" />
-    <None Include="Renderer.scr" />
-    <None Include="Particle.scr" />
-    <None Include="ParticleEmitter.scr" />
+    <None Include="Boid.cpp" />
+    <None Include="FirstPersonControls.cpp" />
+    <None Include="MeshRenderer.cpp" />
+    <None Include="Renderer.cpp" />
+    <None Include="Particle.cpp" />
+    <None Include="ParticleEmitter.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

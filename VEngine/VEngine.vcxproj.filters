@@ -213,7 +213,7 @@
     <ClCompile Include="UniformBuffer.cpp">
       <Filter>Source Files\Graphics\Objects\Buffers\UniformBuffer</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleRenderer.scr">
+    <ClCompile Include="ParticleRenderer.cpp">
       <Filter>Resource Files\Scripts\Core\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
@@ -305,31 +305,31 @@
     <ClInclude Include="Camera.h">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Rotate.scr">
-      <Filter>Resource Files\Scripts\Cube</Filter>
-    </ClInclude>
     <ClInclude Include="UniformBuffer.h">
       <Filter>Header Files\Graphics\Objects\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="Rotate.cpp">
+      <Filter>Resource Files\Scripts\Cube</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Boid.scr">
-      <Filter>Resource Files\Scripts\AI</Filter>
+    <None Include="ParticleEmitter.cpp">
+      <Filter>Resource Files\Scripts\Core\Particles</Filter>
     </None>
-    <None Include="FirstPersonControls.scr">
+    <None Include="Particle.cpp">
+      <Filter>Resource Files\Scripts\Core\Particles</Filter>
+    </None>
+    <None Include="MeshRenderer.cpp">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="Renderer.cpp">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="FirstPersonControls.cpp">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </None>
-    <None Include="Particle.scr">
-      <Filter>Resource Files\Scripts\Core\Particles</Filter>
-    </None>
-    <None Include="Renderer.scr">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
-    </None>
-    <None Include="MeshRenderer.scr">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
-    </None>
-    <None Include="ParticleEmitter.scr">
-      <Filter>Resource Files\Scripts\Core\Particles</Filter>
+    <None Include="Boid.cpp">
+      <Filter>Resource Files\Scripts\AI</Filter>
     </None>
   </ItemGroup>
 </Project>

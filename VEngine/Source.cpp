@@ -26,12 +26,12 @@
 #include "Clock.h"
 #include "Camera.h"
 
-#include "Rotate.scr"
-#include "Boid.scr"
-#include "FirstPersonControls.scr"
-#include "ParticleRenderer.scr"
-#include "ParticleEmitter.scr"
-#include "MeshRenderer.scr"
+#include "Rotate.cpp"
+#include "Boid.cpp"
+#include "FirstPersonControls.cpp"
+#include "ParticleRenderer.cpp"
+#include "ParticleEmitter.cpp"
+#include "MeshRenderer.cpp"
 
 void main()
 {
