@@ -216,6 +216,9 @@
     <ClCompile Include="ParticleRenderer.cpp">
       <Filter>Resource Files\Scripts\Core\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Resource Files\Scripts\Core\Particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VEngineDefs.h">
@@ -313,9 +316,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ParticleEmitter.cpp">
-      <Filter>Resource Files\Scripts\Core\Particles</Filter>
-    </None>
     <None Include="Particle.cpp">
       <Filter>Resource Files\Scripts\Core\Particles</Filter>
     </None>

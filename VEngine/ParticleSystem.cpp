@@ -8,26 +8,25 @@
 
 #include <list>
 
-class ParticleEmitter : public Component
+class ParticleSystem : public Component
 {
 public:
-	ParticleEmitter()
-	{
-	}
 
-	ParticleEmitter(int NumParticles)
+	ParticleSystem(int NumParticles)
 	{
 		numParticles = NumParticles;
 		particles = new std::vector<Particle>(numParticles);
 		particleSystemData = new std::vector<ParticleInstanceData>(numParticles);
 	}
 
-	~ParticleEmitter()
+	~ParticleSystem()
 	{
-		delete particles;
-		delete particleSystemData;
-		delete vertexBuffer;
-		delete instanceBuffer;
+		std::cout << "This is fucking weird\n";
+		//delete particles;
+		//delete particleSystemData;
+		//delete vertexBuffer;
+		//delete instanceBuffer;
+		std::cout << "I know right?\n";
 	}
 
 	void Start()
@@ -37,11 +36,11 @@ public:
 		currentTime = timeUntilNextSpawn;
 
 		std::vector<glm::vec3> particleVerts(6);
-		particleVerts[0] = {  1.0f, -1.0f,  0.0f };
+		particleVerts[0] = { 1.0f, -1.0f,  0.0f };
 		particleVerts[2] = { -1.0f,  1.0f,  0.0f };
 		particleVerts[1] = { -1.0f, -1.0f,  0.0f };
-		particleVerts[3] = {  1.0f, -1.0f,  0.0f };
-		particleVerts[4] = {  1.0f,  1.0f,  0.0f };
+		particleVerts[3] = { 1.0f, -1.0f,  0.0f };
+		particleVerts[4] = { 1.0f,  1.0f,  0.0f };
 		particleVerts[5] = { -1.0f,  1.0f,  0.0f };
 
 		std::vector<glm::vec3> particleNorms(6);
@@ -66,11 +65,11 @@ public:
 			vertBuffer[i + 0] = particleVerts[k].x;
 			vertBuffer[i + 1] = particleVerts[k].y;
 			vertBuffer[i + 2] = particleVerts[k].z;
-											  
+
 			vertBuffer[i + 3] = particleNorms[k].x;
 			vertBuffer[i + 4] = particleNorms[k].y;
 			vertBuffer[i + 5] = particleNorms[k].z;
-						 
+
 			vertBuffer[i + 6] = particlUVs[k].x;
 			vertBuffer[i + 7] = particlUVs[k].y;
 			i += 8;
@@ -88,16 +87,31 @@ public:
 		if (currentTime <= 0.f)
 		{
 			//Spawn new particle
-			int newParticleIndex = enabledParticles.size() % numParticles;
-			enabledParticles.push_back(&(*particles)[newParticleIndex]); //Overrites a particle back at the start if all are active.
+			particleSpawnIndex = particleSpawnIndex % numParticles;
+			enabledParticles.push_back(&(*particles)[particleSpawnIndex]); //Overrites a particle back at the start if all are active.
 			enabledParticles.back()->Start();
-			
+			particleSpawnIndex++;
+
 			if ((int)enabledParticles.size() > numParticles)
 			{
 				enabledParticles.pop_front();
 			}
-		
+
 			currentTime = timeUntilNextSpawn;
+		}
+
+
+		for (std::list<Particle*>::const_iterator index = enabledParticles.begin(), end = enabledParticles.end(); index != end; )
+		{
+			if ((*index)->IsAlive())
+			{//Update alive particles
+				index++;
+			}
+			else
+			{//Delete dead particles
+				index = enabledParticles.erase(index); //Erase returns the correct new current index, so index is set to that.
+			}
+
 		}
 
 		int i = 0;
@@ -105,26 +119,16 @@ public:
 		{
 			//Update enabled particles
 			(*index)->Update(static_cast<float>(clockPtr->DeltaTime()));
-
-			if ((*index)->IsAlive())
-			{//Update alive particles
-				(*particleSystemData)[i] = (*index)->instanceData;
-				i++;
-				index++;
-			}
-			else
-			{//Delete dead particles
-				index = enabledParticles.erase(index); //Erase returns the correct new current index, so index is set to that.
-			}
+			(*particleSystemData)[i] = (*index)->instanceData;
+			i++;
+			index++;
 		}
 
-		instanceBuffer->CopyMemoryIntoBuffer((*particleSystemData).data(), sizeof(ParticleInstanceData) * i);
+		instanceBuffer->CopyMemoryIntoBuffer((*particleSystemData).data(), sizeof(ParticleInstanceData) * enabledParticles.size());
 	}
 
 	GPUBuffer* vertexBuffer;
 	GPUBuffer* instanceBuffer;
-
-
 
 public:
 	inline int NumActiveParticles() { return enabledParticles.size(); }
@@ -141,5 +145,6 @@ private:
 
 	std::list<Particle*> enabledParticles;
 	int numParticles;
-	//int numActiveParticles = 0;
+
+	int particleSpawnIndex = 0;
 };

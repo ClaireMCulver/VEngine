@@ -1,7 +1,7 @@
 #pragma
 
 #include "Renderer.cpp"
-#include "ParticleEmitter.cpp"
+#include "ParticleSystem.cpp"
 
 class ParticleRenderer : public Renderer
 {
@@ -18,7 +18,7 @@ public:
 
 	void Start()
 	{
-		particleEmitter = owner->GetComponent<ParticleEmitter>();
+		particleEmitter = owner->GetComponent<ParticleSystem>();
 		owner->SetRenderer(this);
 	}
 
@@ -36,5 +36,5 @@ public:
 	}
 
 private:
-	ParticleEmitter* particleEmitter;
+	ParticleSystem* particleEmitter;
 };

@@ -30,7 +30,7 @@
 #include "Boid.cpp"
 #include "FirstPersonControls.cpp"
 #include "ParticleRenderer.cpp"
-#include "ParticleEmitter.cpp"
+#include "ParticleSystem.cpp"
 #include "MeshRenderer.cpp"
 
 void main()
@@ -72,7 +72,7 @@ void main()
 
 	GameObject particleSystem(&cubeMesh, &standardMaterial);
 	particleSystem.SetTexture(boxTex, 0);
-	particleSystem.AddComponent(new ParticleEmitter(1000));
+	particleSystem.AddComponent(new ParticleSystem(1000));
 	particleSystem.AddComponent(new ParticleRenderer());
 	mainRenderPass.RegisterObject(&particleSystem);
 	objectManager.AddObject(&particleSystem);

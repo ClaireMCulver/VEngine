@@ -55,11 +55,11 @@ public:
 
 	//Simulation data
 	bool alive = false;
+
 private:
 
 	float lifeTime = 30.0f;
 	float currentLife;
 
 	glm::vec3 velocity;
-
 };
