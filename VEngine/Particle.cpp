@@ -28,7 +28,7 @@ public:
 		currentLife = lifeTime;
 		alive = true;
 
-		instanceData.position = { (float)(rand() % 30) / 10.0f - 0.5f, 0, (float)(rand() % 30) / 10.0f - 0.5f };
+		instanceData.position = { 0, 0, 0 };// { (float)(rand() % 30) / 10.0f - 0.5f, 0, (float)(rand() % 30) / 10.0f - 0.5f };
 		velocity = { (float)(rand() % 10) / 10.0f - 0.5f, 1, (float)(rand() % 10) / 10.0f - 0.5f };
 	}
 

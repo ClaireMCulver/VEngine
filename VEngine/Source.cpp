@@ -56,7 +56,7 @@ void main()
 	
 	Shader standardVertShader("../Assets/Shaders/StandardParticleVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
 	Shader standardFragShader("../Assets/Shaders/StandardParticleFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
-	Texture boxTex("../Assets/Textures/box.png", 512, 512);
+	Texture boxTex("../Assets/Textures/Smoke.png", 512, 512);
 
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
