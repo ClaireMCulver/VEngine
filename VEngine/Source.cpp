@@ -67,7 +67,8 @@ void main()
 	mainCamera.AddComponent(new Camera());
 	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 15, -40.0f));
 	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 15, 0 });
-	mainCamera.AddComponent(new FirstPersonControls());
+	FirstPersonControls* aFirstPersonThing = new FirstPersonControls();
+	mainCamera.AddComponent(aFirstPersonThing);
 	objectManager.AddObject(&mainCamera);
 
 	GameObject particleSystem(&cubeMesh, &standardMaterial);

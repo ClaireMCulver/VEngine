@@ -6,7 +6,7 @@ class Component
 {
 public:
 	Component() {};
-	~Component() {};
+	virtual ~Component() {};
 
 	//Function is called when the component is added to the game object.
 	virtual void Start() = 0;
@@ -15,7 +15,7 @@ public:
 	virtual void Update() = 0;
 
 	void SetOwner(GameObject* object) { owner = object; }
-
+	inline GameObject* GetOwner() { return owner; }
 protected:
 	GameObject* owner;
 };

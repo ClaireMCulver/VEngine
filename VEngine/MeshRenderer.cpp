@@ -12,7 +12,6 @@ public:
 
 	~MeshRenderer()
 	{
-
 	}
 
 	void Start()

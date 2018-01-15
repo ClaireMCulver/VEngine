@@ -18,13 +18,13 @@ GameObject::GameObject(Geometry *mesh, Material *mat)
 	//Per-Draw Data
 	descriptorBindings.push_back
 	(
-	{	//VkDescriptorSetLayoutBinding
-		0,											//binding;				
-		VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
-		1,											//descriptorCount;		
-		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
-		NULL										//pImmutableSamplers;
-	}
+		{	//VkDescriptorSetLayoutBinding
+			0,											//binding;				
+			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
+			1,											//descriptorCount;		
+			VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
+			NULL										//pImmutableSamplers;
+		}
 	);
 
 	//Passed Textures
@@ -80,7 +80,7 @@ GameObject::~GameObject()
 	//Iterate through the components, delete each component, which is the second stored value in the map
 	for (std::pair<const std::type_info*, Component*> element : components)
 	{
-		delete element.second;
+		element.second->~Component();
 	}
 
 	delete instanceBuffer;
@@ -110,7 +110,6 @@ void GameObject::Update()
 	transform->Update(); //Transform must be the last component to update.
 }
 
-//Should be a pointer to a heap component. Will be deleted by the GameObject.
 void GameObject::AddComponent(Component* component)
 {
 	components.insert(std::make_pair(&typeid(*component), component));

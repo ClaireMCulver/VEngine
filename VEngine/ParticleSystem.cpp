@@ -5,6 +5,7 @@
 #include "Clock.h"
 
 #include "Particle.cpp"
+#include "Camera.h"
 
 #include <list>
 
@@ -21,12 +22,12 @@ public:
 
 	~ParticleSystem()
 	{
-		std::cout << "This is fucking weird\n";
-		//delete particles;
-		//delete particleSystemData;
-		//delete vertexBuffer;
-		//delete instanceBuffer;
-		std::cout << "I know right?\n";
+		delete particles;
+		delete particleSystemData;
+		delete vertexBuffer;
+		delete instanceBuffer;
+		//std::cout << "This is fucking weird\n";
+		//std::cout << "I know right?\n";
 	}
 
 	void Start()
@@ -100,7 +101,7 @@ public:
 			currentTime = timeUntilNextSpawn;
 		}
 
-
+		//Sort the particles by active
 		for (std::list<Particle*>::const_iterator index = enabledParticles.begin(), end = enabledParticles.end(); index != end; )
 		{
 			if ((*index)->IsAlive())
@@ -111,7 +112,6 @@ public:
 			{//Delete dead particles
 				index = enabledParticles.erase(index); //Erase returns the correct new current index, so index is set to that.
 			}
-
 		}
 
 		int i = 0;
@@ -123,6 +123,15 @@ public:
 			i++;
 			index++;
 		}
+
+		//Get camera position for distance sorting
+
+		//Sort the particles by distance.
+		std::qsort(
+			(*particleSystemData).data(),
+			enabledParticles.size(),
+			sizeof(ParticleInstanceData),
+			compareFunc);
 
 		instanceBuffer->CopyMemoryIntoBuffer((*particleSystemData).data(), sizeof(ParticleInstanceData) * enabledParticles.size());
 	}
@@ -147,4 +156,23 @@ private:
 	int numParticles;
 
 	int particleSpawnIndex = 0;
+
+	static int compareFunc(const void* left, const void* right)
+	{
+		glm::vec3 cameraPosition;
+		cameraPosition = Camera::GetMain()->GetOwner()->GetTransform()->GetPosition();
+
+		float leftDistance = glm::length((*(ParticleInstanceData*)left).position - cameraPosition);
+		float rightDistance = glm::length((*(ParticleInstanceData*)right).position - cameraPosition);
+
+		if (leftDistance <= rightDistance)
+		{
+			return 1;
+		}
+		else
+		{
+			return -1;
+		}
+	}
+	
 };

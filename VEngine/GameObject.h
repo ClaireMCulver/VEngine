@@ -44,7 +44,10 @@ public:
 
 	void Update();
 
+
 	// Components //
+
+	//Should be a pointer to a heap component. Will be deleted by the GameObject.
 	void AddComponent(Component* component);
 
 	//Returns nullptr if there is no component of that type;
