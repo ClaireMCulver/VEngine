@@ -35,7 +35,12 @@ public:
 
 		glm::vec3 movement = { upMovement + downMovement, forwardMovement + backwardMovement, rightMovement + leftMovement };
 
+		float rotation = (float)input->keyboard.IsKeyDown('z');
+		rotation += (float)input->keyboard.IsKeyDown('x');
+
 		transform->Translate(movement);
+		transform->rotate(rotation);
+
 		camera->SetLookPoint(camera->GetViewPoint() + movement);
 	}
 

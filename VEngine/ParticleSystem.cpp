@@ -111,7 +111,7 @@ public:
 			(*particleSystemData).data(),
 			enabledParticles.size(),
 			sizeof(ParticleInstanceData),
-			compareFunc);
+			compareFunc_Distance);
 
 		instanceBuffer->CopyMemoryIntoBuffer((*particleSystemData).data(), sizeof(ParticleInstanceData) * enabledParticles.size());
 	}
@@ -137,7 +137,7 @@ private:
 
 	int particleSpawnIndex = 0;
 
-	static int compareFunc(const void* left, const void* right)
+	static int compareFunc_Distance(const void* left, const void* right)
 	{
 		glm::vec3 cameraPosition;
 		cameraPosition = Camera::GetMain()->GetOwner()->GetTransform()->GetPosition();
@@ -155,4 +155,20 @@ private:
 		}
 	}
 	
+	static int compareFunc_Depth(const void* left, const void* right)
+	{
+		glm::mat4 viewProjection = Camera::GetMain()->GetVPMatrix();
+
+		float leftDistance = (viewProjection * glm::vec4((*(ParticleInstanceData*)left).position, 1.0)).z;
+		float rightDistance = (viewProjection * glm::vec4((*(ParticleInstanceData*)right).position, 1.0)).z;
+
+		if (leftDistance <= rightDistance)
+		{
+			return 1;
+		}
+		else
+		{
+			return -1;
+		}
+	}
 };
