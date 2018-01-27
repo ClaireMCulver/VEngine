@@ -5,6 +5,8 @@ GraphicsLogicalDevice::GraphicsLogicalDevice(GraphicsPhysicalDevice &physicalDev
 	//Fetch info on the device's queues
 	GraphicsPhysicalDevice::QueueFamilyIndices indices = physicalDevice.GetQueueFamilyIndices();
 
+	const VkPhysicalDeviceFeatures physicalDeviceFeatures = physicalDevice.GetPhysicalDeviceFeatures();
+
 	VkDeviceQueueCreateInfo queuesRequested;
 	queuesRequested.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
 	queuesRequested.pNext = nullptr;
@@ -28,7 +30,7 @@ GraphicsLogicalDevice::GraphicsLogicalDevice(GraphicsPhysicalDevice &physicalDev
 	logicalDeviceCI.ppEnabledLayerNames = nullptr;
 	logicalDeviceCI.enabledExtensionCount = deviceExtentions.size();
 	logicalDeviceCI.ppEnabledExtensionNames = deviceExtentions.data();
-	logicalDeviceCI.pEnabledFeatures = nullptr;
+	logicalDeviceCI.pEnabledFeatures = &physicalDeviceFeatures;
 
 	vkCreateDevice(physicalDevice.GetPhysicalDevice(), &logicalDeviceCI, nullptr, &vkLogicalDevice);
 }

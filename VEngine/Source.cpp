@@ -55,18 +55,20 @@ void main()
 	cubeMesh.LoadMeshFromDae("../Assets/Models/monkey.dae");
 	
 	Shader standardVertShader("../Assets/Shaders/StandardParticleVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader standardGeomshader("../Assets/Shaders/StandardParticleGeomShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_GEOMETRY_BIT);
 	Shader standardFragShader("../Assets/Shaders/StandardParticleFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
 	Texture boxTex("../Assets/Textures/Smoke.png", 512, 512);
 
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
+	standardMaterial.AddShader(standardGeomshader);
 	standardMaterial.AddShader(standardFragShader);
 	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout());
 
 	GameObject mainCamera(&cubeMesh, &standardMaterial);
 	mainCamera.AddComponent(new Camera());
-	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 15, -40.0f));
-	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 15, 0 });
+	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 0, -40.0f));
+	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
 	FirstPersonControls* aFirstPersonThing = new FirstPersonControls();
 	mainCamera.AddComponent(aFirstPersonThing);
 	objectManager.AddObject(&mainCamera);

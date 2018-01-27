@@ -26,8 +26,6 @@ public:
 		delete particleSystemData;
 		delete vertexBuffer;
 		delete instanceBuffer;
-		//std::cout << "This is fucking weird\n";
-		//std::cout << "I know right?\n";
 	}
 
 	void Start()
@@ -36,45 +34,27 @@ public:
 
 		currentTime = timeUntilNextSpawn;
 
-		std::vector<glm::vec3> particleVerts(6);
-		particleVerts[0] = { 1.0f, -1.0f,  0.0f };
-		particleVerts[2] = { -1.0f,  1.0f,  0.0f };
-		particleVerts[1] = { -1.0f, -1.0f,  0.0f };
-		particleVerts[3] = { 1.0f, -1.0f,  0.0f };
-		particleVerts[4] = { 1.0f,  1.0f,  0.0f };
-		particleVerts[5] = { -1.0f,  1.0f,  0.0f };
+		std::vector<glm::vec3> particleVerts(1);
+		particleVerts[0] = {0.0f, 0.0f, 0.0f};
 
-		std::vector<glm::vec3> particleNorms(6);
+		std::vector<glm::vec3> particleNorms(1);
 		particleNorms[0] = { 0.0f, 0.0f, -1.0f };
-		particleNorms[1] = { 0.0f, 0.0f, -1.0f };
-		particleNorms[2] = { 0.0f, 0.0f, -1.0f };
-		particleNorms[3] = { 0.0f, 0.0f, -1.0f };
-		particleNorms[4] = { 0.0f, 0.0f, -1.0f };
-		particleNorms[5] = { 0.0f, 0.0f, -1.0f };
 
-		std::vector<glm::vec2> particlUVs(6);
-		particlUVs[0] = { 1.0f, 0.0f };
-		particlUVs[2] = { 0.0f, 1.0f };
-		particlUVs[1] = { 0.0f, 0.0f };
-		particlUVs[3] = { 1.0f, 0.0f };
-		particlUVs[4] = { 1.0f, 1.0f };
-		particlUVs[5] = { 0.0f, 1.0f };
+		std::vector<glm::vec2> particlUVs(1);
+		particlUVs[0] = { 0.0f, 0.0f };
 
 		std::vector<float> vertBuffer((particleVerts.size() * 3) + (particleNorms.size() * 3) + (particlUVs.size() * 2));
-		for (int i = 0, k = 0, count = vertBuffer.size(); i < count;)
 		{
-			vertBuffer[i + 0] = particleVerts[k].x;
-			vertBuffer[i + 1] = particleVerts[k].y;
-			vertBuffer[i + 2] = particleVerts[k].z;
+			vertBuffer[0] = particleVerts[0].x;
+			vertBuffer[1] = particleVerts[0].y;
+			vertBuffer[2] = particleVerts[0].z;
 
-			vertBuffer[i + 3] = particleNorms[k].x;
-			vertBuffer[i + 4] = particleNorms[k].y;
-			vertBuffer[i + 5] = particleNorms[k].z;
+			vertBuffer[3] = particleNorms[0].x;
+			vertBuffer[4] = particleNorms[0].y;
+			vertBuffer[5] = particleNorms[0].z;
 
-			vertBuffer[i + 6] = particlUVs[k].x;
-			vertBuffer[i + 7] = particlUVs[k].y;
-			i += 8;
-			k += 1;
+			vertBuffer[6] = particlUVs[0].x;
+			vertBuffer[7] = particlUVs[0].y;
 		}
 
 		vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertBuffer.data(), sizeof(float) * vertBuffer.size());
