@@ -49,13 +49,13 @@ void main()
     outNormal = inNormal[0];
     outUV = vec2(0, 0);
     EmitVertex();
-
+    
     vec3 TopLeft = P - (right - up);
     gl_Position = perFrameData.viewProjectionMatrix * vec4(TopLeft, 1.0);
     outNormal = inNormal[0];
     outUV = vec2(0, 1);
     EmitVertex();
-
+    
     vec3 rightBottom = P + (right - up);
     gl_Position = perFrameData.viewProjectionMatrix * vec4(rightBottom, 1.0);
     outNormal = inNormal[0];

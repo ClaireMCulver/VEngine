@@ -45,5 +45,5 @@ void main() {
     outNormal = vec3(0, 0, -1);
     outUV = inUV;
     //vec3 rotatedPosition = pos + 2.0 * cross(localRotation.xyz, cross(localRotation.xyz, pos) + localRotation.w * pos);
-    gl_Position = perFrameData.viewProjectionMatrix * vec4(pos + localPosition, 1.0);
+    gl_Position = vec4(pos + localPosition, 1.0);
 }
