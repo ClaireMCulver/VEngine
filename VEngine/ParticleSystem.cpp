@@ -9,6 +9,8 @@
 
 #include <list>
 
+#define comp2(a,b) (*( ParticleInstanceData* )a < *( ParticleInstanceData* )b)
+
 class ParticleSystem : public Component
 {
 public:
@@ -106,12 +108,14 @@ public:
 
 		//Get camera position for distance sorting
 
-		//Sort the particles by distance.
-		std::qsort(
+		//Sort the particles
+		glm::mat4 viewProjection = Camera::GetMain()->GetVPMatrix();
+		qsort_s(
 			(*particleSystemData).data(),
 			enabledParticles.size(),
 			sizeof(ParticleInstanceData),
-			compareFunc_Distance);
+			compareFunc_Depth_s,
+			(void*)&viewProjection);
 
 		instanceBuffer->CopyMemoryIntoBuffer((*particleSystemData).data(), sizeof(ParticleInstanceData) * enabledParticles.size());
 	}
@@ -137,38 +141,19 @@ private:
 
 	int particleSpawnIndex = 0;
 
-	static int compareFunc_Distance(const void* left, const void* right)
+	static inline int compareFunc_Distance(void* cameraPosition, const void* left, const void* right)
 	{
-		glm::vec3 cameraPosition;
-		cameraPosition = Camera::GetMain()->GetOwner()->GetTransform()->GetPosition();
+		double leftDistance = glm::length((*(ParticleInstanceData*)left).position - (*(glm::vec3*)cameraPosition));
+		double rightDistance = glm::length((*(ParticleInstanceData*)right).position - (*(glm::vec3*)cameraPosition));
 
-		float leftDistance = glm::length((*(ParticleInstanceData*)left).position - cameraPosition);
-		float rightDistance = glm::length((*(ParticleInstanceData*)right).position - cameraPosition);
-
-		if (leftDistance <= rightDistance)
-		{
-			return 1;
-		}
-		else
-		{
-			return -1;
-		}
+		return leftDistance <= rightDistance ? 1 : -1;
 	}
-	
-	static int compareFunc_Depth(const void* left, const void* right)
+
+	static inline int compareFunc_Depth_s(void* vpMatrix, const void* left, const void* right)
 	{
-		glm::mat4 viewProjection = Camera::GetMain()->GetVPMatrix();
+		double leftDistance = ((*(glm::mat4*)vpMatrix) * glm::vec4((*(ParticleInstanceData*)left).position, 1.0)).z;
+		double rightDistance = ((*(glm::mat4*)vpMatrix) * glm::vec4((*(ParticleInstanceData*)right).position, 1.0)).z;
 
-		float leftDistance = (viewProjection * glm::vec4((*(ParticleInstanceData*)left).position, 1.0)).z;
-		float rightDistance = (viewProjection * glm::vec4((*(ParticleInstanceData*)right).position, 1.0)).z;
-
-		if (leftDistance <= rightDistance)
-		{
-			return 1;
-		}
-		else
-		{
-			return -1;
-		}
+		return leftDistance <= rightDistance ? 1 : -1;
 	}
 };
