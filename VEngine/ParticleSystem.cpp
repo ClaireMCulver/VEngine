@@ -151,8 +151,13 @@ private:
 
 	static inline int compareFunc_Depth_s(void* vpMatrix, const void* left, const void* right)
 	{
-		double leftDistance = ((*(glm::mat4*)vpMatrix) * glm::vec4((*(ParticleInstanceData*)left).position, 1.0)).z;
-		double rightDistance = ((*(glm::mat4*)vpMatrix) * glm::vec4((*(ParticleInstanceData*)right).position, 1.0)).z;
+		//glm::mat4* Mat = ((glm::mat4*)vpMatrix);
+#define Mat ((glm::mat4*)vpMatrix)
+		glm::vec4 L = glm::vec4((*(ParticleInstanceData*)left).position, 1.0);
+		glm::vec4 R = glm::vec4((*(ParticleInstanceData*)right).position, 1.0);
+
+		double leftDistance = (*(Mat))[2].x * L.x + (*(Mat))[2].y * L.y + (*(Mat))[2].z * L.z + (*(Mat))[2].w;
+		double rightDistance = (*(Mat))[2].x * R.x + (*(Mat))[2].y * R.y + (*(Mat))[2].z * R.z + (*(Mat))[2].w;
 
 		return leftDistance <= rightDistance ? 1 : -1;
 	}
