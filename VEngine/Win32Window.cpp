@@ -33,7 +33,7 @@ Win32Window::Win32Window(std::string WindowName, int xResolution, int yResolutio
 	//store this pointer.
 	SetWindowLongPtr(windowData.window, GWLP_USERDATA, (LONG_PTR)this);
 
-	winMousePtr = &Input::singleton->mouse;
+	inputPtr = Input::singleton;
 
 	assert(windowData.window);
 }
@@ -75,7 +75,7 @@ LRESULT CALLBACK Win32Window::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 
 	case WM_LBUTTONUP:
 
-		ThisPtr->winMousePtr->OnMouseUp();
+		ThisPtr->inputPtr->mouse.OnMouseUp();
 
 	default:
 		break;
