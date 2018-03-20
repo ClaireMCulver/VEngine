@@ -13,9 +13,8 @@ WinMouse::~WinMouse()
 
 void WinMouse::OnMouseDown(HWND inhWnd)
 {
-	GetCursorPos(lpPoint);
-
-
+	GetCursorPos(&point);
+	ScreenToClient(inhWnd, &point);
 }
 
 void WinMouse::OnMouseUp()

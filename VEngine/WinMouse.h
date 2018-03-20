@@ -17,11 +17,15 @@ private:
 
 private: //Friend functions
 
+	// Gets the mouse input and converts it to window space for use.
 	void OnMouseDown(HWND inhWnd);
+
 	void OnMouseUp();
 
 private:
-	LPPOINT lpPoint;
+	POINT point;
 	int x, y;
+
+	bool captured = false;
 
 };
