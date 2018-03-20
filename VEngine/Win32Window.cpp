@@ -68,7 +68,7 @@ LRESULT CALLBACK Win32Window::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 		GetFocus();
 		
 	
-		ThisPtr->winMousePtr->OnMouseDown(hWnd);
+		ThisPtr->inputPtr->mouse.OnMouseDown(hWnd);
 
 
 		break;

@@ -21,12 +21,11 @@ public:
 	~Win32Window();
 
 	const WindowData GetWindowData() const { return windowData; }
-	inline WinMouse* GetMousePtr() { return winMousePtr; }
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 private:
 	WindowData windowData;
 	
-	WinMouse* winMousePtr;
+	Input* inputPtr;
 };
 
