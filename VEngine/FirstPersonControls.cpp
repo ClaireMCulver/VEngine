@@ -18,7 +18,7 @@ public:
 	void Start()
 	{
 		transform = owner->GetTransform();
-		input = Input::Singleton;
+		input = Input::singleton;
 		camera = owner->GetComponent<Camera>();
 	}
 

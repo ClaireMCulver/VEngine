@@ -159,6 +159,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="WinMouse.cpp" />
     <ClInclude Include="Rotate.cpp">
       <DeploymentContent>false</DeploymentContent>
       <FileType>CppHeader</FileType>
@@ -176,6 +177,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="WinKeyboard.cpp" />
+    <ClInclude Include="WinMouse.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />

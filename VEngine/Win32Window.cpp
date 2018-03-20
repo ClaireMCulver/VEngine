@@ -29,7 +29,12 @@ Win32Window::Win32Window(std::string WindowName, int xResolution, int yResolutio
 	RECT windowRect = { 0, 0, (LONG)xResolution, (LONG)yResolution };
 	AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 	windowData.window = CreateWindowEx(0, windowClass.lpszClassName, WindowName.c_str(), WS_VISIBLE | WS_SYSMENU | WS_OVERLAPPEDWINDOW, 100, 100, windowRect.right - windowRect.left, windowRect.bottom - windowRect.top, NULL, NULL, windowData.connection, NULL);
-	
+
+	//store this pointer.
+	SetWindowLongPtr(windowData.window, GWLP_USERDATA, (LONG_PTR)this);
+
+	winMousePtr = &Input::singleton->mouse;
+
 	assert(windowData.window);
 }
 
@@ -39,20 +44,39 @@ Win32Window::~Win32Window()
 }
 
 // MS-Windows event handling function:
-LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	switch (uMsg) {
+LRESULT CALLBACK Win32Window::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
+{
+	//Get 'this' pointer back.
+	Win32Window* ThisPtr = reinterpret_cast<Win32Window*>((intptr_t)(LONG_PTR)GetWindowLongPtr(hWnd, GWLP_USERDATA));	
+	
+	switch (uMsg) 
+	{
+
 	case WM_CLOSE:
 		PostQuitMessage(0);
 		break;
+
 	case WM_PAINT:
 		//run(info); //Placeholder function for samples that want to show dynamic content
 		return 0;
+
 	case WM_SETFOCUS:
 		SetFocus(hWnd);
 		break;
+
 	case WM_LBUTTONDOWN:
 		GetFocus();
+		
+	
+		ThisPtr->winMousePtr->OnMouseDown(hWnd);
+
+
 		break;
+
+	case WM_LBUTTONUP:
+
+		ThisPtr->winMousePtr->OnMouseUp();
+
 	default:
 		break;
 	}

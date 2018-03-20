@@ -219,6 +219,9 @@
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Resource Files\Scripts\Core\Particles</Filter>
     </ClCompile>
+    <ClCompile Include="WinMouse.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VEngineDefs.h">
@@ -313,6 +316,9 @@
     </ClInclude>
     <ClInclude Include="Rotate.cpp">
       <Filter>Resource Files\Scripts\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="WinMouse.h">
+      <Filter>Header Files\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

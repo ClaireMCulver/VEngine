@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WinKeyboard.h"
+#include "WinMouse.h";
 
 class Input
 {
@@ -12,6 +13,7 @@ public:
 
 public:
 	WinKeyboard keyboard;
-	static Input* Singleton;
+	WinMouse mouse;
+	static Input* singleton;
 };
 

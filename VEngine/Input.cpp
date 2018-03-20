@@ -1,12 +1,12 @@
 #include "Input.h"
 
-Input* Input::Singleton = nullptr;
+Input* Input::singleton = nullptr;
 
 Input::Input()
 {
-	if (!Singleton)
+	if (!singleton)
 	{
-		Singleton = this;
+		singleton = this;
 	}
 }
 
