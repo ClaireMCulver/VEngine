@@ -29,9 +29,10 @@
 #include "Rotate.cpp"
 #include "Boid.cpp"
 #include "FirstPersonControls.cpp"
-#include "ParticleRenderer.cpp"
+#include "ParticleRenderer.scr"
 #include "ParticleSystem.cpp"
-#include "MeshRenderer.cpp"
+#include "MeshRenderer.scr"
+#include "MouseDrawing.scr"
 
 void main()
 {
@@ -69,8 +70,6 @@ void main()
 	mainCamera.AddComponent(new Camera());
 	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 0, -40.0f));
 	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
-	FirstPersonControls* aFirstPersonThing = new FirstPersonControls();
-	mainCamera.AddComponent(aFirstPersonThing);
 	objectManager.AddObject(&mainCamera);
 
 	GameObject particleSystem(&cubeMesh, &standardMaterial);
@@ -80,8 +79,12 @@ void main()
 	mainRenderPass.RegisterObject(&particleSystem);
 	objectManager.AddObject(&particleSystem);
 
+	GameObject mouseDrawer(&cubeMesh, &standardMaterial);
+	mouseDrawer.AddComponent(new MouseDrawing());
+	objectManager.AddObject(&mouseDrawer);
+
 	// Main loop //
-	while (!inputSystem.keyboard.IsKeyDown('q'))
+	while (!inputSystem.GetKeyboard()->IsKeyDown('q'))
 	{
 		//Clock update
 		clock.Tick();

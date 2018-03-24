@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer.cpp"
+#include "Renderer.scr"
 
 class MeshRenderer : public Renderer
 {

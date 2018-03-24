@@ -1,0 +1,50 @@
+#pragma once
+
+#include "Renderer.scr"
+
+#include "MouseDrawing.scr"
+
+class DrawingRenderer : public Renderer
+{
+public:
+	DrawingRenderer();
+	~DrawingRenderer();
+
+	void Start();
+
+	void Update();
+	
+	void Draw(VkCommandBuffer commandBuffer);
+
+private:
+	MouseDrawing* mouseDrawing;
+
+};
+
+DrawingRenderer::DrawingRenderer()
+{
+}
+
+DrawingRenderer::~DrawingRenderer()
+{
+}
+
+void DrawingRenderer::Start()
+{
+	mouseDrawing = owner->GetComponent<MouseDrawing>();
+}
+
+void DrawingRenderer::Update()
+{
+	
+}
+
+void DrawingRenderer::Draw(VkCommandBuffer commandBuffer)
+{
+	const VkDeviceSize offsets[1] = { 0 };
+	VkBuffer vkBuffer = mouseDrawing->vertexBuffer->GetVKBuffer();
+
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vkBuffer, offsets);
+
+	vkCmdDraw(commandBuffer, 2, 1, 0, 0);
+}

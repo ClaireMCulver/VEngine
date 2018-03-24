@@ -1,22 +1,24 @@
 #include "WinMouse.h"
 
-WinMouse* WinMouse::singleton = nullptr;
-
 WinMouse::WinMouse()
 {
-	singleton = this;
 }
 
 WinMouse::~WinMouse()
 {
 }
 
-void WinMouse::OnMouseDown(HWND inhWnd)
+void WinMouse::OnMouseDown()
 {
-	GetCursorPos(&point);
-	ScreenToClient(inhWnd, &point);
+	
 }
 
 void WinMouse::OnMouseUp()
 {
+}
+
+void WinMouse::OnMouseMove(HWND inhWnd)
+{
+	GetCursorPos(&mousePosition.point);
+	ScreenToClient(inhWnd, &mousePosition.point);
 }

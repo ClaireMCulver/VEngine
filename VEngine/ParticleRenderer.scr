@@ -1,6 +1,6 @@
 #pragma
 
-#include "Renderer.cpp"
+#include "Renderer.scr"
 #include "ParticleSystem.cpp"
 
 class ParticleRenderer : public Renderer

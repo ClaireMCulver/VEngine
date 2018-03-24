@@ -153,7 +153,7 @@
     </ClCompile>
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="ParticleRenderer.cpp" />
+    <ClCompile Include="ParticleRenderer.scr" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="RenderPass.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -231,9 +231,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Boid.cpp" />
+    <None Include="DrawingRenderer.scr">
+      <SubType>
+      </SubType>
+    </None>
     <None Include="FirstPersonControls.cpp" />
-    <None Include="MeshRenderer.cpp" />
-    <None Include="Renderer.cpp" />
+    <None Include="MeshRenderer.scr" />
+    <None Include="MouseDrawing.scr">
+      <SubType>
+      </SubType>
+    </None>
+    <None Include="Renderer.scr" />
     <None Include="Particle.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

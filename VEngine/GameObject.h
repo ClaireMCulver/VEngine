@@ -13,7 +13,7 @@
 
 #include "Geometry.h"
 #include "Material.h"
-#include "Renderer.cpp"
+#include "Renderer.scr"
 #include "CommandBuffer.h"
 #include "GPUBuffer.h"
 #include "DescriptorPool.h"

@@ -133,6 +133,9 @@
     <Filter Include="Resource Files\Scripts\Core\Particles">
       <UniqueIdentifier>{5b81f30c-46ea-4c09-adfa-f3c18d44190e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Scripts\MouseDrawing">
+      <UniqueIdentifier>{31db647f-3e4c-44b1-94e0-a136b517544d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -213,14 +216,14 @@
     <ClCompile Include="UniformBuffer.cpp">
       <Filter>Source Files\Graphics\Objects\Buffers\UniformBuffer</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleRenderer.cpp">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="ParticleSystem.cpp">
       <Filter>Resource Files\Scripts\Core\Particles</Filter>
     </ClCompile>
     <ClCompile Include="WinMouse.cpp">
       <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -325,17 +328,23 @@
     <None Include="Particle.cpp">
       <Filter>Resource Files\Scripts\Core\Particles</Filter>
     </None>
-    <None Include="MeshRenderer.cpp">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
-    </None>
-    <None Include="Renderer.cpp">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
-    </None>
     <None Include="FirstPersonControls.cpp">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </None>
     <None Include="Boid.cpp">
       <Filter>Resource Files\Scripts\AI</Filter>
+    </None>
+    <None Include="MouseDrawing.scr">
+      <Filter>Resource Files\Scripts\MouseDrawing</Filter>
+    </None>
+    <None Include="Renderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="MeshRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="DrawingRenderer.scr">
+      <Filter>Resource Files\Scripts\MouseDrawing</Filter>
     </None>
   </ItemGroup>
 </Project>

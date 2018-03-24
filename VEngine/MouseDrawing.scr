@@ -1,0 +1,55 @@
+#pragma once
+
+#include "GameObject.h"
+
+#include "Input.h"
+
+class MouseDrawing : public Component
+{
+	friend class DrawingRenderer;
+
+public:
+	MouseDrawing();
+	~MouseDrawing();
+
+	void Start();
+
+	void Update();
+
+private:
+	WinMouse* mousePtr;
+
+	glm::vec2 mousePosition;
+
+	glm::vec3 lineVertices[2]; const size_t LINEVERTICESSIZE = sizeof(glm::vec3) * 2;
+
+	GPUBuffer* vertexBuffer;
+};
+
+MouseDrawing::MouseDrawing()
+{
+}
+
+MouseDrawing::~MouseDrawing()
+{
+}
+
+void MouseDrawing::Start()
+{
+	mousePtr = (Input::singleton->GetMouse());
+	mousePosition = {mousePtr->GetMousePosition()->point.x, mousePtr->GetMousePosition()->point.y};
+
+	vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, LINEVERTICESSIZE);
+}
+
+void MouseDrawing::Update()
+{
+	MousePosition* newMousePos = mousePtr->GetMousePosition();
+
+	lineVertices[0] = { mousePosition.x, mousePosition.y, 0.0f};
+	lineVertices[1] = { newMousePos->point.x, newMousePos->point.y, 0.0f};
+
+	mousePosition = {(float)newMousePos->point.x, (float)newMousePos->point.y};
+
+	vertexBuffer->CopyMemoryIntoBuffer(lineVertices, LINEVERTICESSIZE);
+}

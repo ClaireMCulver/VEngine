@@ -24,19 +24,19 @@ public:
 
 	void Update()
 	{
-		float rightMovement = moveSpeed * input->keyboard.IsKeyDown('w');
-		float leftMovement = -moveSpeed * input->keyboard.IsKeyDown('s');
+		float rightMovement = moveSpeed * input->GetKeyboard()->IsKeyDown('w');
+		float leftMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown('s');
 
-		float upMovement = moveSpeed * input->keyboard.IsKeyDown('a');
-		float downMovement = -moveSpeed * input->keyboard.IsKeyDown('d');
+		float upMovement = moveSpeed * input->GetKeyboard()->IsKeyDown('a');
+		float downMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown('d');
 
-		float forwardMovement = -moveSpeed * input->keyboard.IsKeyDown(VK_LSHIFT);
-		float backwardMovement = moveSpeed * input->keyboard.IsKeyDown(VK_SPACE);
+		float forwardMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown(VK_LSHIFT);
+		float backwardMovement = moveSpeed * input->GetKeyboard()->IsKeyDown(VK_SPACE);
 
 		glm::vec3 movement = { upMovement + downMovement, forwardMovement + backwardMovement, rightMovement + leftMovement };
 
-		float rotation = (float)input->keyboard.IsKeyDown('z');
-		rotation += (float)input->keyboard.IsKeyDown('x');
+		float rotation = (float)input->GetKeyboard()->IsKeyDown('z');
+		rotation += (float)input->GetKeyboard()->IsKeyDown('x');
 
 		transform->Translate(movement);
 		transform->rotate(rotation);

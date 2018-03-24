@@ -11,8 +11,13 @@ public:
 
 	void UpdateInput();
 
+	inline WinKeyboard* GetKeyboard() { return &keyboard; }
+	inline WinMouse* GetMouse() { return &mouse; }
+
 public:
+	static Input* singleton;
+
+private:
 	WinKeyboard keyboard;
 	WinMouse mouse;
-	static Input* singleton;
 };
