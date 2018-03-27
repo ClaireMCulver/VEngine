@@ -5,6 +5,8 @@
 #endif // !EngineName
 const int EngineVersion = 1;
 
+#define ASSETSPATH "../Assets/"
+
 //Queue priorities
 const int GraphicsQueuePriority = 0;
 const int PresentQueuePriority	= 0;

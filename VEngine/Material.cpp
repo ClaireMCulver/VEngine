@@ -137,7 +137,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	rs.depthBiasConstantFactor = 0;
 	rs.depthBiasClamp = 0;
 	rs.depthBiasSlopeFactor = 0;
-	rs.lineWidth = 1.0f;
+	rs.lineWidth = 3.0f;
 
 	VkPipelineColorBlendStateCreateInfo cb;
 	cb.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;

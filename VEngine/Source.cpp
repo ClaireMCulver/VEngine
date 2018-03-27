@@ -33,6 +33,7 @@
 #include "ParticleSystem.cpp"
 #include "MeshRenderer.scr"
 #include "MouseDrawing.scr"
+#include "DrawingRenderer.scr"
 
 void main()
 {
@@ -55,14 +56,12 @@ void main()
 	Geometry cubeMesh;
 	cubeMesh.LoadMeshFromDae("../Assets/Models/monkey.dae");
 	
-	Shader standardVertShader("../Assets/Shaders/StandardParticleVertShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-	Shader standardGeomshader("../Assets/Shaders/StandardParticleGeomShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_GEOMETRY_BIT);
-	Shader standardFragShader("../Assets/Shaders/StandardParticleFragShader.glsl", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+	Shader standardVertShader("../Assets/Shaders/DrawingShader.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader standardFragShader("../Assets/Shaders/DrawingShader.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
 	Texture boxTex("../Assets/Textures/Smoke.png", 512, 512);
 
 	Material standardMaterial;
 	standardMaterial.AddShader(standardVertShader);
-	standardMaterial.AddShader(standardGeomshader);
 	standardMaterial.AddShader(standardFragShader);
 	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout());
 
@@ -72,15 +71,10 @@ void main()
 	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
 	objectManager.AddObject(&mainCamera);
 
-	GameObject particleSystem(&cubeMesh, &standardMaterial);
-	particleSystem.SetTexture(boxTex, 0);
-	particleSystem.AddComponent(new ParticleSystem(1000));
-	particleSystem.AddComponent(new ParticleRenderer());
-	mainRenderPass.RegisterObject(&particleSystem);
-	objectManager.AddObject(&particleSystem);
-
 	GameObject mouseDrawer(&cubeMesh, &standardMaterial);
-	mouseDrawer.AddComponent(new MouseDrawing());
+	mouseDrawer.AddComponent(new MouseDrawing(mainRenderPass.GetRenderedImage()));
+	mouseDrawer.AddComponent(new DrawingRenderer());
+	mainRenderPass.RegisterObject(&mouseDrawer);
 	objectManager.AddObject(&mouseDrawer);
 
 	// Main loop //

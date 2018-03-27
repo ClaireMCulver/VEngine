@@ -3,6 +3,8 @@
 #include <Windows.h>
 #include <assert.h>
 
+#include "GameDefs.h"
+
 union MousePosition
 {
 	POINT point;

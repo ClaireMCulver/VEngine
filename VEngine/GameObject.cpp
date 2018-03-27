@@ -154,7 +154,7 @@ void GameObject::UpdateDescriptorSet()
 		uniformWrite.pNext = NULL;
 		uniformWrite.dstSet = uniformDescriptorSet;
 		uniformWrite.dstBinding = PerDrawUniformTextureBinding;
-		uniformWrite.dstArrayElement = i; //TODO: Figure out what the fuck.
+		uniformWrite.dstArrayElement = i; 
 		uniformWrite.descriptorCount = 1;
 		uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		uniformWrite.pImageInfo = &imageInfo;

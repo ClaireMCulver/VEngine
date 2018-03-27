@@ -225,6 +225,9 @@
     <ClCompile Include="ParticleRenderer.scr">
       <Filter>Resource Files\Scripts\Core\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="RenderTexture.cpp">
+      <Filter>Source Files\Graphics\Objects\Images</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VEngineDefs.h">
@@ -322,6 +325,9 @@
     </ClInclude>
     <ClInclude Include="WinMouse.h">
       <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTexture.h">
+      <Filter>Header Files\Graphics\Objects\Images</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
