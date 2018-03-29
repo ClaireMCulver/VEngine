@@ -9,7 +9,7 @@ class MouseDrawing : public Component
 	friend class DrawingRenderer;
 
 public:
-	MouseDrawing(Image* existingImage);
+	MouseDrawing();
 	~MouseDrawing();
 
 	void Start();
@@ -26,11 +26,11 @@ private:
 	GPUBuffer* vertexBuffer;
 	GPUBuffer* instanceBuffer;
 
+
 };
 
-MouseDrawing::MouseDrawing(Image* existingImage)
+MouseDrawing::MouseDrawing()
 {
-
 }
 
 MouseDrawing::~MouseDrawing()
@@ -45,25 +45,25 @@ void MouseDrawing::Start()
 	mousePosition = {mousePtr->GetMousePosition()->point.x, mousePtr->GetMousePosition()->point.y};
 
 	vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, LINEVERTICESSIZE);
-	glm::mat4* indentityPtr = new glm::mat4(1.0);
-	instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, indentityPtr, 64);
-	delete indentityPtr;
+	glm::mat4 indentityPtr = glm::mat4(1.0);
+	instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &indentityPtr, 64);
+
 }
 
 void MouseDrawing::Update()
 {
 	MousePosition* newMousePos = mousePtr->GetMousePosition();
-	
-	lineVertices[0]		= (float)mousePosition.x / WindowSize[0]; //x
-	lineVertices[1]		= (float)mousePosition.y / WindowSize[1]; //y
-	lineVertices[0]		= 2.0f * lineVertices[0] - 1.0f;
-	lineVertices[1]		= 2.0f * lineVertices[1] - 1.0f;
-	
-	lineVertices[8]		= (float)newMousePos->point.x / WindowSize[0];
-	lineVertices[9]		= (float)newMousePos->point.y / WindowSize[1];
-	lineVertices[8]		= 2.0f * lineVertices[8] - 1.0f;
-	lineVertices[9]		= 2.0f * lineVertices[9] - 1.0f;
-	
+
+	lineVertices[0] = (float)mousePosition.x / WindowSize[0]; //x
+	lineVertices[1] = (float)mousePosition.y / WindowSize[1]; //y
+	lineVertices[0] = 2.0f * lineVertices[0] - 1.0f;
+	lineVertices[1] = 2.0f * lineVertices[1] - 1.0f;
+
+	lineVertices[8] = (float)newMousePos->point.x / WindowSize[0];
+	lineVertices[9] = (float)newMousePos->point.y / WindowSize[1];
+	lineVertices[8] = 2.0f * lineVertices[8] - 1.0f;
+	lineVertices[9] = 2.0f * lineVertices[9] - 1.0f;
+
 	vertexBuffer->CopyMemoryIntoBuffer(lineVertices, LINEVERTICESSIZE);
 	mousePosition = { (float)newMousePos->point.x, (float)newMousePos->point.y };
 }

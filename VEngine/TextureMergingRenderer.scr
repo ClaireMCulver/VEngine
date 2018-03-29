@@ -1,0 +1,215 @@
+#pragma once
+
+#include "Renderer.scr"
+
+#include "Texture.h"
+#include "CommandBuffer.h"
+
+class TextureMergingRenderer : public Renderer
+{
+public:
+	TextureMergingRenderer(glm::vec2 textureASize, glm::vec2 textureBSize);
+	~TextureMergingRenderer();
+
+	void Start();
+
+	void Update();
+	
+	void Draw(VkCommandBuffer commandBuffer);
+
+	void SetSourceTexture(Image* newImage, Image* mergedImage);
+
+	void UpdateNewDrawTextre() { newTexture->CopyRenderedImage(sourceImage); }
+	void UpdateMergedTexture() { previousTexture->CopyRenderedImage(mergedImage); }
+
+private:
+
+	void ClearTextures();
+
+	void SendImageToNetwork();
+
+private:
+	Texture* previousTexture;
+	Texture* newTexture;
+	Image* sourceImage;
+	Image* mergedImage;
+
+	float fsQuad[(3 + 3 + 2) * 4];
+
+	GPUBuffer* vertexBuffer;
+	GPUBuffer* instanceBuffer;
+
+	Input* inputPtr;
+
+
+	//Variables for connecting to the neural network
+	Image* resolvedImage;
+	float resolvedImageData[28*28];
+
+	bool canSend = true;
+};
+
+TextureMergingRenderer::TextureMergingRenderer(glm::vec2 textureASize, glm::vec2 textureBSize)
+{
+	previousTexture = new Texture((int)textureASize.x, (int)textureASize.y);
+	newTexture = new Texture((int)textureBSize.x, (int)textureBSize.y);
+}
+
+TextureMergingRenderer::~TextureMergingRenderer()
+{
+	delete previousTexture;
+	delete newTexture;
+
+	delete vertexBuffer;
+	delete instanceBuffer;
+
+	delete resolvedImage;
+}
+
+void TextureMergingRenderer::Start()
+{
+	owner->SetRenderer(this);
+
+	inputPtr = Input::singleton;
+
+	glm::vec3 lb = { -1, -1, 0 };
+	glm::vec3 lt = { -1,  1, 0 };
+	glm::vec3 rb = {  1, -1, 0 };
+	glm::vec3 rt = {  1,  1, 0 };
+	int step = (3 + 3 + 2);
+
+	fsQuad[0] = lb.x;
+	fsQuad[1] = lb.y;
+
+	fsQuad[0 + step] = lt.x;
+	fsQuad[1 + step] = lt.y;
+
+	fsQuad[0 + step * 2] = rb.x;
+	fsQuad[1 + step * 2] = rb.y;
+
+	fsQuad[0 + step * 3] = rt.x;
+	fsQuad[1 + step * 3] = rt.y;
+
+	vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, fsQuad, (sizeof(float)) * step * 4);
+	glm::mat4 indentityPtr = glm::mat4(1.0);
+	instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &indentityPtr, 64);
+
+	resolvedImage = new Image(28, 28, VkFormat::VK_FORMAT_B8G8R8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT);
+
+	owner->SetTexture(*previousTexture, 0);
+	owner->SetTexture(*newTexture, 1);
+}
+
+void TextureMergingRenderer::Update()
+{
+	if (inputPtr->GetKeyboard()->IsKeyDown('c')) 
+	{
+		ClearTextures();
+	}
+
+	if (inputPtr->GetKeyboard()->IsKeyDown('s') && canSend)
+	{
+		SendImageToNetwork();
+		ClearTextures();
+		canSend = false;
+	}
+	else if (!canSend)
+	{
+		canSend = true;
+	}
+}
+
+void TextureMergingRenderer::Draw(VkCommandBuffer commandBuffer)
+{
+	RenderMesh(commandBuffer, 4, vertexBuffer->GetVKBuffer(), instanceBuffer->GetVKBuffer(), 1);
+}
+
+void TextureMergingRenderer::SetSourceTexture(Image* newImage, Image* backImage)
+{
+	sourceImage = newImage;
+	mergedImage = backImage;
+
+	CommandBuffer clearBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	clearBuffer.BeginRecording();
+	sourceImage->CmdClearImage(clearBuffer);
+	mergedImage->CmdClearImage(clearBuffer);
+	clearBuffer.EndRecording();
+	clearBuffer.SubmitBuffer();
+
+	newTexture->CopyRenderedImage(sourceImage);
+	previousTexture->CopyRenderedImage(mergedImage);
+}
+
+void TextureMergingRenderer::ClearTextures()
+{
+	CommandBuffer clearBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	clearBuffer.BeginRecording();
+	newTexture->CmdClearImage(clearBuffer);
+	previousTexture->CmdClearImage(clearBuffer);
+	clearBuffer.EndRecording();
+	clearBuffer.SubmitBuffer();
+	clearBuffer.WaitForCompletion();
+}
+
+void TextureMergingRenderer::SendImageToNetwork()
+{
+	CommandBuffer clearBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+	const uint64_t imageSize = (32 / 8) * 28 * 28; //32 bits per pixel / 8, by 28 by 28. Number of four byte pixels.
+	GPUBuffer imageBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_DST_BIT, imageSize);
+
+	clearBuffer.BeginRecording();
+
+	previousTexture->ChangeImageLayout(clearBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+	resolvedImage->ChangeImageLayout(clearBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	//Blit image
+	Image::CmdBlitImage(clearBuffer, previousTexture, resolvedImage, VkFilter::VK_FILTER_LINEAR);
+	
+	resolvedImage->ChangeImageLayout(clearBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+	//Transfer the image to a buffer
+	VkBufferImageCopy imageToBufferCopy;
+	imageToBufferCopy.bufferOffset = 0;
+	imageToBufferCopy.bufferRowLength = 0;
+	imageToBufferCopy.bufferImageHeight = 0;
+	imageToBufferCopy.imageSubresource;
+		imageToBufferCopy.imageSubresource.aspectMask = resolvedImage->GetImageAspect();
+		imageToBufferCopy.imageSubresource.mipLevel = 0;
+		imageToBufferCopy.imageSubresource.baseArrayLayer = 0;
+		imageToBufferCopy.imageSubresource.layerCount = 1;
+	imageToBufferCopy.imageOffset = { 0, 0, 0 };
+	imageToBufferCopy.imageExtent = { (uint32_t)resolvedImage->GetImageSize().x, (uint32_t)resolvedImage->GetImageSize().y, 1 };
+
+	vkCmdCopyImageToBuffer(clearBuffer.GetVKCommandBuffer(), resolvedImage->GetImage(), resolvedImage->GetImageLayout(), imageBuffer.GetVKBuffer(), 1, &imageToBufferCopy);
+
+	newTexture->CmdClearImage(clearBuffer);
+	previousTexture->CmdClearImage(clearBuffer);
+	clearBuffer.EndRecording();
+	clearBuffer.SubmitBuffer();
+	clearBuffer.WaitForCompletion();
+
+	//Transfer the memory from the device
+	byte data[imageSize];
+	void* deviceDataPtr;
+	vkMapMemory(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), imageBuffer.GetBufferMemory(), 0, imageSize, 0, &deviceDataPtr);
+	memcpy(data, deviceDataPtr, imageSize);
+	vkUnmapMemory(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), imageBuffer.GetBufferMemory());
+
+	//Take every fourth to get the grey scale image. It's all black and white anyway, so this is fine.
+	for (int i = 0; i < 28 * 28; i++)
+	{
+		resolvedImageData[i] = (float)(int)data[i * 4];
+	}
+
+	for (int j = 0; j < 784; j++)
+	{
+		//debug printing
+		printf("%c", resolvedImageData[j] > 0.66f ? 178 : resolvedImageData[j] > 0.33f ? 177 : resolvedImageData[j] > 0.0f ? 176 : ' ');
+		if (j % 28 == 0)
+			printf("\n");
+	}
+
+	//Send buffer to the neural network.
+
+}

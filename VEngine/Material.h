@@ -31,7 +31,8 @@ public:
 	void AddShader(Shader &newShader);
 
 	//Finalizes the material pipeline on the GPU side.
-	void FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout);
+	void FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout, VkPrimitiveTopology primitiveType);
+
 
 
 	//Binds the pipeline

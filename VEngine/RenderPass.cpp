@@ -33,6 +33,12 @@ RenderPass::~RenderPass()
 	{
 		delete images[i];
 	}
+
+	for (int i = 0, count = registeredMeshes.size(); i < count; i++)
+	{
+		registeredMeshes[i]->clear();
+		delete registeredMeshes[i];
+	}
 }
 
 void RenderPass::AddNewSubPass()
@@ -234,7 +240,7 @@ void RenderPass::CreateRenderPass()
 	{	//VkDescriptorSetLayoutBinding
 		1,											//binding;				
 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
-		1,											//descriptorCount;		
+		2,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
 		NULL										//pImmutableSamplers;
 	}
@@ -290,6 +296,13 @@ void RenderPass::CreateRenderPass()
 
 	result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineLayout);
 	assert(result == VK_SUCCESS);
+
+
+	//Create registered mesh lists
+	for (int i = 0, count = subpassDescriptions.size(); i < count; i++)
+	{
+		registeredMeshes.push_back(new std::vector<GameObject*>);
+	}
 }
 
 void RenderPass::BindRenderPass(VkCommandBuffer &cmdBuffer)
@@ -360,21 +373,31 @@ void RenderPass::RecordBuffer()
 
 	vkCmdBindDescriptorSets(vkRenderBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-	// Render pass contents //
-	for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
+	int renderPassIndex = 0;
+	std::vector<GameObject*>* currentRegisteredMeshList;
+	for (int renderPassIndex = 0, numPasses = subpassDescriptions.size(); renderPassIndex < numPasses; renderPassIndex++)
 	{
-		registeredMeshes[i]->SetDrawMatrices(registeredMeshes[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
-		
-		registeredMeshes[i]->UpdateDescriptorSet();
+		currentRegisteredMeshList = registeredMeshes[renderPassIndex];
 
-		//Bind the material
-		registeredMeshes[i]->GetMaterial()->BindPipeline(*renderBuffer);
+		// Render pass contents //
+		for (size_t i = 0, count = (*currentRegisteredMeshList).size(); i < count; i++)
+		{
+			(*currentRegisteredMeshList)[i]->SetDrawMatrices((*currentRegisteredMeshList)[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
 
-		//Bind uniforms
-		registeredMeshes[i]->BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
+			(*currentRegisteredMeshList)[i]->UpdateDescriptorSet();
 
-		//Draw the model in the buffer.
-		registeredMeshes[i]->GetRenderer()->Draw(renderBuffer->GetVKCommandBuffer());
+			//Bind the material
+			(*currentRegisteredMeshList)[i]->GetMaterial()->BindPipeline(*renderBuffer);
+
+			//Bind uniforms
+			(*currentRegisteredMeshList)[i]->BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
+
+			//Draw the model in the buffer.
+			(*currentRegisteredMeshList)[i]->GetRenderer()->Draw(renderBuffer->GetVKCommandBuffer());
+		}
+
+		if (renderPassIndex < numPasses-1)
+			vkCmdNextSubpass(renderBuffer->GetVKCommandBuffer(), VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 	}
 
 	//end render pass
@@ -409,10 +432,10 @@ void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeig
 	}
 }
 
-void RenderPass::RegisterObject(GameObject *object)
+void RenderPass::RegisterObject(GameObject *object, int subpass)
 {
 	assert(object->GetRenderer() != nullptr);
-	registeredMeshes.push_back(object);
+	registeredMeshes[subpass]->push_back(object);
 }
 
 Image* RenderPass::GetRenderedImage()

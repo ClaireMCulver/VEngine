@@ -8,6 +8,7 @@
 class Texture :	public Image
 {
 public:
+	//Allocate a texture for filling later.
 	Texture(int textureWidth, int textureHeight);
 
 	//Load a texture directly from a file
@@ -18,7 +19,7 @@ public: // Get/Set
 	VkSampler GetSampler() const { return textureSampler; }
 
 public: // General Functions
-	void CopyRenderedImage();
+	void CopyRenderedImage(Image* existingimage);
 
 private: // private general functions
 	void InitializeSampler(const VkDevice &logicalDevice);

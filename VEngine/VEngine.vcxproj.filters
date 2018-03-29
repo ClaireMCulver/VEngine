@@ -352,5 +352,8 @@
     <None Include="DrawingRenderer.scr">
       <Filter>Resource Files\Scripts\MouseDrawing</Filter>
     </None>
+    <None Include="TextureMergingRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
   </ItemGroup>
 </Project>

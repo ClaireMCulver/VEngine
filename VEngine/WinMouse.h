@@ -31,11 +31,12 @@ private: //Friend functions
 public: //Get/Set
 
 	inline MousePosition* GetMousePosition() { return &mousePosition; }
-
+	inline bool GetMouseDown() { return isDown; }
 
 private:
 	MousePosition mousePosition;
 
 	bool captured = false;
+	bool isDown = false;
 
 };

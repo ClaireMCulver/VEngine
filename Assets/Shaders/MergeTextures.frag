@@ -22,8 +22,7 @@ layout (set = 1, binding = 0) uniform PerDrawData
     mat4 mvpMatrix;
 } perDrawData;
 
-layout(set = 1, binding = 1) uniform sampler2D texture[2];
-
+layout(set = 1, binding = 1) uniform sampler2D textures[2];
 
 // In data //
 layout (location = 0) in vec3 inNormal;
@@ -34,5 +33,6 @@ layout (location = 0) out vec4 outColor;
 
 void main() 
 {
-    outColor = vec4(1, 1, 1, 1);
+    outColor = texture(textures[0], inUV) + texture(textures[1], inUV);
+
 }

@@ -34,6 +34,7 @@
 #include "MeshRenderer.scr"
 #include "MouseDrawing.scr"
 #include "DrawingRenderer.scr"
+#include "TextureMergingRenderer.scr"
 
 void main()
 {
@@ -56,26 +57,47 @@ void main()
 	Geometry cubeMesh;
 	cubeMesh.LoadMeshFromDae("../Assets/Models/monkey.dae");
 	
-	Shader standardVertShader("../Assets/Shaders/DrawingShader.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-	Shader standardFragShader("../Assets/Shaders/DrawingShader.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+	Shader lineVertShader("../Assets/Shaders/DrawingShader.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader lineFragShader("../Assets/Shaders/DrawingShader.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
 	Texture boxTex("../Assets/Textures/Smoke.png", 512, 512);
 
-	Material standardMaterial;
-	standardMaterial.AddShader(standardVertShader);
-	standardMaterial.AddShader(standardFragShader);
-	standardMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout());
+	Material lineMaterial;
+	lineMaterial.AddShader(lineVertShader);
+	lineMaterial.AddShader(lineFragShader);
+	lineMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout(), VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
 
-	GameObject mainCamera(&cubeMesh, &standardMaterial);
+	GameObject mainCamera(&cubeMesh, &lineMaterial);
 	mainCamera.AddComponent(new Camera());
 	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 0, -40.0f));
 	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
 	objectManager.AddObject(&mainCamera);
 
-	GameObject mouseDrawer(&cubeMesh, &standardMaterial);
-	mouseDrawer.AddComponent(new MouseDrawing(mainRenderPass.GetRenderedImage()));
+	GameObject mouseDrawer(&cubeMesh, &lineMaterial);
+	mouseDrawer.AddComponent(new MouseDrawing());
 	mouseDrawer.AddComponent(new DrawingRenderer());
-	mainRenderPass.RegisterObject(&mouseDrawer);
+	mainRenderPass.RegisterObject(&mouseDrawer, 0);
 	objectManager.AddObject(&mouseDrawer);
+
+	// merge textures //
+
+	// I really don't like having a second render pass, rather than having a sub pass in the first one, but adding functionality that I like for that would take longer than I have to add.
+	// So I have an addition one for compositing and one for ui compositing.
+	DeferredRenderPass mergePass;
+
+	Shader textureMergeVertShader("../Assets/Shaders/MergeTextures.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader textureMergeFragShader("../Assets/Shaders/MergeTextures.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+
+	Material MergeTexturesMaterial;
+	MergeTexturesMaterial.AddShader(textureMergeVertShader);
+	MergeTexturesMaterial.AddShader(textureMergeFragShader);
+	MergeTexturesMaterial.FinalizeMaterial(mergePass.GetVKRenderPass(), mergePass.GetVKDescriptorSetLayout(), mergePass.GetVKPipelineLayout(), VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP);
+
+	GameObject textureMergeEffect(&cubeMesh, &MergeTexturesMaterial);
+	textureMergeEffect.AddComponent(new TextureMergingRenderer({ WindowSize[0], WindowSize[1] }, { WindowSize[0], WindowSize[1] }));
+	mergePass.RegisterObject(&textureMergeEffect, 0);
+	textureMergeEffect.GetComponent<TextureMergingRenderer>()->SetSourceTexture(mainRenderPass.GetRenderedImage(), mergePass.GetRenderedImage());
+	objectManager.AddObject(&textureMergeEffect); 
+
 
 	// Main loop //
 	while (!inputSystem.GetKeyboard()->IsKeyDown('q'))
@@ -92,10 +114,18 @@ void main()
 		//Render update
 		mainRenderPass.RecordBuffer();
 		mainRenderPass.SubmitBuffer();
-
 		mainRenderPass.ResetBuffer();
 
-		swapchain.BlitToSwapChain(mainRenderPass.GetRenderedImage());
+
+		//Composite render
+		textureMergeEffect.GetComponent<TextureMergingRenderer>()->UpdateNewDrawTextre(); //Again, really hate this for this specific reason. Don't have time for better.
+		mergePass.RecordBuffer();
+		mergePass.SubmitBuffer();
+		mergePass.ResetBuffer();
+		textureMergeEffect.GetComponent<TextureMergingRenderer>()->UpdateMergedTexture(); 
+
+
+		swapchain.BlitToSwapChain(mergePass.GetRenderedImage());
 	}
 
 	graphicsSystem.WaitForDeviceIdle();

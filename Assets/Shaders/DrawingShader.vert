@@ -22,7 +22,7 @@ layout (set = 1, binding = 0) uniform PerDrawData
     mat4 mvpMatrix;
 } perDrawData;
 
-layout(set = 1, binding = 1) uniform sampler2D albedo;
+layout(set = 1, binding = 1) uniform sampler2D texture[2];
 
 // Per Vertex Data //
 layout (location = 0) in vec3 pos;

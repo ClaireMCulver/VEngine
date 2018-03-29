@@ -33,7 +33,7 @@ GameObject::GameObject(Geometry *mesh, Material *mat)
 	{	//VkDescriptorSetLayoutBinding
 		1,											//binding;				
 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
-		1,											//descriptorCount;		
+		2,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
 		NULL										//pImmutableSamplers;
 	}

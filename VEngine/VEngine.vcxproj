@@ -245,6 +245,10 @@
     </None>
     <None Include="Renderer.scr" />
     <None Include="Particle.cpp" />
+    <None Include="TextureMergingRenderer.scr">
+      <SubType>
+      </SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

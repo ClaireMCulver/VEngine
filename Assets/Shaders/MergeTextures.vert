@@ -22,17 +22,25 @@ layout (set = 1, binding = 0) uniform PerDrawData
     mat4 mvpMatrix;
 } perDrawData;
 
-layout(set = 1, binding = 1) uniform sampler2D texture[2];
+layout(set = 1, binding = 1) uniform sampler2D albedo;
 
+// Per Vertex Data //
+layout (location = 0) in vec3 pos;
+layout (location = 1) in vec3 inNormal;
+layout (location = 2) in vec2 inUV;
 
-// In data //
-layout (location = 0) in vec3 inNormal;
-layout (location = 1) in vec2 inUV;
+// Per Instance Data
 
 // Out data //
-layout (location = 0) out vec4 outColor;
-
-void main() 
+layout (location = 0) out vec3 outNormal;
+layout (location = 1) out vec2 outUV;
+out gl_PerVertex 
 {
-    outColor = vec4(1, 1, 1, 1);
+    vec4 gl_Position;
+};
+
+void main() {
+    outNormal = inNormal;
+    outUV = 0.5 * pos.xy + 0.5;
+    gl_Position = vec4(pos, 1.0);
 }

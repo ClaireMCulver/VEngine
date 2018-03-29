@@ -93,7 +93,7 @@ void Material::AddShader(Shader &newShader)
 	shaderStages.push_back(shaderStage);
 }
 
-void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout)
+void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout, VkPrimitiveTopology primitiveType)
 {
 	VkResult res;
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
@@ -122,7 +122,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	ia.pNext = NULL;
 	ia.flags = 0;
 	ia.primitiveRestartEnable = VK_FALSE;
-	ia.topology = VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;// VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+	ia.topology = primitiveType;
 
 	VkPipelineRasterizationStateCreateInfo rs;
 	rs.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -137,7 +137,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	rs.depthBiasConstantFactor = 0;
 	rs.depthBiasClamp = 0;
 	rs.depthBiasSlopeFactor = 0;
-	rs.lineWidth = 3.0f;
+	rs.lineWidth = 30.0f;
 
 	VkPipelineColorBlendStateCreateInfo cb;
 	cb.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;

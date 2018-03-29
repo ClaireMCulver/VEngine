@@ -1,6 +1,6 @@
 #include "Texture.h"
 
-Texture::Texture(int textureWidth, int textureHeight) : Image(textureWidth, textureHeight, VkFormat::VK_FORMAT_B8G8R8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT)
+Texture::Texture(int textureWidth, int textureHeight) : Image(textureWidth, textureHeight, VkFormat::VK_FORMAT_B8G8R8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT)
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
@@ -8,7 +8,7 @@ Texture::Texture(int textureWidth, int textureHeight) : Image(textureWidth, text
 }
 
 
-Texture::Texture(const char* fileName, int textureWidth, int textureHeight) : Image(textureWidth, textureHeight, VkFormat::VK_FORMAT_B8G8R8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT)
+Texture::Texture(const char* fileName, int textureWidth, int textureHeight) : Image(textureWidth, textureHeight, VkFormat::VK_FORMAT_B8G8R8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT)
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
@@ -63,11 +63,41 @@ Texture::~Texture()
 	vkDestroySampler(logicalDevice, textureSampler, NULL);
 }
 
-void Texture::CopyRenderedImage()
+void Texture::CopyRenderedImage(Image* existingImage)
 {
-	CommandBuffer copyVuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
-	
+	CommandBuffer copyBuffer(CommandBufferType::Transfer, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
+	VkImageCopy imageRegion;
+	imageRegion.srcSubresource;															//VkImageSubresourceLayers
+		imageRegion.srcSubresource.aspectMask		= existingImage->GetImageAspect();
+		imageRegion.srcSubresource.mipLevel			= 0;
+		imageRegion.srcSubresource.baseArrayLayer	= 0;
+		imageRegion.srcSubresource.layerCount		= 1;
+	imageRegion.srcOffset	= { 0, 0, 0 };												//VkOffset3D     
+
+	imageRegion.dstSubresource;
+		imageRegion.dstSubresource.aspectMask		= vkImageAspect;					//VkImageSubresourceLayers
+		imageRegion.dstSubresource.mipLevel			= 0;
+		imageRegion.dstSubresource.baseArrayLayer	= 0;
+		imageRegion.dstSubresource.layerCount		= 1;
+	imageRegion.dstOffset = { 0, 0, 0 };												//VkOffset3D   
+	imageRegion.extent = { (uint32_t)imageSize[0], (uint32_t)imageSize[1], 1 };			//VkExtent3D     
+
+	VkImageLayout existingImageOriginalLayout = existingImage->GetImageLayout();
+
+	copyBuffer.BeginRecording();
+
+	existingImage->ChangeImageLayout(copyBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+	this->ChangeImageLayout(copyBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	
+	vkCmdCopyImage(copyBuffer.GetVKCommandBuffer(), existingImage->GetImage(), existingImage->GetImageLayout(), this->vkImage, this->vkImageLayout, 1, &imageRegion);
+
+	existingImage->ChangeImageLayout(copyBuffer, existingImageOriginalLayout);
+	this->ChangeImageLayout(copyBuffer, VkImageLayout::VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	copyBuffer.EndRecording();
+	copyBuffer.SubmitBuffer();
+	copyBuffer.WaitForCompletion();
 }
 
 void Texture::InitializeSampler(const VkDevice &logicalDevice)
@@ -92,6 +122,7 @@ void Texture::InitializeSampler(const VkDevice &logicalDevice)
 	samplerCI.maxLod = 0.0;
 	samplerCI.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_BLACK;
 	samplerCI.unnormalizedCoordinates = VK_FALSE;
+
 
 	vkCreateSampler(logicalDevice, &samplerCI, NULL, &textureSampler);
 }
