@@ -50,6 +50,7 @@ void MouseDrawing::Start()
 
 }
 
+//track the mouse input to get a line.
 void MouseDrawing::Update()
 {
 	MousePosition* newMousePos = mousePtr->GetMousePosition();

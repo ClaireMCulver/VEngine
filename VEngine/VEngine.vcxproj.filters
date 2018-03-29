@@ -136,6 +136,12 @@
     <Filter Include="Resource Files\Scripts\MouseDrawing">
       <UniqueIdentifier>{31db647f-3e4c-44b1-94e0-a136b517544d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\NeuralNetwork">
+      <UniqueIdentifier>{018abd51-440c-4604-ae74-84097b623f69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NeturalNetwork">
+      <UniqueIdentifier>{6fb1d3d5-457f-432a-975e-d7d1aba3bb15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -227,6 +233,15 @@
     </ClCompile>
     <ClCompile Include="RenderTexture.cpp">
       <Filter>Source Files\Graphics\Objects\Images</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Source Files\NeturalNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetwork.cpp">
+      <Filter>Source Files\NeturalNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files\NeturalNetwork</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -328,6 +343,15 @@
     </ClInclude>
     <ClInclude Include="RenderTexture.h">
       <Filter>Header Files\Graphics\Objects\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetwork.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

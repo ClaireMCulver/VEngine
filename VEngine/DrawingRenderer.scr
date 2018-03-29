@@ -40,6 +40,7 @@ void DrawingRenderer::Update()
 	
 }
 
+//Draw the new line on the screen.
 void DrawingRenderer::Draw(VkCommandBuffer commandBuffer)
 {
 	if (mouseDrawing->mousePtr->GetMouseDown())
