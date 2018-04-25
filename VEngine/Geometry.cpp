@@ -48,7 +48,7 @@ void Geometry::LoadMeshFromDae(char* filePath)
 	std::vector<glm::vec2> UVs = loadUVs(sourceNode);
 
 	//Parse the number of faces from the PolyList.
-	sourceNode = meshNode->first_node("polylist");
+	sourceNode = meshNode->first_node("triangles");
 	int numberOfFaces = std::stoi(sourceNode->first_attribute("count")->value());
 
 	std::vector<Triangle> geometry;
@@ -94,7 +94,7 @@ void Geometry::LoadMeshFromDae(char* filePath)
 
 		geometry[i].uvC = UVs[polyList[k++]];
 	}
-
+	
 	//Create the buffers
 	LoadMesh(geometry, polyList);
 }

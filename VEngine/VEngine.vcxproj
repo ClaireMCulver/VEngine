@@ -77,6 +77,9 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>../Include\;C:\Program Files (x86)\Visual Leak Detector\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <LanguageStandard>
+      </LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>../Lib32/;C:\Program Files (x86)\Visual Leak Detector\lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -144,17 +147,28 @@
     <ClCompile Include="GraphicsPhysicalDevice.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="Layer.cpp" />
     <ClCompile Include="Material.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="NeuralNetwork.cpp" />
+    <ClCompile Include="Node.cpp" />
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="ParticleRenderer.scr" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="RenderPass.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClInclude Include="Rotate.scr">
+    <ClCompile Include="RenderTexture.cpp" />
+    <ClCompile Include="WinMouse.cpp" />
+    <ClInclude Include="Layer.h" />
+    <ClInclude Include="NeuralNetwork.h" />
+    <ClInclude Include="Node.h" />
+    <ClInclude Include="RenderTexture.h" />
+    <ClInclude Include="Rotate.cpp">
       <DeploymentContent>false</DeploymentContent>
       <FileType>CppHeader</FileType>
     </ClInclude>
@@ -171,6 +185,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="WinKeyboard.cpp" />
+    <ClInclude Include="WinMouse.h" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
@@ -221,6 +236,25 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="WinKeyboard.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Boid.cpp" />
+    <None Include="DrawingRenderer.scr">
+      <SubType>
+      </SubType>
+    </None>
+    <None Include="FirstPersonControls.cpp" />
+    <None Include="MeshRenderer.scr" />
+    <None Include="MouseDrawing.scr">
+      <SubType>
+      </SubType>
+    </None>
+    <None Include="Renderer.scr" />
+    <None Include="Particle.cpp" />
+    <None Include="TextureMergingRenderer.scr">
+      <SubType>
+      </SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

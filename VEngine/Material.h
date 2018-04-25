@@ -12,10 +12,12 @@
 #include "Texture.h"
 
 #include "glm\glm.hpp"
+#include "glm\gtc\quaternion.hpp"
 
 struct PipelineData
 {
 	VkPipeline pipeline; //Graphics Pipeline
+	VkPipelineLayout layout; //Layout of descriptors in the layout
 };
 
 class Material
@@ -29,7 +31,8 @@ public:
 	void AddShader(Shader &newShader);
 
 	//Finalizes the material pipeline on the GPU side.
-	void FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout);
+	void FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout, VkPrimitiveTopology primitiveType);
+
 
 
 	//Binds the pipeline
@@ -38,29 +41,14 @@ public:
 	//Returns the pipeline and pipeline layout handles
 	PipelineData GetPipelineData() const { return pipelineData; }
 
-	void UpdateDescriptorSet(VkDescriptorSet &descriptorSet);
-
-	// Uniform updates //
-
-	//Updates the uniform in uniformSet at binding
-	void SetUniform_Mat4x4(glm::mat4x4 &data, int offset);
-
-	void SetTexture(Texture& texture, int offset);
-
 private:
 	//Pipeline handles
 	PipelineData pipelineData;
 
 	//Vertex binding and per-vertex attribute info
-	VkVertexInputBindingDescription viBinding;//Binding of the vertices within the shaders
+	std::vector<VkVertexInputBindingDescription> viBindings;//Binding of the vertices within the shaders
 	std::vector<VkVertexInputAttributeDescription> viAttribs;//Bindings for the attributes of the vertices.
 
 	//Pipeline information
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages; //Stages in the shader pipeline
-
-	//Descriptor Updating
-	UniformBuffer* uniformBuffer = NULL;
-	VkWriteDescriptorSet uniformWrite;
-
-	std::vector<Texture*> textures;
 };

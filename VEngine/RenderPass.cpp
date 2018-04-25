@@ -26,11 +26,18 @@ RenderPass::~RenderPass()
 
 	vkDestroyPipelineLayout(logicalDevice, pipelineLayout, NULL);
 
-	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, NULL);
+	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout[0], NULL);
+	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout[1], NULL);
 
 	for (size_t i = 0, count = images.size(); i < count; i++)
 	{
 		delete images[i];
+	}
+
+	for (int i = 0, count = registeredMeshes.size(); i < count; i++)
+	{
+		registeredMeshes[i]->clear();
+		delete registeredMeshes[i];
 	}
 }
 
@@ -92,13 +99,13 @@ void RenderPass::AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint3
 	if (useDepthBuffer)
 	{
 		VkAttachmentDescription depthAttachment;
-		depthAttachment.format = VkFormat::VK_FORMAT_D16_UNORM;
+		depthAttachment.format = VkFormat::VK_FORMAT_D32_SFLOAT;
 		depthAttachment.samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
 		depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+		depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
 		depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 		depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		depthAttachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		depthAttachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;// VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 		depthAttachment.flags = 0;
 
@@ -189,6 +196,7 @@ void RenderPass::CreateRenderPass()
 
 	// Descriptor Set Bindings //
 	std::vector<VkDescriptorSetLayoutBinding> descriptorBindings;
+	std::vector<VkDescriptorSetLayoutBinding> perDrawDescriptorBindings;
 
 	//Per-Frame Data
 	descriptorBindings.push_back
@@ -215,10 +223,10 @@ void RenderPass::CreateRenderPass()
 	);
 
 	//Per-Draw Data
-	descriptorBindings.push_back
+	perDrawDescriptorBindings.push_back
 	(
 	{	//VkDescriptorSetLayoutBinding
-		2,											//binding;				
+		0,											//binding;				
 		VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
 		1,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
@@ -227,26 +235,33 @@ void RenderPass::CreateRenderPass()
 	);
 
 	//Passed Textures
-	descriptorBindings.push_back
+	perDrawDescriptorBindings.push_back
 	(
 	{	//VkDescriptorSetLayoutBinding
-		3,											//binding;				
+		1,											//binding;				
 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
-		1,											//descriptorCount;		
+		2,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
 		NULL										//pImmutableSamplers;
 	}
 	);
 
 	// Descriptor Set Layout //
-	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCI;
-	descriptorSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	descriptorSetLayoutCI.pNext = NULL;
-	descriptorSetLayoutCI.flags = 0;
-	descriptorSetLayoutCI.bindingCount = descriptorBindings.size();
-	descriptorSetLayoutCI.pBindings = descriptorBindings.data();
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCI[2];
+	descriptorSetLayoutCI[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCI[0].pNext = NULL;
+	descriptorSetLayoutCI[0].flags = 0;
+	descriptorSetLayoutCI[0].bindingCount = descriptorBindings.size();
+	descriptorSetLayoutCI[0].pBindings = descriptorBindings.data();
 
-	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI, NULL, &descriptorSetLayout);
+	descriptorSetLayoutCI[1].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCI[1].pNext = NULL;
+	descriptorSetLayoutCI[1].flags = 0;
+	descriptorSetLayoutCI[1].bindingCount = perDrawDescriptorBindings.size();
+	descriptorSetLayoutCI[1].pBindings = perDrawDescriptorBindings.data();
+
+	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI[0], NULL, &descriptorSetLayout[0]);
+	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI[1], NULL, &descriptorSetLayout[1]);
 	assert(result == VK_SUCCESS);
 
 	//Allocate descriptor set
@@ -255,7 +270,7 @@ void RenderPass::CreateRenderPass()
 	descirptorSetAlloc.pNext = NULL;
 	descirptorSetAlloc.descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
 	descirptorSetAlloc.descriptorSetCount = 1;
-	descirptorSetAlloc.pSetLayouts = &descriptorSetLayout;
+	descirptorSetAlloc.pSetLayouts = &descriptorSetLayout[0];
 
 	result = vkAllocateDescriptorSets(logicalDevice, &descirptorSetAlloc, &descriptorSet);
 	assert(result == VK_SUCCESS);
@@ -274,13 +289,20 @@ void RenderPass::CreateRenderPass()
 	pipelineLayoutCI.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 	pipelineLayoutCI.pNext = NULL;
 	pipelineLayoutCI.flags = 0;
-	pipelineLayoutCI.setLayoutCount = 1;
-	pipelineLayoutCI.pSetLayouts = &descriptorSetLayout;
+	pipelineLayoutCI.setLayoutCount = 2;
+	pipelineLayoutCI.pSetLayouts = descriptorSetLayout;
 	pipelineLayoutCI.pushConstantRangeCount = 1;
 	pipelineLayoutCI.pPushConstantRanges = &pushConstantRange;
 
 	result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineLayout);
 	assert(result == VK_SUCCESS);
+
+
+	//Create registered mesh lists
+	for (int i = 0, count = subpassDescriptions.size(); i < count; i++)
+	{
+		registeredMeshes.push_back(new std::vector<GameObject*>);
+	}
 }
 
 void RenderPass::BindRenderPass(VkCommandBuffer &cmdBuffer)
@@ -348,29 +370,34 @@ void RenderPass::RecordBuffer()
 
 	vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
 
-	Material* currentMaterial;
 
 	vkCmdBindDescriptorSets(vkRenderBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
-	// Render pass contents //
-	for (size_t i = 0, count = registeredMeshes.size(); i < count; i++)
+	int renderPassIndex = 0;
+	std::vector<GameObject*>* currentRegisteredMeshList;
+	for (int renderPassIndex = 0, numPasses = subpassDescriptions.size(); renderPassIndex < numPasses; renderPassIndex++)
 	{
-		currentMaterial = registeredMeshes[i]->GetMaterial();
+		currentRegisteredMeshList = registeredMeshes[renderPassIndex];
 
-		//Model Matrix
-		currentMaterial->SetUniform_Mat4x4(registeredMeshes[i]->GetTransform()->GetModelMat(), 0);
+		// Render pass contents //
+		for (size_t i = 0, count = (*currentRegisteredMeshList).size(); i < count; i++)
+		{
+			(*currentRegisteredMeshList)[i]->SetDrawMatrices((*currentRegisteredMeshList)[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
 
-		//Model View Matrix
-		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetViewMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), sizeof(glm::mat4));
+			(*currentRegisteredMeshList)[i]->UpdateDescriptorSet();
 
-		//Model View Projection Matrix
-		currentMaterial->SetUniform_Mat4x4(Camera::GetMain()->GetVPMatrix() * registeredMeshes[i]->GetTransform()->GetModelMat(), sizeof(glm::mat4) + sizeof(glm::mat4));
+			//Bind the material
+			(*currentRegisteredMeshList)[i]->GetMaterial()->BindPipeline(*renderBuffer);
 
-		//
-		currentMaterial->UpdateDescriptorSet(descriptorSet);
+			//Bind uniforms
+			(*currentRegisteredMeshList)[i]->BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
 
-		//Draw the model in the buffer.
-		registeredMeshes[i]->Draw(*renderBuffer);
+			//Draw the model in the buffer.
+			(*currentRegisteredMeshList)[i]->GetRenderer()->Draw(renderBuffer->GetVKCommandBuffer());
+		}
+
+		if (renderPassIndex < numPasses-1)
+			vkCmdNextSubpass(renderBuffer->GetVKCommandBuffer(), VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 	}
 
 	//end render pass
@@ -400,14 +427,15 @@ void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeig
 
 	if (hasDepthBuffer)
 	{
-		images.push_back(new Image(pixelWidth, pixelHeight, VkFormat::VK_FORMAT_D16_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT));
+		images.push_back(new Image(pixelWidth, pixelHeight, VkFormat::VK_FORMAT_D32_SFLOAT, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT));
 		images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 	}
 }
 
-void RenderPass::RegisterObject(GameObject *object)
+void RenderPass::RegisterObject(GameObject *object, int subpass)
 {
-	registeredMeshes.push_back(object);
+	assert(object->GetRenderer() != nullptr);
+	registeredMeshes[subpass]->push_back(object);
 }
 
 Image* RenderPass::GetRenderedImage()

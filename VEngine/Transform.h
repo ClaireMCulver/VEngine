@@ -34,6 +34,7 @@ public:
 
 	// Get/Set //
 	glm::vec3 GetPosition() { return position; }
+	void SetPosition(glm::vec3 newPosition) { position = newPosition; }
 
 	glm::mat4 GetModelMat() { return modelMatrix; }
 

@@ -124,6 +124,24 @@
     <Filter Include="Source Files\Graphics\Objects\Buffers\UniformBuffer">
       <UniqueIdentifier>{3df98956-a74e-4318-8f65-1d3a126ca095}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Scripts\AI">
+      <UniqueIdentifier>{7f76dcba-2fe7-4e94-b63c-39241ace67e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\Core\Rendering">
+      <UniqueIdentifier>{fb808681-ab39-4fe8-bf94-9fac46bc6410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\Core\Particles">
+      <UniqueIdentifier>{5b81f30c-46ea-4c09-adfa-f3c18d44190e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\MouseDrawing">
+      <UniqueIdentifier>{31db647f-3e4c-44b1-94e0-a136b517544d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\NeuralNetwork">
+      <UniqueIdentifier>{018abd51-440c-4604-ae74-84097b623f69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\NeturalNetwork">
+      <UniqueIdentifier>{6fb1d3d5-457f-432a-975e-d7d1aba3bb15}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -203,6 +221,27 @@
     </ClCompile>
     <ClCompile Include="UniformBuffer.cpp">
       <Filter>Source Files\Graphics\Objects\Buffers\UniformBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleSystem.cpp">
+      <Filter>Resource Files\Scripts\Core\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMouse.cpp">
+      <Filter>Source Files\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTexture.cpp">
+      <Filter>Source Files\Graphics\Objects\Images</Filter>
+    </ClCompile>
+    <ClCompile Include="Layer.cpp">
+      <Filter>Source Files\NeturalNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="NeuralNetwork.cpp">
+      <Filter>Source Files\NeturalNetwork</Filter>
+    </ClCompile>
+    <ClCompile Include="Node.cpp">
+      <Filter>Source Files\NeturalNetwork</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -293,11 +332,52 @@
     <ClInclude Include="Camera.h">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </ClInclude>
-    <ClInclude Include="Rotate.scr">
-      <Filter>Resource Files\Scripts\Cube</Filter>
-    </ClInclude>
     <ClInclude Include="UniformBuffer.h">
       <Filter>Header Files\Graphics\Objects\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="Rotate.cpp">
+      <Filter>Resource Files\Scripts\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="WinMouse.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTexture.h">
+      <Filter>Header Files\Graphics\Objects\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="Layer.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="NeuralNetwork.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+    <ClInclude Include="Node.h">
+      <Filter>Header Files\NeuralNetwork</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Particle.cpp">
+      <Filter>Resource Files\Scripts\Core\Particles</Filter>
+    </None>
+    <None Include="FirstPersonControls.cpp">
+      <Filter>Resource Files\Scripts\Core\Camera</Filter>
+    </None>
+    <None Include="Boid.cpp">
+      <Filter>Resource Files\Scripts\AI</Filter>
+    </None>
+    <None Include="MouseDrawing.scr">
+      <Filter>Resource Files\Scripts\MouseDrawing</Filter>
+    </None>
+    <None Include="Renderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="MeshRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
+    <None Include="DrawingRenderer.scr">
+      <Filter>Resource Files\Scripts\MouseDrawing</Filter>
+    </None>
+    <None Include="TextureMergingRenderer.scr">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </None>
   </ItemGroup>
 </Project>

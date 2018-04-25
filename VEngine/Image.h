@@ -30,9 +30,16 @@ public:
 	VkImageView GetImageView() const { return vkImageView; }
 	VkClearValue GetClearValue() const { return vkClearColour; }
 	VkImageLayout GetImageLayout() const { return vkImageLayout; }
+	VkImageAspectFlags GetImageAspect() const { return vkImageAspect; }
 	glm::vec2 GetImageSize() const { return imageSize; }
 
 	void CmdClearImage(CommandBuffer &commandBuffer);
+
+public: //Static transfer functions
+
+	//Blit image from source to destination as part of a command buffer
+	static void CmdBlitImage(CommandBuffer &commandBuffer, Image* sourceImage, Image* destinationImage, VkFilter filter);
+
 
 protected:
 	//Vulkan Handles

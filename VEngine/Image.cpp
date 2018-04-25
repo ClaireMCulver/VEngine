@@ -224,6 +224,29 @@ void Image::CmdClearImage(CommandBuffer &commandBuffer)
 	ChangeImageLayout(commandBuffer, currentLayout);
 }
 
+void Image::CmdBlitImage(CommandBuffer & commandBuffer, Image * sourceImage, Image * destinationImage, VkFilter filter)
+{
+	VkImageBlit imageResolve;
+	imageResolve.srcSubresource;
+	imageResolve.srcSubresource.aspectMask = sourceImage->GetImageAspect();
+	imageResolve.srcSubresource.mipLevel = 0;
+	imageResolve.srcSubresource.baseArrayLayer = 0;
+	imageResolve.srcSubresource.layerCount = 1;
+	imageResolve.srcOffsets[0] = { 0, 0, 0 };
+	imageResolve.srcOffsets[1] = { (int32_t)sourceImage->GetImageSize().x, (int32_t)sourceImage->GetImageSize().y, 1 };
+
+	imageResolve.dstSubresource;
+	imageResolve.dstSubresource.aspectMask = destinationImage->GetImageAspect();;
+	imageResolve.dstSubresource.mipLevel = 0;;
+	imageResolve.dstSubresource.baseArrayLayer = 0;;
+	imageResolve.dstSubresource.layerCount = 1;;
+	imageResolve.dstOffsets[0] = { 0, 0, 0 };
+	imageResolve.dstOffsets[1] = { (int32_t)destinationImage->GetImageSize().x, (int32_t)destinationImage->GetImageSize().y, 1 };
+
+	//Blit the image to the 28x28 image
+	vkCmdBlitImage(commandBuffer.GetVKCommandBuffer(), sourceImage->GetImage(), sourceImage->GetImageLayout(), destinationImage->GetImage(), destinationImage->GetImageLayout(), 1, &imageResolve, filter);
+}
+
 Image::ImageAccessData Image::FetchImageAccessAndStage(VkImageLayout newLayout)
 {
 	ImageAccessData accessData;
@@ -299,7 +322,6 @@ Image::ImageAccessData Image::FetchImageAccessAndStage(VkImageLayout newLayout)
 	case VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL:
 		// Image will be used as a transfer source
 		// Make sure any reads from and writes to the image have been finished
-		accessData.srcMask = accessData.srcMask | VK_ACCESS_TRANSFER_READ_BIT;
 		accessData.dstMask = VK_ACCESS_TRANSFER_READ_BIT;
 		accessData.dstStageFlags = VK_PIPELINE_STAGE_TRANSFER_BIT;
 		break;

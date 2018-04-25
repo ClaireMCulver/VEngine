@@ -1,0 +1,262 @@
+#pragma once
+
+#include "Renderer.scr"
+
+#include "Texture.h"
+#include "CommandBuffer.h"
+
+#include "NeuralNetwork.h"
+
+//Handles merging the textures and passing the resulting texture to the neural network.
+//Wish the nn was contained in it's own file, but whatever.
+class TextureMergingRenderer : public Renderer
+{
+public:
+	TextureMergingRenderer(glm::vec2 textureASize, glm::vec2 textureBSize);
+	~TextureMergingRenderer();
+
+	void Start();
+
+	void Update();
+	
+	void Draw(VkCommandBuffer commandBuffer);
+
+	void SetSourceTexture(Image* newImage, Image* mergedImage);
+
+	void UpdateNewDrawTextre() { newTexture->CopyRenderedImage(sourceImage); }
+	void UpdateMergedTexture() { previousTexture->CopyRenderedImage(mergedImage); }
+
+private:
+
+	void ClearTextures();
+
+	void SendImageToNetwork();
+
+private:
+	// Variables for presenting to the screen.
+	Texture* previousTexture;
+	Texture* newTexture;
+	Image* sourceImage;
+	Image* mergedImage;
+
+	float fsQuad[(3 + 3 + 2) * 4];
+
+	GPUBuffer* vertexBuffer;
+	GPUBuffer* instanceBuffer;
+
+	Input* inputPtr;
+	NeuralNetwork* nn;
+
+	// Variables for connecting to the neural network
+	Image* resolvedImage;
+	float resolvedImageData[28*28];
+
+	bool canSend = true;
+
+	int secretNumber;
+};
+
+TextureMergingRenderer::TextureMergingRenderer(glm::vec2 textureASize, glm::vec2 textureBSize)
+{
+	previousTexture = new Texture((int)textureASize.x, (int)textureASize.y);
+	newTexture = new Texture((int)textureBSize.x, (int)textureBSize.y);
+}
+
+TextureMergingRenderer::~TextureMergingRenderer()
+{
+	delete previousTexture;
+	delete newTexture;
+
+	delete vertexBuffer;
+	delete instanceBuffer;
+
+	delete resolvedImage;
+
+	delete nn;
+}
+
+void TextureMergingRenderer::Start()
+{
+	owner->SetRenderer(this);
+
+	inputPtr = Input::singleton;
+
+	glm::vec3 lb = { -1, -1, 0 };
+	glm::vec3 lt = { -1,  1, 0 };
+	glm::vec3 rb = {  1, -1, 0 };
+	glm::vec3 rt = {  1,  1, 0 };
+	int step = (3 + 3 + 2);
+
+	fsQuad[0] = lb.x;
+	fsQuad[1] = lb.y;
+
+	fsQuad[0 + step] = lt.x;
+	fsQuad[1 + step] = lt.y;
+
+	fsQuad[0 + step * 2] = rb.x;
+	fsQuad[1 + step * 2] = rb.y;
+
+	fsQuad[0 + step * 3] = rt.x;
+	fsQuad[1 + step * 3] = rt.y;
+
+	vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, fsQuad, (sizeof(float)) * step * 4);
+	glm::mat4 indentityPtr = glm::mat4(1.0);
+	instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &indentityPtr, 64); //This isn't used, but it needs to be filled and passed, both because vulkan will complain and because my standardized descriptor sets.
+
+	resolvedImage = new Image(28, 28, VkFormat::VK_FORMAT_B8G8R8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT);
+
+	owner->SetTexture(*previousTexture, 0);
+	owner->SetTexture(*newTexture, 1);
+
+
+	//Start neural Network. //Like I said, I wish this was it's own thing, but oh well.
+
+	int ncount[6] = { 784, 75, 75, 75, 50, 10 };		// 84.9%
+
+	LayerType ltype[6] = { FCL, FCL, FCL, FCL, FCL, FCL };
+	ActivationFunction nfunc[6] = { TANH,TANH,TANH,TANH,TANH,TANH };
+
+	nn = new NeuralNetwork(6, ltype, ncount, nfunc, 28 * 28);
+	nn->ReLinkPointers();
+	nn->LoadStateLog("../nnstatelog.csv"); //nnstatelog_accuracy.csv if you wish to load a file yourself emi/david.
+
+	srand((unsigned)time(NULL));
+	secretNumber = rand() % 10;
+	printf("A secret number has been selected, take a guess!\n");
+}
+
+void TextureMergingRenderer::Update()
+{
+	if (inputPtr->GetKeyboard()->IsKeyDown('c')) 
+	{
+		ClearTextures();
+	}
+
+	if (inputPtr->GetKeyboard()->IsKeyUp('s'))
+	{
+		canSend = true;
+	}
+
+	if (inputPtr->GetKeyboard()->IsKeyDown('s') && canSend)
+	{
+		SendImageToNetwork();
+		ClearTextures();
+		canSend = false;
+	}
+}
+
+void TextureMergingRenderer::Draw(VkCommandBuffer commandBuffer)
+{
+	RenderMesh(commandBuffer, 4, vertexBuffer->GetVKBuffer(), instanceBuffer->GetVKBuffer(), 1);
+}
+
+//Sets the images to merge and for updating.
+void TextureMergingRenderer::SetSourceTexture(Image* newImage, Image* backImage)
+{
+	sourceImage = newImage;
+	mergedImage = backImage;
+
+	CommandBuffer clearBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	clearBuffer.BeginRecording();
+	sourceImage->CmdClearImage(clearBuffer);
+	mergedImage->CmdClearImage(clearBuffer);
+	clearBuffer.EndRecording();
+	clearBuffer.SubmitBuffer();
+
+	newTexture->CopyRenderedImage(sourceImage);
+	previousTexture->CopyRenderedImage(mergedImage);
+}
+
+void TextureMergingRenderer::ClearTextures()
+{
+	CommandBuffer clearBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+	clearBuffer.BeginRecording();
+	newTexture->CmdClearImage(clearBuffer);
+	previousTexture->CmdClearImage(clearBuffer);
+	clearBuffer.EndRecording();
+	clearBuffer.SubmitBuffer();
+	clearBuffer.WaitForCompletion();
+}
+
+//This is where the actual neural network stuff appens.
+void TextureMergingRenderer::SendImageToNetwork()
+{
+	CommandBuffer commandBuffer(CommandBufferType::Graphics, VkCommandBufferLevel::VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+	const uint64_t imageSize = (32 / 8) * 28 * 28; //32 bits per pixel / 8, by 28 by 28. Number of four byte pixels.
+	GPUBuffer imageBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_TRANSFER_DST_BIT, imageSize);
+
+	commandBuffer.BeginRecording();
+
+	previousTexture->ChangeImageLayout(commandBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+	resolvedImage->ChangeImageLayout(commandBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	//Blit image
+	Image::CmdBlitImage(commandBuffer, previousTexture, resolvedImage, VkFilter::VK_FILTER_LINEAR);
+	
+	resolvedImage->ChangeImageLayout(commandBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+	//Transfer the image to a buffer
+	VkBufferImageCopy imageToBufferCopy;
+	imageToBufferCopy.bufferOffset = 0;
+	imageToBufferCopy.bufferRowLength = 0;
+	imageToBufferCopy.bufferImageHeight = 0;
+	imageToBufferCopy.imageSubresource;
+		imageToBufferCopy.imageSubresource.aspectMask = resolvedImage->GetImageAspect();
+		imageToBufferCopy.imageSubresource.mipLevel = 0;
+		imageToBufferCopy.imageSubresource.baseArrayLayer = 0;
+		imageToBufferCopy.imageSubresource.layerCount = 1;
+	imageToBufferCopy.imageOffset = { 0, 0, 0 };
+	imageToBufferCopy.imageExtent = { (uint32_t)resolvedImage->GetImageSize().x, (uint32_t)resolvedImage->GetImageSize().y, 1 };
+
+	vkCmdCopyImageToBuffer(commandBuffer.GetVKCommandBuffer(), resolvedImage->GetImage(), resolvedImage->GetImageLayout(), imageBuffer.GetVKBuffer(), 1, &imageToBufferCopy);
+
+	newTexture->CmdClearImage(commandBuffer);
+	previousTexture->CmdClearImage(commandBuffer);
+	commandBuffer.EndRecording();
+	commandBuffer.SubmitBuffer();
+	commandBuffer.WaitForCompletion();
+
+	//Transfer the buffer data from the device to the host
+	byte data[imageSize];
+	void* deviceDataPtr;
+	vkMapMemory(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), imageBuffer.GetBufferMemory(), 0, imageSize, 0, &deviceDataPtr);
+	memcpy(data, deviceDataPtr, imageSize);
+	vkUnmapMemory(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), imageBuffer.GetBufferMemory());
+
+	//Take every fourth to get the grey scale image. It's all black and white anyway, so this is fine.
+	for (int i = 0; i < 28 * 28; i++)
+	{
+		resolvedImageData[i] = (float)(int)data[i * 4];
+	}
+
+	//Send buffer to the neural network.
+	float output[10];
+	nn->Evaluate(resolvedImageData, 784, output);
+	//check output
+	float max = output[0];
+	char prediction = 0;
+	for (int j = 0; j < 10; j++)
+	{
+		if (output[j] > max)
+		{
+			max = output[j];
+			prediction = j;
+		}
+	}
+
+	//"Game logic"
+	printf("\n\tThis is a %i,", prediction);
+	if (prediction == secretNumber)
+	{
+		printf(" you guessed correctly!\n");
+		secretNumber = rand() % 10;
+		printf("New number selected, take a guess!\n");
+
+	}
+	else
+	{
+		printf(" you did not geuss correctly. Guess again!\n");
+	}
+
+}

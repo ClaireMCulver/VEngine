@@ -43,10 +43,10 @@ public:
 	void ResetBuffer();
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
-	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout; }
+	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout[0]; }
 	VkPipelineLayout GetVKPipelineLayout() const { return pipelineLayout; }
 
-	void RegisterObject(GameObject *object);
+	void RegisterObject(GameObject *object, int subpass);
 
 	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION. //TODO: Should change this some time later on to specify the image we want.
 	Image* GetRenderedImage();
@@ -68,12 +68,12 @@ private:
 	VkRect2D renderArea;
 	std::vector<VkClearValue> clearValues;
 
-	std::vector<GameObject*> registeredMeshes;
+	std::vector<std::vector<GameObject*>*> registeredMeshes;
 
 	VkPresentInfoKHR bufferPresentInfo;
 
 	VkPipelineLayout pipelineLayout;
-	VkDescriptorSetLayout descriptorSetLayout;
+	VkDescriptorSetLayout descriptorSetLayout[2];
 	VkDescriptorSet descriptorSet;
 
 	UniformBuffer* perFrameUniformBuffer;
