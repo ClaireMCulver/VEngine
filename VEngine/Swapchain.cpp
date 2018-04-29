@@ -257,7 +257,19 @@ void SwapChain::BlitToSwapChain(Image *srcImage)
 	// Record command buffer and submit it //
 	blitBuffer->BeginRecording();
 
-	vkCmdBlitImage(blitBuffer->GetVKCommandBuffer(), srcImage->GetImage(), srcImage->GetImageLayout(), swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
+	//Change image layouts
+	VkImageLayout originalSrcImageLayout = srcImage->GetImageLayout();
+	srcImage->ChangeImageLayout(*blitBuffer, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL);
+
+	this->ChangeSwapchainImageLayout(*blitBuffer, swapchainImages[currentImage], VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	//Blit the image to the swapchain
+	vkCmdBlitImage(blitBuffer->GetVKCommandBuffer(), srcImage->GetImage(), srcImage->GetImageLayout(), swapchainImages[currentImage], VkImageLayout::VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &blitRegion, VkFilter::VK_FILTER_NEAREST);
+
+	//Restore image layouts
+	srcImage->ChangeImageLayout(*blitBuffer, originalSrcImageLayout);
+
+	this->ChangeSwapchainImageLayout(*blitBuffer, swapchainImages[currentImage], VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VkImageLayout::VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 
 	blitBuffer->EndRecording();
 
@@ -321,4 +333,36 @@ void SwapChain::SetSwapchainImageLayouts(VkDevice logicalDevice)
 	layoutBuffer.SubmitBuffer();
 
 	layoutBuffer.WaitForCompletion();
+}
+
+void SwapChain::ChangeSwapchainImageLayout(CommandBuffer & commandBuffer, VkImage swapchainImage, VkImageAspectFlags imageAspect, VkImageLayout currentLayout, VkImageLayout newLayout)
+{
+	Image::ImageAccessData accessData = Image::FetchImageAccessAndStage(currentLayout,newLayout);
+
+	VkImageSubresourceRange subresourceRange = {};
+	subresourceRange.aspectMask = imageAspect;
+	subresourceRange.baseMipLevel = 0;
+	subresourceRange.levelCount = 1;
+	subresourceRange.layerCount = 1;
+
+	VkImageMemoryBarrier imageMemoryBarrier;
+	imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	imageMemoryBarrier.pNext = NULL;
+	imageMemoryBarrier.srcAccessMask = accessData.srcMask;
+	imageMemoryBarrier.dstAccessMask = accessData.dstMask;
+	imageMemoryBarrier.oldLayout = currentLayout;
+	imageMemoryBarrier.newLayout = newLayout;
+	imageMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	imageMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	imageMemoryBarrier.image = swapchainImage;
+	imageMemoryBarrier.subresourceRange = subresourceRange;
+
+	vkCmdPipelineBarrier(
+		commandBuffer.GetVKCommandBuffer(),
+		accessData.srcStageFlags,
+		accessData.dstStageFlags,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &imageMemoryBarrier);
 }

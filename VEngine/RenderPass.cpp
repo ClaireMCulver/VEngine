@@ -240,7 +240,7 @@ void RenderPass::CreateRenderPass()
 	{	//VkDescriptorSetLayoutBinding
 		1,											//binding;				
 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
-		2,											//descriptorCount;		
+		1,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
 		NULL										//pImmutableSamplers;
 	}

@@ -55,4 +55,6 @@ private:
 
 	void SetSwapchainImageLayouts(VkDevice logicalDevice);
 
+	void ChangeSwapchainImageLayout(CommandBuffer & commandBuffer, VkImage swapchainImage, VkImageAspectFlags imageAspect, VkImageLayout currentLayout, VkImageLayout newLayout);
+
 };
