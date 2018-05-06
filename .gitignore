@@ -273,3 +273,7 @@ __pycache__/
 #*.glsl
 #*.scr
 /.project
+
+Lib64d/shaderc/shaderc_combined\.lib
+
+x64_Debug/
