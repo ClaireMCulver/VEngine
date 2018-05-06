@@ -276,5 +276,7 @@ __pycache__/
 #*.scr
 /.project
 
-
+Lib32/shaderc/shaderc_combined\.lib
+Lib32d/shaderc/shaderc_combined\.lib
 Lib64d/shaderc/shaderc_combined\.lib
+Lib64/shaderc/shaderc_combined\.lib
