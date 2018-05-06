@@ -18,7 +18,7 @@ void ObjectManager::AddObject(GameObject* object)
 
 void ObjectManager::UpdateObjects()
 {
-	for (int i = 0, count = objects.size(); i < count; i++)
+	for (int i = 0, count = (int)objects.size(); i < count; i++)
 	{
 		objects[i]->Update();
 	}

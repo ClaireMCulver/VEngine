@@ -44,7 +44,7 @@ GameObject::GameObject(Geometry *mesh, Material *mat)
 	descriptorSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	descriptorSetLayoutCI.pNext = NULL;
 	descriptorSetLayoutCI.flags = 0;
-	descriptorSetLayoutCI.bindingCount = descriptorBindings.size();
+	descriptorSetLayoutCI.bindingCount = (uint32_t)descriptorBindings.size();
 	descriptorSetLayoutCI.pBindings = descriptorBindings.data();
 
 	vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI, NULL, &descriptorSetLayout);
@@ -154,7 +154,7 @@ void GameObject::UpdateDescriptorSet()
 		uniformWrite.pNext = NULL;
 		uniformWrite.dstSet = uniformDescriptorSet;
 		uniformWrite.dstBinding = PerDrawUniformTextureBinding;
-		uniformWrite.dstArrayElement = i; 
+		uniformWrite.dstArrayElement = (uint32_t)i;
 		uniformWrite.descriptorCount = 1;
 		uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		uniformWrite.pImageInfo = &imageInfo;
@@ -178,10 +178,10 @@ void GameObject::SetDrawMatrices(glm::mat4 &modelMat, glm::mat4 &viewMat, glm::m
 	SetUniform_Mat4x4(modelMat, 0);
 
 	//Model View Matrix
-	SetUniform_Mat4x4(viewMat * modelMat, mat4Size);
+	SetUniform_Mat4x4(viewMat * modelMat, (int)mat4Size);
 
 	//Model View Projection Matrix
-	SetUniform_Mat4x4(viewProjoectionMat * modelMat, mat4Size + mat4Size);
+	SetUniform_Mat4x4(viewProjoectionMat * modelMat, (int)(mat4Size + mat4Size));
 
 	instanceData.position = transform->GetPosition();
 	instanceData.rotation = glm::toQuat(modelMat);

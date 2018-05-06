@@ -102,7 +102,7 @@ void CommandBuffer::AddWaitSemaphore(VkSemaphore semaphore)
 {
 	waitSemaphores.push_back(semaphore);
 
-	submitInfo.waitSemaphoreCount = waitSemaphores.size();
+	submitInfo.waitSemaphoreCount = (uint32_t)waitSemaphores.size();
 	submitInfo.pWaitSemaphores = waitSemaphores.data();
 }
 
@@ -110,7 +110,7 @@ void CommandBuffer::AddSignalSemaphore(VkSemaphore semaphore)
 {
 	signalSemaphores.push_back(semaphore);
 
-	submitInfo.signalSemaphoreCount = signalSemaphores.size();
+	submitInfo.signalSemaphoreCount = (uint32_t)signalSemaphores.size();
 	submitInfo.pSignalSemaphores = signalSemaphores.data();
 }
 

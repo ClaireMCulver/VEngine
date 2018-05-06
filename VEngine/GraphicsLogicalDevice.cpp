@@ -28,7 +28,7 @@ GraphicsLogicalDevice::GraphicsLogicalDevice(GraphicsPhysicalDevice &physicalDev
 	logicalDeviceCI.pQueueCreateInfos = &queuesRequested;
 	logicalDeviceCI.enabledLayerCount = 0;
 	logicalDeviceCI.ppEnabledLayerNames = nullptr;
-	logicalDeviceCI.enabledExtensionCount = deviceExtentions.size();
+	logicalDeviceCI.enabledExtensionCount = (uint32_t)deviceExtentions.size();
 	logicalDeviceCI.ppEnabledExtensionNames = deviceExtentions.data();
 	logicalDeviceCI.pEnabledFeatures = &physicalDeviceFeatures;
 

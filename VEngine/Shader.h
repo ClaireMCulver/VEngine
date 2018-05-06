@@ -8,11 +8,14 @@
 #endif
 #include "vulkan\vulkan.h"
 
-#include "glslang\Include\BaseTypes.h"
-#include "glslang\Include\Common.h"
-#include "glslang\Include\ShHandle.h"
-#include "glslang\Include\intermediate.h"
-#include "SPIRV\GlslangToSpv.h"
+//#include "glslang\Include\BaseTypes.h"
+//#include "glslang\Include\Common.h"
+//#include "glslang\Include\ShHandle.h"
+//#include "glslang\Include\intermediate.h"
+//#include "SPIRV\spirv.hpp"
+//#include "SPIRV\GlslangToSpv.h"
+
+#include "shaderc\shaderc.hpp"
 
 #include "Graphics.h"
 
@@ -39,9 +42,10 @@ private:
 	bool CreateShaderModule(const char* fileText, VkShaderStageFlagBits shaderType);
 
 private:
-	bool GLSLtoSPV(const VkShaderStageFlagBits shader_type, const char *pshader, const char* shaderName, std::vector<unsigned int> &spirv);
-	void init_resources(TBuiltInResource &Resources);
-	EShLanguage FindLanguage(const VkShaderStageFlagBits shader_type);
+	std::vector<uint32_t> GLSLtoSPV(const std::string& source_name, VkShaderStageFlagBits stageFlagBits, const std::string& source, bool optimize = false);
+	//bool GLSLtoSPV(const VkShaderStageFlagBits shader_type, const char *pshader, const char* shaderName, std::vector<unsigned int> &spirv);
+	//void init_resources(TBuiltInResource &Resources);
+	//EShLanguage FindLanguage(const VkShaderStageFlagBits shader_type);
 	bool memory_type_from_properties(VkPhysicalDeviceMemoryProperties &memory_properties, uint32_t typeBits, VkFlags requirements_mask, uint32_t *typeIndex);
 };
 

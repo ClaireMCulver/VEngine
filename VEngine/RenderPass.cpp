@@ -34,7 +34,7 @@ RenderPass::~RenderPass()
 		delete images[i];
 	}
 
-	for (int i = 0, count = registeredMeshes.size(); i < count; i++)
+	for (int i = 0, count = (int)registeredMeshes.size(); i < count; i++)
 	{
 		registeredMeshes[i]->clear();
 		delete registeredMeshes[i];
@@ -89,7 +89,7 @@ void RenderPass::AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint3
 
 	//Reference to the attachment for the renderpass
 	VkAttachmentReference colourReference;
-	colourReference.attachment = attachmentDescriptions.size(); //The index of the attachment in the pattachments variable in the renderpassCI.
+	colourReference.attachment = (uint32_t)attachmentDescriptions.size(); //The index of the attachment in the pattachments variable in the renderpassCI.
 	colourReference.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
 	//Push back all the things!
@@ -110,7 +110,7 @@ void RenderPass::AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint3
 		depthAttachment.flags = 0;
 
 		VkAttachmentReference depthReference;
-		depthReference.attachment = attachmentDescriptions.size(); //The index of the attachment in the pattachments variable in the renderpassCI.
+		depthReference.attachment = (uint32_t)attachmentDescriptions.size(); //The index of the attachment in the pattachments variable in the renderpassCI.
 		depthReference.layout = VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		//The frame buffer descriptions already has this frame buffer in it.
@@ -126,7 +126,7 @@ void RenderPass::CreateRenderPass()
 	assert(subpassDescriptions.size() == subpassReferences.size());
 	for (size_t i = 0; i < subpassDescriptions.size(); i++)
 	{
-		subpassDescriptions[i].colorAttachmentCount = subpassReferences[i].colourReferences.size();
+		subpassDescriptions[i].colorAttachmentCount = (uint32_t)subpassReferences[i].colourReferences.size();
 		subpassDescriptions[i].pColorAttachments = subpassReferences[i].colourReferences.data();
 		if (subpassReferences[i].depthReference.attachment != 0)
 		{
@@ -139,9 +139,9 @@ void RenderPass::CreateRenderPass()
 	renderPassCI.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 	renderPassCI.flags = 0;
 	renderPassCI.pNext = NULL;
-	renderPassCI.attachmentCount = attachmentDescriptions.size();
+	renderPassCI.attachmentCount = (uint32_t)attachmentDescriptions.size();
 	renderPassCI.pAttachments = attachmentDescriptions.data();
-	renderPassCI.subpassCount = subpassDescriptions.size();
+	renderPassCI.subpassCount = (uint32_t)subpassDescriptions.size();
 	renderPassCI.pSubpasses = subpassDescriptions.data();
 	renderPassCI.dependencyCount = 0;
 	renderPassCI.pDependencies = NULL;
@@ -165,7 +165,7 @@ void RenderPass::CreateRenderPass()
 	frameBufferCI.pNext = NULL;
 	frameBufferCI.flags = 0;
 	frameBufferCI.renderPass = renderPass;
-	frameBufferCI.attachmentCount = vkImageViews.size();
+	frameBufferCI.attachmentCount = (uint32_t)vkImageViews.size();
 	frameBufferCI.pAttachments = vkImageViews.data();
 	frameBufferCI.width = renderArea.extent.width;
 	frameBufferCI.height = renderArea.extent.height;
@@ -187,7 +187,7 @@ void RenderPass::CreateRenderPass()
 	renderPassBeginInfo.renderPass = renderPass;
 	renderPassBeginInfo.renderArea = renderArea;
 	renderPassBeginInfo.framebuffer = frameBuffer;
-	renderPassBeginInfo.clearValueCount = clearValues.size();
+	renderPassBeginInfo.clearValueCount = (uint32_t)clearValues.size();
 	renderPassBeginInfo.pClearValues = clearValues.data();
 	
 	//Allocate command buffer
@@ -251,13 +251,13 @@ void RenderPass::CreateRenderPass()
 	descriptorSetLayoutCI[0].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	descriptorSetLayoutCI[0].pNext = NULL;
 	descriptorSetLayoutCI[0].flags = 0;
-	descriptorSetLayoutCI[0].bindingCount = descriptorBindings.size();
+	descriptorSetLayoutCI[0].bindingCount = (uint32_t)descriptorBindings.size();
 	descriptorSetLayoutCI[0].pBindings = descriptorBindings.data();
 
 	descriptorSetLayoutCI[1].sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	descriptorSetLayoutCI[1].pNext = NULL;
 	descriptorSetLayoutCI[1].flags = 0;
-	descriptorSetLayoutCI[1].bindingCount = perDrawDescriptorBindings.size();
+	descriptorSetLayoutCI[1].bindingCount = (uint32_t)perDrawDescriptorBindings.size();
 	descriptorSetLayoutCI[1].pBindings = perDrawDescriptorBindings.data();
 
 	result = vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI[0], NULL, &descriptorSetLayout[0]);
@@ -299,7 +299,7 @@ void RenderPass::CreateRenderPass()
 
 
 	//Create registered mesh lists
-	for (int i = 0, count = subpassDescriptions.size(); i < count; i++)
+	for (int i = 0, count = (int)subpassDescriptions.size(); i < count; i++)
 	{
 		registeredMeshes.push_back(new std::vector<GameObject*>);
 	}
@@ -347,8 +347,8 @@ void RenderPass::RecordBuffer()
 
 	//Update the PerFrameUniformBuffer : TODO: Move this into it's own function.
 	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetViewMatrix(), mat4Size, 0);
-	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetProjectionMatrix(), mat4Size, mat4Size);
-	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetVPMatrix(), mat4Size, mat4Size + mat4Size);
+	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetProjectionMatrix(), mat4Size, (int)mat4Size);
+	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetVPMatrix(), mat4Size, (int)(mat4Size + mat4Size));
 
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 	VkDescriptorBufferInfo perFrameBufferInfo;
@@ -375,7 +375,7 @@ void RenderPass::RecordBuffer()
 
 	int renderPassIndex = 0;
 	std::vector<GameObject*>* currentRegisteredMeshList;
-	for (int renderPassIndex = 0, numPasses = subpassDescriptions.size(); renderPassIndex < numPasses; renderPassIndex++)
+	for (int renderPassIndex = 0, numPasses = (int)subpassDescriptions.size(); renderPassIndex < numPasses; renderPassIndex++)
 	{
 		currentRegisteredMeshList = registeredMeshes[renderPassIndex];
 

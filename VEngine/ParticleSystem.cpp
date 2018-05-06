@@ -124,7 +124,7 @@ public:
 	GPUBuffer* instanceBuffer;
 
 public:
-	inline int NumActiveParticles() { return enabledParticles.size(); }
+	inline int NumActiveParticles() { return (int)enabledParticles.size(); }
 	inline int NumParticles() { return numParticles; }
 
 private:

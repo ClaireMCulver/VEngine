@@ -17,7 +17,7 @@ DescriptorPool::DescriptorPool()
 	descPoolCI.pNext = NULL;
 	descPoolCI.flags = VkDescriptorPoolCreateFlagBits::VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 	descPoolCI.maxSets = 32;
-	descPoolCI.poolSizeCount = typeCount.size();
+	descPoolCI.poolSizeCount = (uint32_t)typeCount.size();
 	descPoolCI.pPoolSizes = typeCount.data();
 
 	vkCreateDescriptorPool(GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice(), &descPoolCI, NULL, &vkDescriptorPool);

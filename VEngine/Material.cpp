@@ -112,9 +112,9 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	vi.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 	vi.pNext = NULL;
 	vi.flags = 0;
-	vi.vertexBindingDescriptionCount = viBindings.size();
+	vi.vertexBindingDescriptionCount = (uint32_t)viBindings.size();
 	vi.pVertexBindingDescriptions = viBindings.data();
-	vi.vertexAttributeDescriptionCount = viAttribs.size();
+	vi.vertexAttributeDescriptionCount = (uint32_t)viAttribs.size();
 	vi.pVertexAttributeDescriptions = viAttribs.data();
 
 	VkPipelineInputAssemblyStateCreateInfo ia;
@@ -220,7 +220,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	pipelineInfo.pViewportState = &vp;
 	pipelineInfo.pDepthStencilState = &ds;
 	pipelineInfo.pStages = shaderStages.data();
-	pipelineInfo.stageCount = shaderStages.size();
+	pipelineInfo.stageCount = (uint32_t)shaderStages.size();
 	pipelineInfo.renderPass = renderPass;
 	pipelineInfo.subpass = 0;
 

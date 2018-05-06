@@ -72,9 +72,9 @@ GraphicsInstance::GraphicsInstance()
 	instanceCI.pNext = nullptr;
 	instanceCI.flags = 0;
 	instanceCI.pApplicationInfo = &appInfo;
-	instanceCI.enabledLayerCount = instanceLayers.size();
+	instanceCI.enabledLayerCount = (uint32_t)instanceLayers.size();
 	instanceCI.ppEnabledLayerNames = instanceLayers.data();
-	instanceCI.enabledExtensionCount = instanceExtentions.size();
+	instanceCI.enabledExtensionCount = (uint32_t)instanceExtentions.size();
 	instanceCI.ppEnabledExtensionNames = instanceExtentions.data();
 
 	result = vkCreateInstance(&instanceCI, NULL, &vkInstance);

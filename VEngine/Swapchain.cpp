@@ -94,7 +94,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	swapchainCI.imageArrayLayers = 1;
 	swapchainCI.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT;
 	swapchainCI.imageSharingMode = VkSharingMode::VK_SHARING_MODE_EXCLUSIVE;
-	swapchainCI.queueFamilyIndexCount = familyIndices.size();
+	swapchainCI.queueFamilyIndexCount = (uint32_t)familyIndices.size();
 	swapchainCI.pQueueFamilyIndices = familyIndices.data();
 	swapchainCI.preTransform = VkSurfaceTransformFlagBitsKHR::VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR;
 	swapchainCI.compositeAlpha = VkCompositeAlphaFlagBitsKHR::VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -119,7 +119,7 @@ SwapChain::SwapChain(GraphicsSystem &graphicsSystem, int xResolution, int yResol
 	vkGetSwapchainImagesKHR(vkLogicalDevice, vkSwapchain, &swapchainImageCount, swapchainImages.data());
 
 	swapchainImageViews.resize(swapchainImageCount);
-	for (int i = 0, count = swapchainImageViews.size(); i < count; i++)
+	for (int i = 0, count = (int)swapchainImageViews.size(); i < count; i++)
 	{
 		VkImageViewCreateInfo imageViewCI;
 		imageViewCI.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;

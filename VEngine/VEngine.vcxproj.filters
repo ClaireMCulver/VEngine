@@ -278,9 +278,6 @@
     <ClInclude Include="DeferredRenderPass.h">
       <Filter>Header Files\Graphics\Objects\RenderPass</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsDefs.h">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
     <ClInclude Include="Image.h">
       <Filter>Header Files\Graphics\Objects\Images</Filter>
     </ClInclude>
@@ -322,6 +319,9 @@
     </ClInclude>
     <ClInclude Include="ObjectManager.h">
       <Filter>Header Files\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsDefs.h">
+      <Filter>Resource Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

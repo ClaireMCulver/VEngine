@@ -102,7 +102,7 @@ FrameBuffer::FrameBuffer(uint32_t width, uint32_t height, VkFormat frameBufferFo
 	frameBufferCI.pNext = NULL;
 	frameBufferCI.flags = 0;
 	frameBufferCI.renderPass = renderPass;
-	frameBufferCI.attachmentCount = attachements.size();
+	frameBufferCI.attachmentCount = (uint32_t)attachements.size();
 	frameBufferCI.pAttachments = attachements.data();
 	frameBufferCI.width = width;
 	frameBufferCI.height = height;
@@ -119,7 +119,7 @@ FrameBuffer::~FrameBuffer()
 	//destroy image views
 	for (size_t i = 0; i < attachements.size(); i++)
 	{
-		vkDestroyImage(logicalDevice, attachements[i], NULL);
+		vkDestroyImageView(logicalDevice, attachements[i], NULL);
 	}
 
 	//destroy images

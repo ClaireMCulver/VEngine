@@ -49,7 +49,7 @@ GraphicsPhysicalDevice::GraphicsPhysicalDevice(GraphicsInstance &instance)
 	GetQueueFamilyIndices();
 
 	// Fetch the discrete GPU's index in the physical device list //
-	for (size_t i = 0, count = physicalDeviceProperties.size(); i < count; i++)
+	for (int i = 0, count = (int)physicalDeviceProperties.size(); i < count; i++)
 	{
 		if (physicalDeviceProperties[i].deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
 		{
@@ -75,25 +75,25 @@ void GraphicsPhysicalDevice::FindQueueFamilyIndices()
 			bool queueFound = false;
 			if (physicalDeviceQueueFamilyProperties[i][j].queueFlags & VkQueueFlagBits::VK_QUEUE_GRAPHICS_BIT)
 			{
-				physicalDeviceQueueFamilyIndices[i].graphicsQueueIndex = j;
+				physicalDeviceQueueFamilyIndices[i].graphicsQueueIndex = (uint32_t)j;
 				graphicsFound = true;
 				queueFound = true;
 			}
 			if (physicalDeviceQueueFamilyProperties[i][j].queueFlags & VkQueueFlagBits::VK_QUEUE_COMPUTE_BIT)
 			{
-				physicalDeviceQueueFamilyIndices[i].computeQueueIndex = j;
+				physicalDeviceQueueFamilyIndices[i].computeQueueIndex = (uint32_t)j;
 				computeFound = true;
 				queueFound = true;
 			}
 			if (physicalDeviceQueueFamilyProperties[i][j].queueFlags & VkQueueFlagBits::VK_QUEUE_TRANSFER_BIT)
 			{
-				physicalDeviceQueueFamilyIndices[i].transferQueueIndex = j;
+				physicalDeviceQueueFamilyIndices[i].transferQueueIndex = (uint32_t)j;
 				transferFound = true;
 				queueFound = true;
 			}
 			if (physicalDeviceQueueFamilyProperties[i][j].queueFlags & VkQueueFlagBits::VK_QUEUE_SPARSE_BINDING_BIT)
 			{
-				physicalDeviceQueueFamilyIndices[i].sparseQueueIndex = j;
+				physicalDeviceQueueFamilyIndices[i].sparseQueueIndex = (uint32_t)j;
 				sparseFound = true;
 				queueFound = true;
 			}

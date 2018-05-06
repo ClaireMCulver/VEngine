@@ -62,14 +62,14 @@ void Geometry::LoadMeshFromDae(char* filePath)
 	std::vector<uint32_t> polyList;
 	polyList.resize(numberOfFaces * 9); //Times nine because there are three vertices to a face and three attributes to a vertex
 
-	for (int i = 0, count = polyList.size(); i < count; i++)
+	for (int i = 0, count = (int)polyList.size(); i < count; i++)
 	{
 		polyListSS >> polyListElement;
 		polyList[i] = std::stoi(polyListElement);
 	}
 
 	//Build the vertex buffer with the indices.
-	for (int i = 0, k = 0, count = geometry.size(); i < count; i++)
+	for (int i = 0, k = 0, count = (int)geometry.size(); i < count; i++)
 	{
 		//First vertex attributes
 		geometry[i].vertexA = vertices[polyList[k++]];
@@ -102,7 +102,7 @@ void Geometry::LoadMeshFromDae(char* filePath)
 void Geometry::LoadMesh(std::vector<Triangle> &geometry, std::vector<uint32_t> &indices)
 {
 	// Store the number of vertices in the geometry //
-	numVertices = geometry.size() * 3;
+	numVertices = (uint32_t)geometry.size() * 3;
 
 	// Store the vertex buffer device side //
 	vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, geometry.data(), sizeof(Triangle) * geometry.size());
