@@ -8,13 +8,6 @@
 #endif
 #include "vulkan\vulkan.h"
 
-//#include "glslang\Include\BaseTypes.h"
-//#include "glslang\Include\Common.h"
-//#include "glslang\Include\ShHandle.h"
-//#include "glslang\Include\intermediate.h"
-//#include "SPIRV\spirv.hpp"
-//#include "SPIRV\GlslangToSpv.h"
-
 #include "shaderc\shaderc.hpp"
 
 #include "Graphics.h"

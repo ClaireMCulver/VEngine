@@ -1,0 +1,3 @@
+[submodule "Ext/shaderc"]
+	path = Ext/shaderc
+	url = https://github.com/google/shaderc.git
