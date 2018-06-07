@@ -59,12 +59,18 @@ struct Triangle
 	glm::vec3 vertexA; 
 	glm::vec3 normalA;
 	glm::vec2 uvA;
+	glm::vec3 tangentA;
+	glm::vec3 biTangentA;
 	
 	glm::vec3 vertexB;
 	glm::vec3 normalB;
 	glm::vec2 uvB;
+	glm::vec3 tangentB;
+	glm::vec3 biTangentB;
 
 	glm::vec3 vertexC;
 	glm::vec3 normalC;
 	glm::vec2 uvC;
+	glm::vec3 tangentC;
+	glm::vec3 biTangentC;
 };

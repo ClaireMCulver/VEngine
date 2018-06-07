@@ -7,6 +7,13 @@ Texture::Texture(int textureWidth, int textureHeight) : Image(textureWidth, text
 	InitializeSampler(logicalDevice);
 }
 
+Texture::Texture(Image * image) : Image(*image)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	InitializeSampler(logicalDevice);
+}
+
 
 Texture::Texture(const char* fileName, int textureWidth, int textureHeight) : Image(textureWidth, textureHeight, VkFormat::VK_FORMAT_B8G8R8A8_UNORM, VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_DST_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT)
 {

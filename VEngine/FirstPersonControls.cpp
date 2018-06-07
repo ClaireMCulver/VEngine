@@ -24,17 +24,17 @@ public:
 
 	void Update()
 	{
-		float rightMovement = moveSpeed * input->GetKeyboard()->IsKeyDown('w');
-		float leftMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown('s');
+		float rightMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown('d');
+		float leftMovement = moveSpeed * input->GetKeyboard()->IsKeyDown('a');
 
-		float upMovement = moveSpeed * input->GetKeyboard()->IsKeyDown('a');
-		float downMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown('d');
+		float upMovement = moveSpeed * input->GetKeyboard()->IsKeyDown(VK_SPACE);
+		float downMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown(VK_LSHIFT);
 
-		float forwardMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown(VK_LSHIFT);
-		float backwardMovement = moveSpeed * input->GetKeyboard()->IsKeyDown(VK_SPACE);
+		float forwardMovement = moveSpeed * input->GetKeyboard()->IsKeyDown('w');
+		float backwardMovement = -moveSpeed * input->GetKeyboard()->IsKeyDown('s');
 
-		glm::vec3 movement = { upMovement + downMovement, forwardMovement + backwardMovement, rightMovement + leftMovement };
-
+		glm::vec3 movement = { rightMovement + leftMovement, upMovement + downMovement, forwardMovement + backwardMovement };
+		
 		float rotation = (float)input->GetKeyboard()->IsKeyDown('z');
 		rotation += (float)input->GetKeyboard()->IsKeyDown('x');
 
@@ -49,5 +49,5 @@ private:
 	Input* input;
 	Camera* camera;
 
-	float moveSpeed = 0.05f;
+	float moveSpeed = 0.15f;
 };

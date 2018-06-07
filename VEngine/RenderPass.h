@@ -13,25 +13,38 @@
 #include "Image.h"
 #include "FrameBuffer.h"
 
+#include "ObjectManager.h"
 #include "CommandBuffer.h"
 #include "GameObject.h"
-
 #include "Camera.h"
 
 struct SubpassReferences
 {
+	std::vector<VkAttachmentReference> inputReferences;
 	std::vector<VkAttachmentReference> colourReferences;
+	std::vector<VkAttachmentReference> resolveReferences;
+	std::vector<VkAttachmentReference> preserveReferences;
 	VkAttachmentReference depthReference = { 0, VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED };
 };
 
 class RenderPass
 {
 public:
-	RenderPass();
+	RenderPass(uint32_t renderAreaWidth, uint32_t renderAreaHeight);
 	~RenderPass();
 
+	//Adds new subpass to renderpass
 	void AddNewSubPass(); 
-	void AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat renderbufferFormat, bool useDepthBuffer);
+
+	//Adds a new colour attachement to the subpass.
+	//Returns a VkAttachementReference to the new attachment for input references.
+	VkAttachmentReference AddColourAttachmentToCurrentSubpass(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat renderbufferFormat);
+
+	//Adds a depth attachement to the current Subpass
+	void AddDepthAttachmentToCurrentSubpass(uint32_t pixelWidth, uint32_t pixelHeight);
+
+	//Adds the given attachment as an input to the current subpass.
+	void AddInputAttachmentToCurrentSubpass(VkAttachmentReference attachment);
 
 	void CreateRenderPass();
 
@@ -48,8 +61,8 @@ public:
 
 	void RegisterObject(GameObject *object, int subpass);
 
-	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION. //TODO: Should change this some time later on to specify the image we want.
-	Image* GetRenderedImage();
+	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION.
+	Image* GetImage(int index);
 
 private:
 	VkRenderPass renderPass;
@@ -79,6 +92,7 @@ private:
 	UniformBuffer* perFrameUniformBuffer;
 
 private:
-	void CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat, bool hasDepthBuffer);
+	void CreateColourImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat);
+	void CreateDepthImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight);
 };
 

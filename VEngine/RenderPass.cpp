@@ -1,8 +1,8 @@
 #include "RenderPass.h"
 
-RenderPass::RenderPass()
+RenderPass::RenderPass(uint32_t renderAreaWidth, uint32_t renderAreaHeight)
 {
-	renderArea.extent = { 0, 0 };
+	renderArea.extent = { renderAreaWidth, renderAreaHeight };
 	renderArea.offset = { 0, 0 };
 
 	perFrameUniformBuffer = new UniformBuffer();
@@ -33,7 +33,7 @@ RenderPass::~RenderPass()
 	{
 		delete images[i];
 	}
-
+	
 	for (int i = 0, count = (int)registeredMeshes.size(); i < count; i++)
 	{
 		registeredMeshes[i]->clear();
@@ -61,19 +61,12 @@ void RenderPass::AddNewSubPass()
 	subpassReferences.push_back(SubpassReferences());
 }
 
-void RenderPass::AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat renderbufferFormat, bool useDepthBuffer)
+VkAttachmentReference RenderPass::AddColourAttachmentToCurrentSubpass(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat renderbufferFormat)
 {
-	if (pixelWidth > renderArea.extent.width)
-	{
-		renderArea.extent.width = pixelWidth;
-	}
-	if (pixelHeight > renderArea.extent.height)
-	{
-		renderArea.extent.height = pixelHeight;
-	}
+	assert(pixelWidth <= renderArea.extent.width && pixelHeight <= renderArea.extent.height);
 
 	//Image and image views for vulkan side for the things that we are going to actually have to use.
-	CreateImageAndImageView(pixelWidth, pixelHeight, renderbufferFormat, useDepthBuffer);
+	CreateColourImageAndImageView(pixelWidth, pixelHeight, renderbufferFormat);
 
 	//Description of the colour attachment for the subpass.
 	VkAttachmentDescription colourAttachment;
@@ -96,27 +89,40 @@ void RenderPass::AddColourAttachementToCurrentSubpass(uint32_t pixelWidth, uint3
 	attachmentDescriptions.push_back(colourAttachment);
 	subpassReferences.back().colourReferences.push_back(colourReference);
 
-	if (useDepthBuffer)
-	{
-		VkAttachmentDescription depthAttachment;
-		depthAttachment.format = VkFormat::VK_FORMAT_D32_SFLOAT;
-		depthAttachment.samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
-		depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-		depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-		depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-		depthAttachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;// VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		depthAttachment.flags = 0;
+	return colourReference;
+}
 
-		VkAttachmentReference depthReference;
-		depthReference.attachment = (uint32_t)attachmentDescriptions.size(); //The index of the attachment in the pattachments variable in the renderpassCI.
-		depthReference.layout = VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+void RenderPass::AddDepthAttachmentToCurrentSubpass(uint32_t pixelWidth, uint32_t pixelHeight)
+{
+	assert(pixelWidth <= renderArea.extent.width && pixelHeight <= renderArea.extent.height);
+	assert(subpassReferences.back().depthReference.attachment == 0);
 
-		//The frame buffer descriptions already has this frame buffer in it.
-		attachmentDescriptions.push_back(depthAttachment);
-		subpassReferences.back().depthReference = depthReference;
-	}
+	//Image and image views for vulkan side for the things that we are going to actually have to use.
+	CreateDepthImageAndImageView(pixelWidth, pixelHeight);
+
+	VkAttachmentDescription depthAttachment;
+	depthAttachment.format = VkFormat::VK_FORMAT_D32_SFLOAT;
+	depthAttachment.samples = VkSampleCountFlagBits::VK_SAMPLE_COUNT_1_BIT;
+	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	depthAttachment.initialLayout = VkImageLayout::VK_IMAGE_LAYOUT_UNDEFINED;
+	depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	depthAttachment.flags = 0;
+
+	VkAttachmentReference depthReference;
+	depthReference.attachment = (uint32_t)attachmentDescriptions.size(); //The index of the attachment in the pattachments variable in the renderpassCI.
+	depthReference.layout = VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+	//The frame buffer descriptions already has this frame buffer in it.
+	attachmentDescriptions.push_back(depthAttachment);
+	subpassReferences.back().depthReference = depthReference;
+}
+
+void RenderPass::AddInputAttachmentToCurrentSubpass(VkAttachmentReference attachment)
+{
+	subpassReferences.back().inputReferences.push_back(attachment);
 }
 
 void RenderPass::CreateRenderPass()
@@ -240,7 +246,7 @@ void RenderPass::CreateRenderPass()
 	{	//VkDescriptorSetLayoutBinding
 		1,											//binding;				
 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
-		1,											//descriptorCount;		
+		6,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
 		NULL										//pImmutableSamplers;
 	}
@@ -297,8 +303,7 @@ void RenderPass::CreateRenderPass()
 	result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineLayout);
 	assert(result == VK_SUCCESS);
 
-
-	//Create registered mesh lists
+	//Create registered mesh lists 
 	for (int i = 0, count = (int)subpassDescriptions.size(); i < count; i++)
 	{
 		registeredMeshes.push_back(new std::vector<GameObject*>);
@@ -374,26 +379,26 @@ void RenderPass::RecordBuffer()
 	vkCmdBindDescriptorSets(vkRenderBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
 
 	int renderPassIndex = 0;
-	std::vector<GameObject*>* currentRegisteredMeshList;
+	std::vector<GameObject*>* objectList;
 	for (int renderPassIndex = 0, numPasses = (int)subpassDescriptions.size(); renderPassIndex < numPasses; renderPassIndex++)
 	{
-		currentRegisteredMeshList = registeredMeshes[renderPassIndex];
+		objectList = registeredMeshes[renderPassIndex];
 
 		// Render pass contents //
-		for (size_t i = 0, count = (*currentRegisteredMeshList).size(); i < count; i++)
+		for (size_t i = 0, count = (*objectList).size(); i < count; i++)
 		{
-			(*currentRegisteredMeshList)[i]->SetDrawMatrices((*currentRegisteredMeshList)[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
+			(*objectList)[i]->SetDrawMatrices((*objectList)[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
 
-			(*currentRegisteredMeshList)[i]->UpdateDescriptorSet();
+			(*objectList)[i]->UpdateDescriptorSet();
 
 			//Bind the material
-			(*currentRegisteredMeshList)[i]->GetMaterial()->BindPipeline(*renderBuffer);
+			(*objectList)[i]->GetMaterial()->BindPipeline(*renderBuffer);
 
 			//Bind uniforms
-			(*currentRegisteredMeshList)[i]->BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
+			(*objectList)[i]->BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
 
 			//Draw the model in the buffer.
-			(*currentRegisteredMeshList)[i]->GetRenderer()->Draw(renderBuffer->GetVKCommandBuffer());
+			(*objectList)[i]->GetRenderer()->Draw(renderBuffer->GetVKCommandBuffer());
 		}
 
 		if (renderPassIndex < numPasses-1)
@@ -418,29 +423,32 @@ void RenderPass::ResetBuffer()
 	renderBuffer->ResetBuffer();
 }
 
-void RenderPass::CreateImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat, bool hasDepthBuffer)
+void RenderPass::CreateColourImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat)
 {
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
-	images.push_back(new Image(pixelWidth, pixelHeight, imageFormat, VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT));
+	images.push_back(new Image(pixelWidth, pixelHeight, imageFormat, VkImageUsageFlagBits::VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_TRANSFER_SRC_BIT | VkImageUsageFlagBits::VK_IMAGE_USAGE_SAMPLED_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_COLOR_BIT));
 	images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
-
-	if (hasDepthBuffer)
-	{
-		images.push_back(new Image(pixelWidth, pixelHeight, VkFormat::VK_FORMAT_D32_SFLOAT, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT));
-		images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-	}
 }
 
-void RenderPass::RegisterObject(GameObject *object, int subpass)
+void RenderPass::CreateDepthImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	images.push_back(new Image(pixelWidth, pixelHeight, VkFormat::VK_FORMAT_D32_SFLOAT, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT));
+	images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+}
+
+void RenderPass::RegisterObject(GameObject * object, int subpass)
 {
 	assert(object->GetRenderer() != nullptr);
 	registeredMeshes[subpass]->push_back(object);
 }
 
-Image* RenderPass::GetRenderedImage()
+Image* RenderPass::GetImage(int index)
 {
 	assert(images.size() > 0);
+	assert(images.size() - 1 >= index);
 	
-	return images[0];
+	return images[index];
 }

@@ -47,6 +47,6 @@ public:
 
 	void Update()
 	{
-		owner->GetTransform()->rotate(0.4f);
+		owner->GetTransform()->rotate(0.4f, { 0, 1, 0 });
 	}
 };

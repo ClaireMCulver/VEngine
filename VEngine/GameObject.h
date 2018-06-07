@@ -18,6 +18,7 @@
 #include "GPUBuffer.h"
 #include "DescriptorPool.h"
 #include "Texture.h"
+#include "RenderTexture.h"
 
 #include "Component.h"
 #include "Transform.h"
@@ -84,6 +85,7 @@ public:
 	void SetUniform_Float32(float &data, int offset);
 
 	void SetTexture(Texture& texture, int offset);
+	void SetTexture(RenderTexture& texture, int offset);
 
 private:
 	Transform* transform;
@@ -110,6 +112,7 @@ private:
 		glm::quat rotation;
 	} instanceData;
 
-	std::vector<Texture*> textures;
+	//TODO: Replace with VkImageInfo in order to work with both textures and rendertextures.
+	std::vector<VkDescriptorImageInfo> textures;
 };
 

@@ -3,11 +3,11 @@
 
 Material::Material()
 {
-	int sizeOfVertex = sizeof(glm::vec3), sizeOfNormals = sizeof(glm::vec3), sizeOfUVs = sizeof(glm::vec2);
+	int sizeOfVertex = sizeof(glm::vec3), sizeOfNormals = sizeof(glm::vec3), sizeOfUVs = sizeof(glm::vec2), sizeOfTangent = sizeof(glm::vec3), sizeOfBitangent = sizeof(glm::vec3);
 	//Description of binding and attributes for pipeline
 	viBindings.push_back(VkVertexInputBindingDescription()); //PerVertexData
  	viBindings[0].binding = 0; //Index of the array
- 	viBindings[0].stride = sizeOfVertex + sizeOfNormals + sizeOfUVs; //Number of bytes from one vertex data set to the next
+ 	viBindings[0].stride = sizeOfVertex + sizeOfNormals + sizeOfUVs + sizeOfTangent + sizeOfBitangent; //Number of bytes from one vertex data set to the next
  	viBindings[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX; //As apposed to instance rendering.
 
 	viBindings.push_back(VkVertexInputBindingDescription()); //PerInstanceData
@@ -27,6 +27,7 @@ Material::Material()
  		}
  	);		
 
+	//Normals
 	viAttribs.push_back
 	(
 		{
@@ -48,12 +49,33 @@ Material::Material()
  		}
  	);			
 
+	//Tangents
+	viAttribs.push_back
+	(
+		{
+			3,
+			0,
+			VK_FORMAT_R32G32B32_SFLOAT,
+			(uint32_t)(sizeOfVertex + sizeOfNormals + sizeOfUVs)
+		}
+	);
+
+	//Bitangents
+	viAttribs.push_back
+	(
+		{
+			4,
+			0,
+			VK_FORMAT_R32G32B32_SFLOAT,
+			(uint32_t)(sizeOfVertex + sizeOfNormals + sizeOfUVs + sizeOfTangent)
+		}
+	);
 
 	// local position
 	viAttribs.push_back
 	(
 		{
-			3,
+			5,
 			1,
 			VK_FORMAT_R32G32B32_SFLOAT,
 			0
@@ -64,7 +86,7 @@ Material::Material()
 	viAttribs.push_back
 	(
 		{
-			4,
+			6,
 			1,
 			VK_FORMAT_R32G32B32A32_SFLOAT,
 			(uint32_t)sizeOfVertex

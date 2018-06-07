@@ -201,9 +201,6 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Graphics\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Resource Files\Scripts\Core\Camera</Filter>
-    </ClCompile>
     <ClCompile Include="UniformBuffer.cpp">
       <Filter>Source Files\Graphics\Objects\Buffers\UniformBuffer</Filter>
     </ClCompile>
@@ -221,6 +218,12 @@
     </ClCompile>
     <ClCompile Include="ObjectManager.cpp">
       <Filter>Source Files\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="fxaaEffect.cpp">
+      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

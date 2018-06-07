@@ -4,7 +4,7 @@
 #include "Image.h"
 #include "FreeImage\FreeImage.h"
 
-class RenderTexture : public Image
+class RenderTexture
 {
 public:
 	RenderTexture(Image* renderedImage);
@@ -12,9 +12,10 @@ public:
 
 public: // Get/Set
 	VkSampler GetSampler() const { return textureSampler; }
+	VkImageView GetImageView() const { return renderedImage->GetImageView(); }
+	VkImageLayout GetImageLayout() const { return renderedImage->GetImageLayout(); }
 
 public: // General Functions
-	void CopyRenderedImage();
 
 private:
 	VkSampler textureSampler;

@@ -14,10 +14,14 @@
 #endif
 #include "vulkan\vulkan.h"
 
+#include <glm/glm.hpp>
 #include <glm\common.hpp>
 
 #include "rapidxml\rapidxml.hpp"
 #include "rapidxml\rapidxml_utils.hpp"
+
+//#define TINYOBJLOADER_IMPLEMENTATION // define this in only *one* .cc
+//#include "tinyobjloader/tiny_obj_loader.h"
 
 #include "Graphics.h"
 #include "GPUBuffer.h"
@@ -37,6 +41,7 @@ private:
 
 public: 
 	void LoadMeshFromDae(char* filePath);
+	//void LoadMeshFromObj(char* filePath);
 	
 	void Draw(VkCommandBuffer commandBuffer);
 

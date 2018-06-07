@@ -11,6 +11,9 @@ public:
 	//Allocate a texture for filling later.
 	Texture(int textureWidth, int textureHeight);
 
+	//Create texture from existing Image object
+	Texture(Image* image);
+
 	//Load a texture directly from a file
 	Texture(const char* fileName, int textureWidth, int textureHeight);
 	~Texture();

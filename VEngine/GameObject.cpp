@@ -33,7 +33,7 @@ GameObject::GameObject(Geometry *mesh, Material *mat)
 	{	//VkDescriptorSetLayoutBinding
 		1,											//binding;				
 		VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
-		1,											//descriptorCount;		
+		6,											//descriptorCount;		
 		VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
 		NULL										//pImmutableSamplers;
 	}
@@ -141,14 +141,8 @@ void GameObject::UpdateDescriptorSet()
 
 	vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
 
-	VkDescriptorImageInfo imageInfo;
 	for (size_t i = 0, count = textures.size(); i < count; i++)
 	{
-		//Image infor the describes the image to 
-		imageInfo.sampler = textures[i]->GetSampler();
-		imageInfo.imageView = textures[i]->GetImageView();
-		imageInfo.imageLayout = textures[i]->GetImageLayout();
-
 		//Descriptor write that tells Vulkan what we're updating and what we're updating it with
 		uniformWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		uniformWrite.pNext = NULL;
@@ -157,7 +151,7 @@ void GameObject::UpdateDescriptorSet()
 		uniformWrite.dstArrayElement = (uint32_t)i;
 		uniformWrite.descriptorCount = 1;
 		uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		uniformWrite.pImageInfo = &imageInfo;
+		uniformWrite.pImageInfo = &textures[i];
 		uniformWrite.pBufferInfo = NULL;
 		uniformWrite.pTexelBufferView = NULL;
 
@@ -214,6 +208,20 @@ void GameObject::SetUniform_Float32(float &data, int offset)
 
 void GameObject::SetTexture(Texture& texture, int offset)
 {
-	textures.push_back(&texture);
+	textures.push_back(VkDescriptorImageInfo());
+
+	textures.back().sampler = texture.GetSampler();
+	textures.back().imageView = texture.GetImageView();
+	textures.back().imageLayout = texture.GetImageLayout();
 }
+
+void GameObject::SetTexture(RenderTexture& texture, int offset)
+{
+	textures.push_back(VkDescriptorImageInfo());
+
+	textures.back().sampler = texture.GetSampler();
+	textures.back().imageView = texture.GetImageView();
+	textures.back().imageLayout = texture.GetImageLayout();
+}
+
 

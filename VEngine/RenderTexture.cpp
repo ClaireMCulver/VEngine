@@ -2,7 +2,7 @@
 
 
 
-RenderTexture::RenderTexture(Image* renderedImage) : Image(*renderedImage)
+RenderTexture::RenderTexture(Image* renderedImage)
 {
 	this->renderedImage = renderedImage;
 
@@ -35,8 +35,7 @@ RenderTexture::RenderTexture(Image* renderedImage) : Image(*renderedImage)
 
 RenderTexture::~RenderTexture()
 {
-}
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
-void RenderTexture::CopyRenderedImage()
-{
+	vkDestroySampler(logicalDevice, textureSampler, NULL);
 }

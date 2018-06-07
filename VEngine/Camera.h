@@ -22,7 +22,7 @@ private:
 	);
 
 	//fov, aspect, near-plane, far-plane.
-	glm::mat4x4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 500.0f);
+	glm::mat4x4 projection = glm::perspective(glm::radians(45.0f), 1.0f, 0.1f, 1000.0f);
 
 	//This is constant because clip space in vulkan is a constant of the api.
 	const glm::mat4x4 clip = glm::mat4(
@@ -101,4 +101,3 @@ public:
 	void Update() {}
 
 };
-

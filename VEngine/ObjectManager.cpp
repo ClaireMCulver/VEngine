@@ -1,9 +1,11 @@
 #include "ObjectManager.h"
 
-
+ObjectManager* ObjectManager::singleton = nullptr;
 
 ObjectManager::ObjectManager()
 {
+	assert(singleton == nullptr);
+	singleton = this;
 }
 
 

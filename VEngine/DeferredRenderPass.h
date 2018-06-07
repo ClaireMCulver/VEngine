@@ -16,7 +16,7 @@
 class DeferredRenderPass : public RenderPass
 {
 public:
-	DeferredRenderPass();
+	DeferredRenderPass(uint32_t renderAreaWidth, uint32_t renderAreaHeight);
 	~DeferredRenderPass();
 };
 

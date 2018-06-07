@@ -10,7 +10,7 @@ class Transform : public Component
 private:
 	// Local data //
 	glm::vec3 position; //TODO: Node hierarchy, parents, local and world transforms. blech.
-	glm::tquat<float> localRotation;
+	glm::tquat<float> localRotation = { 0, 0, 0, 1 };
 
 	// Matrix transformations //
 	glm::mat4 modelMatrix;
@@ -41,7 +41,7 @@ public:
 	// Movement //
 	void Translate(glm::vec3 translation) { position += translation; }
 
-	//TODO: figure out whether the degrees passede should be changed to radians or not.
+	//TODO: figure out whether the degrees passed should be changed to radians or not.
 	void rotate(float degrees, glm::vec3 axis = glm::vec3(0.0f, 1.0f, 0.0f)) { localRotation *= glm::angleAxis(glm::radians(degrees), axis); }
 };
 
