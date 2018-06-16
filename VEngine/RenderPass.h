@@ -16,7 +16,6 @@
 #include "ObjectManager.h"
 #include "CommandBuffer.h"
 #include "GameObject.h"
-#include "Camera.h"
 
 struct SubpassReferences
 {
@@ -51,15 +50,13 @@ public:
 	void BindRenderPass(VkCommandBuffer &cmdBuffer);
 	void UnbindRenderPass(VkCommandBuffer &cmdBuffer);
 
-	void RecordBuffer();
+	void RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix);
 	void SubmitBuffer();
 	void ResetBuffer();
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
 	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout[0]; }
 	VkPipelineLayout GetVKPipelineLayout() const { return pipelineLayout; }
-
-	void RegisterObject(GameObject *object, int subpass);
 
 	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION.
 	Image* GetImage(int index);
@@ -80,8 +77,6 @@ private:
 	VkViewport viewport;
 	VkRect2D renderArea;
 	std::vector<VkClearValue> clearValues;
-
-	std::vector<std::vector<GameObject*>*> registeredMeshes;
 
 	VkPresentInfoKHR bufferPresentInfo;
 

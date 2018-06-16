@@ -26,7 +26,6 @@
 #include "Clock.h"
 #include "Camera.h"
 
-#include "fxaaEffect.cpp"
 #include "Rotate.cpp"
 #include "FirstPersonControls.cpp"
 #include "ParticleRenderer.scr"
@@ -66,9 +65,9 @@ void main()
 	bitangentLightingMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout(), VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
 	GameObject mainCamera(&cubeMesh, &bitangentLightingMaterial);
-	mainCamera.AddComponent(new Camera());
+	mainCamera.AddComponent(new Camera(&mainRenderPass));
 	mainCamera.AddComponent(new FirstPersonControls());
-	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 0, -40.0f));
+	mainCamera.GetTransform()->Translate(glm::vec3(0.0f, 0, -10.0f));
 	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
 	objectManager.AddObject(&mainCamera);
 
@@ -83,7 +82,6 @@ void main()
 	clayObject.AddComponent(new RotateScript());
 	clayObject.AddComponent(new MeshRenderer());
 	objectManager.AddObject(&clayObject);
-	mainRenderPass.RegisterObject(&clayObject, 0);
 
 	//fxaa effect
 	DeferredRenderPass fxaaPass(WindowSize[0], WindowSize[1]);
@@ -96,11 +94,10 @@ void main()
 	fxaaMaterial.AddShader(textureMergeFragShader);
 	fxaaMaterial.FinalizeMaterial(fxaaPass.GetVKRenderPass(), fxaaPass.GetVKDescriptorSetLayout(), fxaaPass.GetVKPipelineLayout(), VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP);
 
-	GameObject textureMergeEffect(&cubeMesh, &fxaaMaterial);
-	textureMergeEffect.AddComponent(new FXAARenderer({ WindowSize[0], WindowSize[1] }, { WindowSize[0], WindowSize[1] }));
-	textureMergeEffect.GetComponent<FXAARenderer>()->SetSourceTexture(mainRenderPass.GetImage(0));
-	objectManager.AddObject(&textureMergeEffect);
-	fxaaPass.RegisterObject(&textureMergeEffect, 0);
+	//GameObject textureMergeEffect(&cubeMesh, &fxaaMaterial);
+	//textureMergeEffect.AddComponent(new FXAAEffect({ WindowSize[0], WindowSize[1] }, { WindowSize[0], WindowSize[1] }));
+	//textureMergeEffect.GetComponent<FXAAEffect>()->SetSourceTexture(mainRenderPass.GetImage(0));
+	//objectManager.AddObject(&textureMergeEffect);
 	
 	// Main loop //
 	while (!inputSystem.GetKeyboard()->IsKeyDown('q'))
@@ -108,22 +105,16 @@ void main()
 		//Clock update
 		clock.Tick();
 
-		//Window update
+		//Window updateB
 		inputSystem.UpdateInput();
 
 		 //Physical update
 		objectManager.UpdateObjects();
 
 		//Render update
-		mainRenderPass.RecordBuffer();
-		mainRenderPass.SubmitBuffer();
-		mainRenderPass.ResetBuffer();
+		mainCamera.GetComponent<Camera>()->Render();
 
-		fxaaPass.RecordBuffer();
-		fxaaPass.SubmitBuffer();
-		fxaaPass.ResetBuffer();
-
-		swapchain.BlitToSwapChain(fxaaPass.GetImage(0));
+		swapchain.BlitToSwapChain(Camera::GetMain()->GetFinalOutput());
 	}
 
 	graphicsSystem.WaitForDeviceIdle();

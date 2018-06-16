@@ -1,0 +1,95 @@
+#pragma once
+
+#include "GraphicsDefs.h"
+#include "GameObject.h"
+#include "Renderer.scr"
+
+#include "RenderTexture.h"
+#include "CommandBuffer.h"
+#include "RenderPass.h"
+
+#include "Input.h"
+
+class ImageEffect : public Component
+{
+public:
+	ImageEffect() 
+	{
+		glm::vec3 lb = { -1, -1, 0 };
+		glm::vec3 lt = { -1,  1, 0 };
+		glm::vec3 rb = { 1, -1, 0 };
+		glm::vec3 rt = { 1,  1, 0 };
+		int step = sizeof(Triangle);
+
+		fsQuad[0] = lb.x;
+		fsQuad[1] = lb.y;
+
+		fsQuad[0 + step] = lt.x;
+		fsQuad[1 + step] = lt.y;
+
+		fsQuad[0 + step * 2] = rb.x;
+		fsQuad[1 + step * 2] = rb.y;
+
+		fsQuad[0 + step * 3] = rt.x;
+		fsQuad[1 + step * 3] = rt.y;
+
+		vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, fsQuad, (sizeof(float)) * step * 4);
+		glm::mat4 indentityPtr = glm::mat4(1.0);
+		instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, &indentityPtr, 64); //This isn't used, but it needs to be filled and passed, both because vulkan will complain because my standardized descriptor sets.	
+	}
+
+	~ImageEffect() {
+		delete inputImage;
+
+		delete vertexBuffer;
+		delete instanceBuffer;
+	}
+	
+	virtual void RenderEffect() = 0;
+
+private: 
+	void Start() 
+	{
+	}
+
+	void Update() 
+	{
+	}
+
+	void SetRenderPass(RenderPass* renderPass) { effectRenderPass = renderPass; }
+
+	void RenderQuad(VkCommandBuffer commandBuffer) 
+	{
+		VkBuffer vertBuffer = vertexBuffer->GetVKBuffer();
+		VkBuffer instBuffer = instanceBuffer->GetVKBuffer();
+		const VkDeviceSize offsets[1] = { 0 };
+
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertBuffer, offsets);
+		vkCmdBindVertexBuffers(commandBuffer, 1, 1, &instBuffer, offsets);
+
+		vkCmdDraw(commandBuffer, 4, 1, 0, 0);
+	}
+
+	void SetSourceTexture(Image* source) 
+	{
+		inputImage = new RenderTexture(source);
+		owner->SetTexture(*inputImage, 0);
+		owner->SetTexture(*inputImage, 1);
+		owner->SetTexture(*inputImage, 2);
+		owner->SetTexture(*inputImage, 3);
+		owner->SetTexture(*inputImage, 4);
+		owner->SetTexture(*inputImage, 5);
+	}
+
+private:
+	// Variables for presenting to the screen.
+	RenderTexture* inputImage;
+	Image* outputImage;
+
+	float fsQuad[(sizeof(Triangle)) * 4];
+
+	GPUBuffer* vertexBuffer;
+	GPUBuffer* instanceBuffer;
+
+	RenderPass* effectRenderPass;
+};

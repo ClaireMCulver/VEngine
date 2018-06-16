@@ -5,6 +5,9 @@
 
 #include "GameObject.h"
 #include "Component.h"
+#include "RenderPass.h"
+#include "Image.h"
+#include "ImageEffect.scr"
 
 class Camera : public Component
 {
@@ -13,7 +16,7 @@ private:
 	glm::vec3 viewPoint = glm::vec3(0.f);
 	glm::vec3 viewVector = glm::vec3(0.f);
 	glm::vec3 UpVector = glm::vec3(0.f, 1.f, 0.f);
-	
+
 	//This definition exist to serve as a reminder of the lookat function and how the lookat works.
 	glm::mat4x4 view = glm::lookAt(
 		glm::vec3(1, 1, 1),		// Camera is at (1,1,1), in World Space
@@ -26,33 +29,34 @@ private:
 
 	//This is constant because clip space in vulkan is a constant of the api.
 	const glm::mat4x4 clip = glm::mat4(
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, -1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 0.5f, 0.0f,
-			0.0f, 0.0f, 0.5f, 1.0f);// Vulkan clip space has inverted Y and half Z.
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, -1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.5f, 0.0f,
+		0.0f, 0.0f, 0.5f, 1.0f);// Vulkan clip space has inverted Y and half Z.
 
 	glm::mat4x4 VPMatrix = clip * projection * view;
 
 	static Camera* mainCamera;
 
+	RenderPass* mainRenderPass;
+	std::vector<ImageEffect*> imageEffects;
+
+	Image* finalRenderOutput;
 
 public:
-	Camera()
-	{
-		if (mainCamera == NULL)
-		{
-			mainCamera = this;
-		}
-	}
+	Camera(RenderPass* renderPass);
+
 
 	~Camera()
 	{
 	}
 
-	
 	// Main Camera //
 	static void SetMain(Camera* cameraPtr) { mainCamera = cameraPtr; }
 	static Camera* GetMain() { return mainCamera; }
+
+	Image* SetFinalOutput(Image* outputImage) { finalRenderOutput = outputImage; }
+	Image* GetFinalOutput() { return finalRenderOutput; }
 
 	// Get Matrices //
 	inline glm::mat4x4 GetViewMatrix() { return view; }
@@ -99,5 +103,7 @@ public:
 	// Component Functions //
 	void Start() {}
 	void Update() {}
+
+	void Render();
 
 };

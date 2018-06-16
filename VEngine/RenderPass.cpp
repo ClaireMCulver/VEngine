@@ -33,12 +33,6 @@ RenderPass::~RenderPass()
 	{
 		delete images[i];
 	}
-	
-	for (int i = 0, count = (int)registeredMeshes.size(); i < count; i++)
-	{
-		registeredMeshes[i]->clear();
-		delete registeredMeshes[i];
-	}
 }
 
 void RenderPass::AddNewSubPass()
@@ -302,12 +296,6 @@ void RenderPass::CreateRenderPass()
 
 	result = vkCreatePipelineLayout(logicalDevice, &pipelineLayoutCI, NULL, &pipelineLayout);
 	assert(result == VK_SUCCESS);
-
-	//Create registered mesh lists 
-	for (int i = 0, count = (int)subpassDescriptions.size(); i < count; i++)
-	{
-		registeredMeshes.push_back(new std::vector<GameObject*>);
-	}
 }
 
 void RenderPass::BindRenderPass(VkCommandBuffer &cmdBuffer)
@@ -320,7 +308,7 @@ void RenderPass::UnbindRenderPass(VkCommandBuffer &cmdBuffer)
 	vkCmdEndRenderPass(cmdBuffer);
 }
 
-void RenderPass::RecordBuffer()
+void RenderPass::RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix)
 {
 	//begin recording buffer;
 	renderBuffer->BeginRecording();
@@ -346,14 +334,12 @@ void RenderPass::RecordBuffer()
 	//Render pass
 	vkCmdBeginRenderPass(vkRenderBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 
-	Camera* currentCamera = Camera::GetMain();
 	size_t mat4Size = sizeof(glm::mat4);
-	currentCamera->UpdateMatrices();
 
 	//Update the PerFrameUniformBuffer : TODO: Move this into it's own function.
-	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetViewMatrix(), mat4Size, 0);
-	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetProjectionMatrix(), mat4Size, (int)mat4Size);
-	perFrameUniformBuffer->SetBufferData((void*)&currentCamera->GetVPMatrix(), mat4Size, (int)(mat4Size + mat4Size));
+	perFrameUniformBuffer->SetBufferData((void*)&vMatrix, mat4Size, 0);
+	perFrameUniformBuffer->SetBufferData((void*)&pMatrix, mat4Size, (int)mat4Size);
+	perFrameUniformBuffer->SetBufferData((void*)&vpMatrix, mat4Size, (int)(mat4Size + mat4Size));
 
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 	VkDescriptorBufferInfo perFrameBufferInfo;
@@ -382,12 +368,12 @@ void RenderPass::RecordBuffer()
 	std::vector<GameObject*>* objectList;
 	for (int renderPassIndex = 0, numPasses = (int)subpassDescriptions.size(); renderPassIndex < numPasses; renderPassIndex++)
 	{
-		objectList = registeredMeshes[renderPassIndex];
+		objectList = ObjectManager::GetManager()->GetRenderObjects();
 
 		// Render pass contents //
 		for (size_t i = 0, count = (*objectList).size(); i < count; i++)
 		{
-			(*objectList)[i]->SetDrawMatrices((*objectList)[i]->GetTransform()->GetModelMat(), currentCamera->GetViewMatrix(), currentCamera->GetVPMatrix());
+			(*objectList)[i]->SetDrawMatrices((*objectList)[i]->GetTransform()->GetModelMat(), vMatrix, vpMatrix);
 
 			(*objectList)[i]->UpdateDescriptorSet();
 
@@ -437,12 +423,6 @@ void RenderPass::CreateDepthImageAndImageView(uint32_t pixelWidth, uint32_t pixe
 
 	images.push_back(new Image(pixelWidth, pixelHeight, VkFormat::VK_FORMAT_D32_SFLOAT, VkImageUsageFlagBits::VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VkImageAspectFlagBits::VK_IMAGE_ASPECT_DEPTH_BIT));
 	images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-}
-
-void RenderPass::RegisterObject(GameObject * object, int subpass)
-{
-	assert(object->GetRenderer() != nullptr);
-	registeredMeshes[subpass]->push_back(object);
 }
 
 Image* RenderPass::GetImage(int index)

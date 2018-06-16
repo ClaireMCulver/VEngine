@@ -124,11 +124,14 @@
     <Filter Include="Source Files\Graphics\Objects\Buffers\UniformBuffer">
       <UniqueIdentifier>{3df98956-a74e-4318-8f65-1d3a126ca095}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files\Scripts\Core\Rendering">
-      <UniqueIdentifier>{fb808681-ab39-4fe8-bf94-9fac46bc6410}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Scripts\Core\Particles">
       <UniqueIdentifier>{5b81f30c-46ea-4c09-adfa-f3c18d44190e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\Core\Renderers">
+      <UniqueIdentifier>{fb808681-ab39-4fe8-bf94-9fac46bc6410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\Scripts\Core\ScreenEffects">
+      <UniqueIdentifier>{ed6eb67c-2c0b-43f7-b5df-08113d0a33af}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -211,7 +214,7 @@
       <Filter>Source Files\Input</Filter>
     </ClCompile>
     <ClCompile Include="ParticleRenderer.scr">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+      <Filter>Resource Files\Scripts\Core\Renderers</Filter>
     </ClCompile>
     <ClCompile Include="RenderTexture.cpp">
       <Filter>Source Files\Graphics\Objects\Images</Filter>
@@ -219,11 +222,11 @@
     <ClCompile Include="ObjectManager.cpp">
       <Filter>Source Files\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="fxaaEffect.cpp">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageEffect.scr">
+      <Filter>Resource Files\Scripts\Core\ScreenEffects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -335,10 +338,10 @@
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </None>
     <None Include="Renderer.scr">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+      <Filter>Resource Files\Scripts\Core\Renderers</Filter>
     </None>
     <None Include="MeshRenderer.scr">
-      <Filter>Resource Files\Scripts\Core\Rendering</Filter>
+      <Filter>Resource Files\Scripts\Core\Renderers</Filter>
     </None>
   </ItemGroup>
 </Project>

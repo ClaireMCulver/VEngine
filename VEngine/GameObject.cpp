@@ -88,6 +88,15 @@ GameObject::~GameObject()
 	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, NULL);
 }
 
+void GameObject::SetRenderer(Renderer * givenRenderer)
+{
+	assert(renderer == nullptr);
+
+	renderer = givenRenderer;
+
+	ObjectManager::GetManager()->AddRenderObject(this);
+}
+
 void GameObject::Draw(CommandBuffer &commandBuffer, VkPipelineLayout pipelineLayout)
 {
 	const PipelineData pipelineData = material->GetPipelineData();

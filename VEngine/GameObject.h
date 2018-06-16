@@ -20,11 +20,13 @@
 #include "Texture.h"
 #include "RenderTexture.h"
 
+#include "ObjectManager.h" 
+class ObjectManager;
+
 #include "Component.h"
 #include "Transform.h"
 
 #include <unordered_map>
-
 
 class GameObject
 {
@@ -39,14 +41,13 @@ public:
 	inline Renderer* GetRenderer() { return renderer; }
 	inline GPUBuffer* GetInstanceBuffer() { return instanceBuffer; }
 
-	inline void SetRenderer(Renderer* givenRenderer) { renderer = givenRenderer; }
+	void SetRenderer(Renderer* givenRenderer);
 
 	// Updates //
 
 	void Draw(CommandBuffer &commandBuffer, VkPipelineLayout pipelineLayout);
 
 	void Update();
-
 
 	// Components //
 
@@ -112,7 +113,6 @@ private:
 		glm::quat rotation;
 	} instanceData;
 
-	//TODO: Replace with VkImageInfo in order to work with both textures and rendertextures.
 	std::vector<VkDescriptorImageInfo> textures;
 };
 

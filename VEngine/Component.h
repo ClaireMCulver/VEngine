@@ -13,6 +13,8 @@ public:
 
 	//Function is called once each frame
 	virtual void Update() = 0;
+	
+	virtual void OnDrawImage() {};
 
 	void SetOwner(GameObject* object) { owner = object; }
 	inline GameObject* GetOwner() { return owner; }

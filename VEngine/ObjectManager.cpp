@@ -15,13 +15,32 @@ ObjectManager::~ObjectManager()
 
 void ObjectManager::AddObject(GameObject* object)
 {
-	objects.push_back(object);
+	activeObjects.push_back(object);
+}
+
+void ObjectManager::AddRenderObject(GameObject * renderObject)
+{
+	renderObjects.push_back(renderObject);
 }
 
 void ObjectManager::UpdateObjects()
 {
-	for (int i = 0, count = (int)objects.size(); i < count; i++)
+	for (int i = 0, count = (int)activeObjects.size(); i < count; i++)
 	{
-		objects[i]->Update();
+		activeObjects[i]->Update();
 	}
 }
+
+void ObjectManager::RenderObjects()
+{
+
+}
+
+void ObjectManager::SetObjectActive(GameObject * object)
+{
+}
+
+void ObjectManager::SetObjectInactive(GameObject * object)
+{
+}
+
