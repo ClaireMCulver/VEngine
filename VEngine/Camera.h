@@ -55,9 +55,6 @@ public:
 	static void SetMain(Camera* cameraPtr) { mainCamera = cameraPtr; }
 	static Camera* GetMain() { return mainCamera; }
 
-	Image* SetFinalOutput(Image* outputImage) { finalRenderOutput = outputImage; }
-	Image* GetFinalOutput() { return finalRenderOutput; }
-
 	// Get Matrices //
 	inline glm::mat4x4 GetViewMatrix() { return view; }
 	inline glm::mat4x4 GetProjectionMatrix() { return projection; }
@@ -99,6 +96,14 @@ public:
 	void SetLookPoint(glm::vec3 point) { viewPoint = point; viewVector = glm::normalize(point - owner->GetTransform()->GetPosition()); }
 	glm::vec3 GetViewVector() { return viewVector; }
 	glm::vec3 GetViewPoint() { return viewPoint; }
+
+	// Image Effects //
+	void SetFinalOutput(Image* outputImage) { finalRenderOutput = outputImage; }
+	Image* GetFinalOutput() { return finalRenderOutput; }
+
+	Image* GetPrimaryRenderOutput(int index) { return mainRenderPass->GetImage(index); }
+
+	void AddImageEffect(ImageEffect* imageEffect) { imageEffects.push_back(imageEffect); }
 
 	// Component Functions //
 	void Start() {}

@@ -343,5 +343,8 @@
     <None Include="MeshRenderer.scr">
       <Filter>Resource Files\Scripts\Core\Renderers</Filter>
     </None>
+    <None Include="FXAAEffect.scr">
+      <Filter>Resource Files\Scripts\Core\ScreenEffects</Filter>
+    </None>
   </ItemGroup>
 </Project>

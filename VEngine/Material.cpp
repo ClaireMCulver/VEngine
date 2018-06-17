@@ -15,7 +15,6 @@ Material::Material()
 	viBindings[1].stride = sizeof(glm::vec3) + sizeof(glm::quat); //Number of bytes from one vertex data set to the next
 	viBindings[1].inputRate = VK_VERTEX_INPUT_RATE_INSTANCE; //As apposed to instance rendering.
  
- 
     //Vertices
  	viAttribs.push_back
  	(
@@ -92,6 +91,64 @@ Material::Material()
 			(uint32_t)sizeOfVertex
 		}
 	);
+
+
+	// Descriptor Sets //
+
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	// Uniforms 
+	uniformBuffer = new UniformBuffer();
+
+	//Per-Draw Data
+	descriptorBindings.push_back
+	(
+		{	//VkDescriptorSetLayoutBinding
+			0,											//binding;				
+			VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,			//descriptorType;		
+			1,											//descriptorCount;		
+			VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
+			NULL										//pImmutableSamplers;
+		}
+	);
+
+	//Passed Textures
+	descriptorBindings.push_back
+	(
+		{	//VkDescriptorSetLayoutBinding
+			1,											//binding;				
+			VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,	//descriptorType;		
+			6,											//descriptorCount;		
+			VkShaderStageFlagBits::VK_SHADER_STAGE_ALL,	//stageFlags;			
+			NULL										//pImmutableSamplers;
+		}
+	);
+
+	// Descriptor Set Layout //
+	VkDescriptorSetLayoutCreateInfo descriptorSetLayoutCI;
+	descriptorSetLayoutCI.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	descriptorSetLayoutCI.pNext = NULL;
+	descriptorSetLayoutCI.flags = 0;
+	descriptorSetLayoutCI.bindingCount = (uint32_t)descriptorBindings.size();
+	descriptorSetLayoutCI.pBindings = descriptorBindings.data();
+
+	vkCreateDescriptorSetLayout(logicalDevice, &descriptorSetLayoutCI, NULL, &descriptorSetLayout);
+
+	VkDescriptorSetAllocateInfo descriptorSetAllocateInfo;
+	descriptorSetAllocateInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	descriptorSetAllocateInfo.pNext = NULL;
+	descriptorSetAllocateInfo.descriptorPool = DescriptorPool::GetSingleton()->GetVKDescriptorPool();
+	descriptorSetAllocateInfo.descriptorSetCount = 1;
+	descriptorSetAllocateInfo.pSetLayouts = &descriptorSetLayout;
+
+	vkAllocateDescriptorSets(logicalDevice, &descriptorSetAllocateInfo, &uniformDescriptorSet);
+
+	//Textures
+	textures.reserve(5);
+
+	//Instance buffer.
+	//This solution is a temporary one. I'd like to organize this better.
+	instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, sizeof(glm::vec3) + sizeof(glm::quat));
 }
 
 Material::~Material()
@@ -99,6 +156,10 @@ Material::~Material()
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
 
 	vkDestroyPipeline(logicalDevice, pipelineData.pipeline, NULL);
+	vkDestroyDescriptorSetLayout(logicalDevice, descriptorSetLayout, NULL);
+
+	delete uniformBuffer;
+	delete instanceBuffer;
 }
 
 void Material::AddShader(Shader &newShader)
@@ -250,7 +311,127 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	assert(res == VK_SUCCESS);
 }
 
+void Material::BindMaterial(glm::mat4 &mMatrix, glm::mat4 &vMatrix, glm::mat4 &vpMatrix, CommandBuffer *renderBuffer, VkPipelineLayout pipelineLayout)
+{
+	SetDrawMatrices(mMatrix, vMatrix, vpMatrix);
+
+	UpdateDescriptorSet();
+
+	//Bind the material?
+	BindPipeline(*renderBuffer);
+
+	//Bind uniforms
+	BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
+}
+
 void Material::BindPipeline(CommandBuffer &commandBuffer)
 {
 	vkCmdBindPipeline(commandBuffer.GetVKCommandBuffer(), VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineData.pipeline);
 }
+
+void Material::UpdateDescriptorSet()
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	VkDescriptorBufferInfo bufferInfo;
+	bufferInfo.buffer = uniformBuffer->GetVKBuffer();
+	bufferInfo.offset = 0;
+	bufferInfo.range = VK_WHOLE_SIZE;
+
+	VkWriteDescriptorSet descriptorWrite;
+	descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	descriptorWrite.pNext = NULL;
+	descriptorWrite.dstSet = uniformDescriptorSet;
+	descriptorWrite.dstBinding = 0;
+	descriptorWrite.dstArrayElement = 0;
+	descriptorWrite.descriptorCount = 1;
+	descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	descriptorWrite.pImageInfo = NULL;
+	descriptorWrite.pBufferInfo = &bufferInfo;
+	descriptorWrite.pTexelBufferView = NULL;
+
+	vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
+
+	for (size_t i = 0, count = textures.size(); i < count; i++)
+	{
+		//Descriptor write that tells Vulkan what we're updating and what we're updating it with
+		uniformWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		uniformWrite.pNext = NULL;
+		uniformWrite.dstSet = uniformDescriptorSet;
+		uniformWrite.dstBinding = PerDrawUniformTextureBinding;
+		uniformWrite.dstArrayElement = (uint32_t)i;
+		uniformWrite.descriptorCount = 1;
+		uniformWrite.descriptorType = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		uniformWrite.pImageInfo = &textures[i];
+		uniformWrite.pBufferInfo = NULL;
+		uniformWrite.pTexelBufferView = NULL;
+
+		vkUpdateDescriptorSets(logicalDevice, 1, &uniformWrite, 0, NULL);
+	}
+}
+
+void Material::BindPerDrawUniforms(VkCommandBuffer vkRenderBuffer, VkPipelineLayout pipelineLayout)
+{
+	vkCmdBindDescriptorSets(vkRenderBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &uniformDescriptorSet, 0, NULL);
+}
+
+void Material::SetDrawMatrices(glm::mat4 & modelMat, glm::mat4 & viewMat, glm::mat4 & viewProjoectionMat)
+{
+	size_t mat4Size = sizeof(glm::mat4);
+
+	//Model Matrix
+	SetUniform_Mat4x4(modelMat, 0);
+
+	//Model View Matrix
+	SetUniform_Mat4x4(viewMat * modelMat, (int)mat4Size);
+
+	//Model View Projection Matrix
+	SetUniform_Mat4x4(viewProjoectionMat * modelMat, (int)(mat4Size + mat4Size));
+
+	instanceData.position = { modelMat[3].x, modelMat[3].y, modelMat[3].z };
+	instanceData.rotation = glm::toQuat(modelMat);
+	instanceBuffer->CopyMemoryIntoBuffer(&instanceData, sizeof(InstanceData));
+}
+
+void Material::SetUniform_Mat4x4(glm::mat4x4 &data, int offset)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	//Place the data into the uniform buffer
+	uniformBuffer->SetBufferData(&data, sizeof(data), offset);
+}
+
+void Material::SetUniform_Int32(int &data, int offset)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	//Place the data into the uniform buffer
+	uniformBuffer->SetBufferData(&data, sizeof(data), offset);
+}
+
+void Material::SetUniform_Float32(float &data, int offset)
+{
+	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
+
+	//Place the data into the uniform buffer
+	uniformBuffer->SetBufferData(&data, sizeof(data), offset);
+}
+
+void Material::SetTexture(Texture& texture, int offset)
+{
+	textures.push_back(VkDescriptorImageInfo());
+
+	textures.back().sampler = texture.GetSampler();
+	textures.back().imageView = texture.GetImageView();
+	textures.back().imageLayout = texture.GetImageLayout();
+}
+
+void Material::SetTexture(RenderTexture& texture, int offset)
+{
+	textures.push_back(VkDescriptorImageInfo());
+
+	textures.back().sampler = texture.GetSampler();
+	textures.back().imageView = texture.GetImageView();
+	textures.back().imageLayout = texture.GetImageLayout();
+}
+

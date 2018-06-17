@@ -256,6 +256,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FirstPersonControls.cpp" />
+    <None Include="FXAAEffect.scr" />
     <None Include="MeshRenderer.scr" />
     <None Include="Renderer.scr" />
     <None Include="Particle.cpp" />

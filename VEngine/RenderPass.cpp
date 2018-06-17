@@ -298,17 +298,7 @@ void RenderPass::CreateRenderPass()
 	assert(result == VK_SUCCESS);
 }
 
-void RenderPass::BindRenderPass(VkCommandBuffer &cmdBuffer)
-{
-	vkCmdBeginRenderPass(cmdBuffer, &renderPassBeginInfo, VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
-}
-
-void RenderPass::UnbindRenderPass(VkCommandBuffer &cmdBuffer)
-{
-	vkCmdEndRenderPass(cmdBuffer);
-}
-
-void RenderPass::RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix)
+void RenderPass::BeginPass(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix)
 {
 	//begin recording buffer;
 	renderBuffer->BeginRecording();
@@ -336,7 +326,7 @@ void RenderPass::RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 
 
 	size_t mat4Size = sizeof(glm::mat4);
 
-	//Update the PerFrameUniformBuffer : TODO: Move this into it's own function.
+	//Update the PerFrameUniformBuffer
 	perFrameUniformBuffer->SetBufferData((void*)&vMatrix, mat4Size, 0);
 	perFrameUniformBuffer->SetBufferData((void*)&pMatrix, mat4Size, (int)mat4Size);
 	perFrameUniformBuffer->SetBufferData((void*)&vpMatrix, mat4Size, (int)(mat4Size + mat4Size));
@@ -361,42 +351,46 @@ void RenderPass::RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 
 
 	vkUpdateDescriptorSets(logicalDevice, 1, &descriptorWrite, 0, NULL);
 
-
 	vkCmdBindDescriptorSets(vkRenderBuffer, VkPipelineBindPoint::VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSet, 0, NULL);
+}
 
+void RenderPass::DrawObjects(std::vector<GameObject*>* objectList, glm::mat4 &vMatrix, glm::mat4 &vpMatrix)
+{
 	int renderPassIndex = 0;
-	std::vector<GameObject*>* objectList;
+	Material* objectMaterial = nullptr;
 	for (int renderPassIndex = 0, numPasses = (int)subpassDescriptions.size(); renderPassIndex < numPasses; renderPassIndex++)
 	{
-		objectList = ObjectManager::GetManager()->GetRenderObjects();
-
 		// Render pass contents //
 		for (size_t i = 0, count = (*objectList).size(); i < count; i++)
 		{
-			(*objectList)[i]->SetDrawMatrices((*objectList)[i]->GetTransform()->GetModelMat(), vMatrix, vpMatrix);
-
-			(*objectList)[i]->UpdateDescriptorSet();
-
-			//Bind the material
-			(*objectList)[i]->GetMaterial()->BindPipeline(*renderBuffer);
-
-			//Bind uniforms
-			(*objectList)[i]->BindPerDrawUniforms(renderBuffer->GetVKCommandBuffer(), pipelineLayout);
+			objectMaterial = (*objectList)[i]->GetMaterial();
+			objectMaterial->BindMaterial((*objectList)[i]->GetTransform()->GetModelMat(), vMatrix, vpMatrix, renderBuffer, pipelineLayout);
 
 			//Draw the model in the buffer.
 			(*objectList)[i]->GetRenderer()->Draw(renderBuffer->GetVKCommandBuffer());
 		}
 
-		if (renderPassIndex < numPasses-1)
+		if (renderPassIndex < numPasses - 1)
 			vkCmdNextSubpass(renderBuffer->GetVKCommandBuffer(), VkSubpassContents::VK_SUBPASS_CONTENTS_INLINE);
 	}
+}
 
+void RenderPass::EndPass()
+{
 	//end render pass
-	vkCmdEndRenderPass(vkRenderBuffer);
+	vkCmdEndRenderPass(renderBuffer->GetVKCommandBuffer());
 
 	//finish recording buffer
 	renderBuffer->EndRecording();
+}
 
+void RenderPass::RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix, std::vector<GameObject*>* objectList)
+{
+	BeginPass(vMatrix, pMatrix, vpMatrix);
+	
+	DrawObjects(objectList, vMatrix, vpMatrix);
+
+	EndPass();
 }
 
 void RenderPass::SubmitBuffer()

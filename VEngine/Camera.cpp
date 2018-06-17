@@ -17,7 +17,7 @@ void Camera::Render()
 {
 	UpdateMatrices();
 
-	mainRenderPass->RecordBuffer(view, projection, VPMatrix);
+	mainRenderPass->RecordBuffer(view, projection, VPMatrix, ObjectManager::GetManager()->GetRenderObjects());
 	mainRenderPass->SubmitBuffer();
 	mainRenderPass->ResetBuffer();
 

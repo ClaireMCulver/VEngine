@@ -31,6 +31,7 @@
 #include "ParticleRenderer.scr"
 #include "ParticleSystem.cpp"
 #include "MeshRenderer.scr"
+#include "FXAAEffect.scr"
 
 void main()
 {
@@ -73,31 +74,18 @@ void main()
 
 	GameObject clayObject(&cubeMesh, &bitangentLightingMaterial);
 	clayObject.GetTransform()->Translate({ 0, 0, 0 });
-	clayObject.SetTexture(boxTex, 0);
-	clayObject.SetTexture(normTex, 1);
-	clayObject.SetTexture(normTex, 2); //And this is why I need defaulting setups everywhere.
-	clayObject.SetTexture(normTex, 3);
-	clayObject.SetTexture(normTex, 4);
-	clayObject.SetTexture(normTex, 5);
+	bitangentLightingMaterial.SetTexture(boxTex, 0);
+	bitangentLightingMaterial.SetTexture(normTex, 1);
+	bitangentLightingMaterial.SetTexture(normTex, 2); //And this is why I need defaulting setups everywhere.
+	bitangentLightingMaterial.SetTexture(normTex, 3);
+	bitangentLightingMaterial.SetTexture(normTex, 4);
+	bitangentLightingMaterial.SetTexture(normTex, 5);
 	clayObject.AddComponent(new RotateScript());
 	clayObject.AddComponent(new MeshRenderer());
 	objectManager.AddObject(&clayObject);
 
 	//fxaa effect
-	DeferredRenderPass fxaaPass(WindowSize[0], WindowSize[1]);
-
-	Shader textureMergeVertShader("../Assets/Shaders/ScreenEffectPassthrough.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-	Shader textureMergeFragShader("../Assets/Shaders/fxaa.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
-	
-	Material fxaaMaterial;
-	fxaaMaterial.AddShader(textureMergeVertShader);
-	fxaaMaterial.AddShader(textureMergeFragShader);
-	fxaaMaterial.FinalizeMaterial(fxaaPass.GetVKRenderPass(), fxaaPass.GetVKDescriptorSetLayout(), fxaaPass.GetVKPipelineLayout(), VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP);
-
-	//GameObject textureMergeEffect(&cubeMesh, &fxaaMaterial);
-	//textureMergeEffect.AddComponent(new FXAAEffect({ WindowSize[0], WindowSize[1] }, { WindowSize[0], WindowSize[1] }));
-	//textureMergeEffect.GetComponent<FXAAEffect>()->SetSourceTexture(mainRenderPass.GetImage(0));
-	//objectManager.AddObject(&textureMergeEffect);
+	mainCamera.AddComponent(new FXAAEffect());
 	
 	// Main loop //
 	while (!inputSystem.GetKeyboard()->IsKeyDown('q'))
@@ -105,7 +93,7 @@ void main()
 		//Clock update
 		clock.Tick();
 
-		//Window updateB
+		//Window update
 		inputSystem.UpdateInput();
 
 		 //Physical update

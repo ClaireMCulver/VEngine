@@ -32,6 +32,23 @@ public:
 	RenderPass(uint32_t renderAreaWidth, uint32_t renderAreaHeight);
 	~RenderPass();
 
+	void RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix, std::vector<GameObject*>* objectList);
+	void SubmitBuffer();
+	void ResetBuffer();
+
+	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION.
+	Image* GetImage(int index);
+
+	VkRenderPass GetVKRenderPass() const { return renderPass; }
+	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout[0]; }
+	VkPipelineLayout GetVKPipelineLayout() const { return pipelineLayout; }
+	CommandBuffer* GetRenderBuffer() const { return renderBuffer; }
+
+	void BeginPass(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix);
+	void DrawObjects(std::vector<GameObject*>* objectList, glm::mat4 &vMatrix, glm::mat4 &vpMatrix);
+	void EndPass();
+protected:
+
 	//Adds new subpass to renderpass
 	void AddNewSubPass(); 
 
@@ -47,19 +64,6 @@ public:
 
 	void CreateRenderPass();
 
-	void BindRenderPass(VkCommandBuffer &cmdBuffer);
-	void UnbindRenderPass(VkCommandBuffer &cmdBuffer);
-
-	void RecordBuffer(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix);
-	void SubmitBuffer();
-	void ResetBuffer();
-
-	VkRenderPass GetVKRenderPass() const { return renderPass; }
-	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout[0]; }
-	VkPipelineLayout GetVKPipelineLayout() const { return pipelineLayout; }
-
-	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION.
-	Image* GetImage(int index);
 
 private:
 	VkRenderPass renderPass;
@@ -89,5 +93,6 @@ private:
 private:
 	void CreateColourImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight, VkFormat imageFormat);
 	void CreateDepthImageAndImageView(uint32_t pixelWidth, uint32_t pixelHeight);
+
 };
 
