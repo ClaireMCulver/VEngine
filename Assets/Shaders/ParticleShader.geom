@@ -22,7 +22,7 @@ layout (set = 1, binding = 0) uniform PerDrawData
     mat4 mvpMatrix;
 } perDrawData;
 
-layout(set = 1, binding = 1) uniform sampler2D albedo;
+layout(set = 1, binding = 1) uniform sampler2D albedo[6];
 
 // Geometry settings //
 layout (points) in;

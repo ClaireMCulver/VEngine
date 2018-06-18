@@ -50,9 +50,11 @@ void main()
 	ObjectManager objectManager;
 
 	DeferredRenderPass mainRenderPass(WindowSize[0], WindowSize[1]);
-	
+
+	//Box
+
 	Geometry cubeMesh;
-	cubeMesh.LoadMeshFromDae("../Assets/Models/box.dae");
+	cubeMesh.LoadMeshFromDae("../Assets/Models/monkey.dae");
 	
 	Shader standardVertShader("../Assets/Shaders/StandardShader.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
 	Shader clayFragShader("../Assets/Shaders/BitangentLighting.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -65,6 +67,43 @@ void main()
 	bitangentLightingMaterial.AddShader(clayFragShader);
 	bitangentLightingMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout(), VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
+	GameObject boxObject(&cubeMesh, &bitangentLightingMaterial);
+	boxObject.GetTransform()->Translate({ 0, 0, 0 });
+	bitangentLightingMaterial.SetTexture(boxTex, 0);
+	bitangentLightingMaterial.SetTexture(normTex, 1);
+	bitangentLightingMaterial.SetTexture(normTex, 2); //And this is why I need defaulting setups everywhere.
+	bitangentLightingMaterial.SetTexture(normTex, 3);
+	bitangentLightingMaterial.SetTexture(normTex, 4);
+	bitangentLightingMaterial.SetTexture(normTex, 5);
+	boxObject.AddComponent(new RotateScript());
+	boxObject.AddComponent(new MeshRenderer());
+	objectManager.AddObject(&boxObject);
+
+
+	//Particles
+	Shader particleVertShader("../Assets/Shaders/ParticleShader.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader particleGeomshader("../Assets/Shaders/ParticleShader.geom", VkShaderStageFlagBits::VK_SHADER_STAGE_GEOMETRY_BIT);
+	Shader particleFragShader("../Assets/Shaders/ParticleShader.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+	Texture smokeTexture("../Assets/Textures/Smoke.png", 512, 512);
+
+	Material particleMaterial;
+	particleMaterial.AddShader(particleVertShader);
+	particleMaterial.AddShader(particleGeomshader);
+	particleMaterial.AddShader(particleFragShader);
+	particleMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout());
+
+	GameObject particleSystem(&cubeMesh, &particleMaterial);
+	particleMaterial.SetTexture(smokeTexture, 0);
+	particleMaterial.SetTexture(smokeTexture, 1);
+	particleMaterial.SetTexture(smokeTexture, 2);
+	particleMaterial.SetTexture(smokeTexture, 3);
+	particleMaterial.SetTexture(smokeTexture, 4);
+	particleMaterial.SetTexture(smokeTexture, 5);
+	particleSystem.AddComponent(new ParticleSystem(1000));
+	particleSystem.AddComponent(new ParticleRenderer());
+	objectManager.AddObject(&particleSystem);
+
+	//fxaa effect
 	GameObject mainCamera(&cubeMesh, &bitangentLightingMaterial);
 	mainCamera.AddComponent(new Camera(&mainRenderPass));
 	mainCamera.AddComponent(new FirstPersonControls());
@@ -72,19 +111,6 @@ void main()
 	mainCamera.GetComponent<Camera>()->SetLookPoint({ 0, 0, 0 });
 	objectManager.AddObject(&mainCamera);
 
-	GameObject clayObject(&cubeMesh, &bitangentLightingMaterial);
-	clayObject.GetTransform()->Translate({ 0, 0, 0 });
-	bitangentLightingMaterial.SetTexture(boxTex, 0);
-	bitangentLightingMaterial.SetTexture(normTex, 1);
-	bitangentLightingMaterial.SetTexture(normTex, 2); //And this is why I need defaulting setups everywhere.
-	bitangentLightingMaterial.SetTexture(normTex, 3);
-	bitangentLightingMaterial.SetTexture(normTex, 4);
-	bitangentLightingMaterial.SetTexture(normTex, 5);
-	clayObject.AddComponent(new RotateScript());
-	clayObject.AddComponent(new MeshRenderer());
-	objectManager.AddObject(&clayObject);
-
-	//fxaa effect
 	mainCamera.AddComponent(new FXAAEffect());
 	
 	// Main loop //

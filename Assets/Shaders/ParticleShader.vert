@@ -22,16 +22,18 @@ layout (set = 1, binding = 0) uniform PerDrawData
     mat4 mvpMatrix;
 } perDrawData;
 
-layout(set = 1, binding = 1) uniform sampler2D albedo;
+layout(set = 1, binding = 1) uniform sampler2D albedo[6];
 
 // Per Vertex Data //
 layout (location = 0) in vec3 pos;
 layout (location = 1) in vec3 inNormal;
 layout (location = 2) in vec2 inUV;
+layout (location = 3) in vec3 inTangent;
+layout (location = 4) in vec3 inBitangent;
 
 // Per Instance Data
-layout (location = 3) in vec3 localPosition;
-layout (location = 4) in vec4 localRotation;
+layout (location = 5) in vec3 localPosition;
+layout (location = 6) in vec4 localRotation;
 
 // Out data //
 layout (location = 0) out vec3 outNormal;

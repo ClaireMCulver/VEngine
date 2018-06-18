@@ -22,7 +22,7 @@ layout (set = 1, binding = 0) uniform PerDrawData
     mat4 mvpMatrix;
 } perDrawData;
 
-layout(set = 1, binding = 1) uniform sampler2D albedo;
+layout(set = 1, binding = 1) uniform sampler2D albedo[6];
 
 // In data //
 layout (location = 0) in vec3 inNormal;
@@ -35,7 +35,7 @@ void main()
 {
     //vec3 lightDirection = (perFrameData.viewMatrix * vec4(normalize(vec3(-1, 1, -1)), 0.0)).xyz;
     //vec3 normal = (perDrawData.mvMatrix * vec4(inNormal, 0.0)).xyz;
-    vec4 texSample = texture(albedo, inUV);
+    vec4 texSample = texture(albedo[0], inUV);
     //vec3 diffuseColour = texSample * dot(normal, lightDirection);
 
     outColor = texSample;

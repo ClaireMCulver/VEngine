@@ -36,30 +36,9 @@ public:
 
 		currentTime = timeUntilNextSpawn;
 
-		std::vector<glm::vec3> particleVerts(1);
-		particleVerts[0] = {0.0f, 0.0f, 0.0f};
+		std::vector<Triangle> vertBuffer(2);
 
-		std::vector<glm::vec3> particleNorms(1);
-		particleNorms[0] = { 0.0f, 0.0f, -1.0f };
-
-		std::vector<glm::vec2> particlUVs(1);
-		particlUVs[0] = { 0.0f, 0.0f };
-
-		std::vector<float> vertBuffer((particleVerts.size() * 3) + (particleNorms.size() * 3) + (particlUVs.size() * 2));
-		{
-			vertBuffer[0] = particleVerts[0].x;
-			vertBuffer[1] = particleVerts[0].y;
-			vertBuffer[2] = particleVerts[0].z;
-
-			vertBuffer[3] = particleNorms[0].x;
-			vertBuffer[4] = particleNorms[0].y;
-			vertBuffer[5] = particleNorms[0].z;
-
-			vertBuffer[6] = particlUVs[0].x;
-			vertBuffer[7] = particlUVs[0].y;
-		}
-
-		vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertBuffer.data(), sizeof(float) * vertBuffer.size());
+		vertexBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, vertBuffer.data(), sizeof(Triangle) * vertBuffer.size());
 		instanceBuffer = new GPUBuffer(VkBufferUsageFlagBits::VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, sizeof(ParticleInstanceData) * numParticles);
 	}
 
