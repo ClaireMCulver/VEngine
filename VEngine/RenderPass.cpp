@@ -112,6 +112,8 @@ void RenderPass::AddDepthAttachmentToCurrentSubpass(uint32_t pixelWidth, uint32_
 	//The frame buffer descriptions already has this frame buffer in it.
 	attachmentDescriptions.push_back(depthAttachment);
 	subpassReferences.back().depthReference = depthReference;
+
+	usesDepth = true;
 }
 
 void RenderPass::AddInputAttachmentToCurrentSubpass(VkAttachmentReference attachment)

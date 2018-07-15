@@ -17,6 +17,7 @@
 #include "Graphics.h"
 #include "SwapChain.h"
 #include "DeferredRenderPass.h"
+#include "MRTCompositeRenderPass.h"
 #include "GameObject.h"
 #include "Material.h"
 #include "Texture.h"
@@ -54,10 +55,10 @@ void main()
 	//Box
 
 	Geometry cubeMesh;
-	cubeMesh.LoadMeshFromDae("../Assets/Models/monkey.dae");
+	cubeMesh.LoadMeshFromDae("../Assets/Models/box.dae");
 	
-	Shader standardVertShader("../Assets/Shaders/StandardShader.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-	Shader clayFragShader("../Assets/Shaders/BitangentLighting.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
+	Shader standardVertShader("../Assets/Shaders/mrt.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+	Shader clayFragShader("../Assets/Shaders/mrt.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
 
 	Texture boxTex("../Assets/Textures/box.png", 512, 512);
 	Texture normTex("../Assets/Textures/NormalsBox.png", 1024, 1024);
@@ -65,7 +66,7 @@ void main()
 	Material bitangentLightingMaterial;
 	bitangentLightingMaterial.AddShader(standardVertShader);
 	bitangentLightingMaterial.AddShader(clayFragShader);
-	bitangentLightingMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout(), VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+	bitangentLightingMaterial.FinalizeMaterial(mainRenderPass, VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
 
 	GameObject boxObject(&cubeMesh, &bitangentLightingMaterial);
 	boxObject.GetTransform()->Translate({ 0, 0, 0 });
@@ -90,7 +91,7 @@ void main()
 	particleMaterial.AddShader(particleVertShader);
 	particleMaterial.AddShader(particleGeomshader);
 	particleMaterial.AddShader(particleFragShader);
-	particleMaterial.FinalizeMaterial(mainRenderPass.GetVKRenderPass(), mainRenderPass.GetVKDescriptorSetLayout(), mainRenderPass.GetVKPipelineLayout());
+	particleMaterial.FinalizeMaterial(mainRenderPass);
 
 	GameObject particleSystem(&cubeMesh, &particleMaterial);
 	particleMaterial.SetTexture(smokeTexture, 0);

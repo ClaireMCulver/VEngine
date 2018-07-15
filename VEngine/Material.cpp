@@ -176,7 +176,7 @@ void Material::AddShader(Shader &newShader)
 	shaderStages.push_back(shaderStage);
 }
 
-void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout, VkPrimitiveTopology primitiveType)
+void Material::FinalizeMaterial(RenderPass &renderPass, VkPrimitiveTopology primitiveType)
 {
 	VkResult res;
 	const VkDevice logicalDevice = GraphicsSystem::GetSingleton()->GetLogicalDevice()->GetVKLogicalDevice();
@@ -226,17 +226,21 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	cb.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
 	cb.pNext = NULL;
 	cb.flags = 0;
-	VkPipelineColorBlendAttachmentState att_state[1];
-	att_state[0].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;;
-	att_state[0].blendEnable = VK_TRUE;
-	att_state[0].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	att_state[0].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	att_state[0].colorBlendOp = VkBlendOp::VK_BLEND_OP_ADD;
-	att_state[0].srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
-	att_state[0].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-	att_state[0].alphaBlendOp = VkBlendOp::VK_BLEND_OP_ADD;
-	cb.attachmentCount = 1;
-	cb.pAttachments = att_state;
+	std::vector<VkPipelineColorBlendAttachmentState> att_state;
+	att_state.resize(renderPass.GetAttachmentsCount());
+	for (size_t i = 0, length = att_state.size(); i < length; i++)
+	{
+		att_state[i].colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;;
+		att_state[i].blendEnable = VK_TRUE;
+		att_state[i].srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		att_state[i].dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		att_state[i].colorBlendOp = VkBlendOp::VK_BLEND_OP_ADD;
+		att_state[i].srcAlphaBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+		att_state[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+		att_state[i].alphaBlendOp = VkBlendOp::VK_BLEND_OP_ADD;
+	}
+	cb.attachmentCount = renderPass.GetAttachmentsCount();
+	cb.pAttachments = att_state.data();
 	cb.logicOpEnable = VK_FALSE;
 	cb.logicOp = VK_LOGIC_OP_NO_OP;
 	cb.blendConstants[0] = 0.0f;
@@ -289,7 +293,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	VkGraphicsPipelineCreateInfo pipelineInfo;
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
 	pipelineInfo.pNext = NULL;
-	pipelineInfo.layout = pipelineData.layout = pipelineLayout;
+	pipelineInfo.layout = pipelineData.layout = renderPass.GetVKPipelineLayout();
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.basePipelineIndex = 0;
 	pipelineInfo.flags = 0;
@@ -304,7 +308,7 @@ void Material::FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout d
 	pipelineInfo.pDepthStencilState = &ds;
 	pipelineInfo.pStages = shaderStages.data();
 	pipelineInfo.stageCount = (uint32_t)shaderStages.size();
-	pipelineInfo.renderPass = renderPass;
+	pipelineInfo.renderPass = renderPass.GetVKRenderPass();
 	pipelineInfo.subpass = 0;
 
 	res = vkCreateGraphicsPipelines(logicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &pipelineData.pipeline);

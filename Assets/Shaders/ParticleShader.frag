@@ -30,6 +30,8 @@ layout (location = 1) in vec2 inUV;
 
 // Out data //
 layout (location = 0) out vec4 outColor;
+layout (location = 1) out vec4 outNormal;
+layout (location = 2) out vec4 outPosition;
 
 void main() 
 {
@@ -39,6 +41,8 @@ void main()
     //vec3 diffuseColour = texSample * dot(normal, lightDirection);
 
     outColor = texSample;
+    outNormal = vec4(inNormal, 1.0);
+    outPosition = texSample;
     //outColor = vec4(inNormal, 1.0);
     //outColor = vec4(inUV, 0.0, 1.0);
 }

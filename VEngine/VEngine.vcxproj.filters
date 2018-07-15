@@ -228,6 +228,9 @@
     <ClCompile Include="ImageEffect.scr">
       <Filter>Resource Files\Scripts\Core\ScreenEffects</Filter>
     </ClCompile>
+    <ClCompile Include="MRTCompositeRenderPass.cpp">
+      <Filter>Source Files\Graphics\Objects\RenderPass</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="VEngineDefs.h">
@@ -328,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="GraphicsDefs.h">
       <Filter>Resource Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MRTCompositeRenderPass.h">
+      <Filter>Header Files\Graphics\Objects\RenderPass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

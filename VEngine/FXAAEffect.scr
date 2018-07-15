@@ -2,7 +2,7 @@
 
 #include "ImageEffect.scr"
 #include "Camera.h"
-#include "DeferredRenderPass.h"
+#include "MRTCompositeRenderPass.h"
 
 class FXAAEffect : public ImageEffect
 {
@@ -15,7 +15,7 @@ public:
 
 	void Start() 
 	{
-		effectRenderPass = new DeferredRenderPass(WindowSize[0], WindowSize[1]);
+		effectRenderPass = new MRTCompositeRenderPass(WindowSize[0], WindowSize[1]);
 
 		Shader textureMergeVertShader("../Assets/Shaders/ScreenEffectPassthrough.vert", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
 		Shader textureMergeFragShader("../Assets/Shaders/fxaa.frag", VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -23,7 +23,7 @@ public:
 		effectMaterial = new Material();
 		effectMaterial->AddShader(textureMergeVertShader);
 		effectMaterial->AddShader(textureMergeFragShader);
-		effectMaterial->FinalizeMaterial(effectRenderPass->GetVKRenderPass(), effectRenderPass->GetVKDescriptorSetLayout(), effectRenderPass->GetVKPipelineLayout());
+		effectMaterial->FinalizeMaterial(*effectRenderPass);
 
 		SetSourceTexture(owner->GetComponent<Camera>()->GetPrimaryRenderOutput(0));
 		owner->GetComponent<Camera>()->SetFinalOutput(effectRenderPass->GetImage(0));

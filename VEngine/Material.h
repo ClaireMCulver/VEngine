@@ -19,6 +19,8 @@ class GameObject;
 #include "Texture.h"
 #include "RenderTexture.h"
 #include "DescriptorPool.h"
+#include "RenderPass.h"
+class RenderPass;
 
 #include "glm\glm.hpp"
 #include "glm\gtc\quaternion.hpp"
@@ -43,7 +45,7 @@ public:
 	void AddShader(Shader &newShader);
 
 	//Finalizes the material pipeline on the GPU side.
-	void FinalizeMaterial(VkRenderPass renderPass, VkDescriptorSetLayout descriptorSetLayout, VkPipelineLayout pipelineLayout, VkPrimitiveTopology primitiveType = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP);
+	void FinalizeMaterial(RenderPass &renderPass, VkPrimitiveTopology primitiveType = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP);
 
 	//Binds the material
 	void BindMaterial(glm::mat4 &mMatrix, glm::mat4 &vMatrix, glm::mat4 &vpMatrix, CommandBuffer *renderBuffer, VkPipelineLayout pipelineLayout);

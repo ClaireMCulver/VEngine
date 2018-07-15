@@ -43,6 +43,7 @@ public:
 	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout[0]; }
 	VkPipelineLayout GetVKPipelineLayout() const { return pipelineLayout; }
 	CommandBuffer* GetRenderBuffer() const { return renderBuffer; }
+	size_t GetAttachmentsCount() const { return images.size() + (usesDepth ? -1 : 0); }
 
 	void BeginPass(glm::mat4 &vMatrix, glm::mat4 &pMatrix, glm::mat4 &vpMatrix);
 	void DrawObjects(std::vector<GameObject*>* objectList, glm::mat4 &vMatrix, glm::mat4 &vpMatrix);
@@ -76,6 +77,7 @@ private:
 	std::vector<Image*> images;
 	std::vector<VkImageView> vkImageViews; //views of the images for the frame buffer
 	std::vector<VkAttachmentDescription> attachmentDescriptions; //descriptions of the attachement for the renderpass itself
+	bool usesDepth = false;
 	VkFramebuffer frameBuffer;
 
 	VkViewport viewport;

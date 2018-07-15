@@ -31,7 +31,9 @@ layout (location = 2) in vec3 inTangent;
 layout (location = 3) in vec3 inBitangent;
 
 // Out data //
-layout (location = 0) out vec4 outColor;
+layout (location = 0) out vec4 outAlbedo;
+layout (location = 1) out vec4 outNormal;
+layout (location = 2) out vec4 outPosition;
 
 void main() 
 {
@@ -41,9 +43,10 @@ void main()
     vec3 lightDirection = TBN * (vec4(normalize(vec3(0, 0, 1)), 0.0)).xyz;
     vec3 normal = texture(albedo[1], inUV).rgb;
     normal = normalize(normal * 2.0 - 1.0);
-    vec3 texSample = texture(albedo[0], inUV).rgb;
-    vec3 diffuseColour = texSample * dot(normal, lightDirection);
+    vec4 texSample = texture(albedo[0], inUV);
+    vec3 diffuseColour = texSample.rgb * dot(normal, lightDirection);
 
-    outColor.rgb = texSample;
-    outColor.a = 1.0;
+    outAlbedo = texSample;
+    outNormal = vec4(inNormal, 1.0);
+    outPosition = texSample;
 }
