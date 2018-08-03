@@ -17,7 +17,7 @@ Some features implemented:
     - Basic Boids ai demo (for a university course assignment)
     - Basic drawing program (for a university course assignment)
     - Reasonable* system for multiple renderpasses
-      - *Some micromanagment required for renderpass dependencent on other renderpasses.
+      - *Some micromanagment required for renderpass dependent on other renderpasses.
       - This was most recently implemented, so the only screen effect implemented thus far is FXAA.
 
       ![alt text](https://github.com/PalaceDCXVI/VEngine/blob/master/ExampleImages/fxaa.png)
