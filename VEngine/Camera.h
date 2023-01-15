@@ -7,7 +7,7 @@
 #include "Component.h"
 #include "RenderPass.h"
 #include "Image.h"
-#include "ImageEffect.scr"
+#include "ImageEffect.cpp"
 
 class Camera : public Component
 {

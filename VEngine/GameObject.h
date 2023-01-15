@@ -12,7 +12,7 @@
 #include "Geometry.h"
 #include "Material.h"
 class Material;
-#include "Renderer.scr"
+#include "Renderer.cpp"
 #include "CommandBuffer.h"
 #include "GPUBuffer.h"
 

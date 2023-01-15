@@ -421,7 +421,7 @@ void RenderPass::CreateDepthImageAndImageView(uint32_t pixelWidth, uint32_t pixe
 	images.back()->ChangeImageLayout(VkImageLayout::VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
-Image* RenderPass::GetImage(int index)
+Image* RenderPass::GetImage(unsigned int index)
 {
 	assert(images.size() > 0);
 	assert(images.size() - 1 >= index);

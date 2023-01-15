@@ -213,7 +213,7 @@
     <ClCompile Include="WinMouse.cpp">
       <Filter>Source Files\Input</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleRenderer.scr">
+    <ClCompile Include="ParticleRenderer.cpp">
       <Filter>Resource Files\Scripts\Core\Renderers</Filter>
     </ClCompile>
     <ClCompile Include="RenderTexture.cpp">
@@ -225,7 +225,7 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </ClCompile>
-    <ClCompile Include="ImageEffect.scr">
+    <ClCompile Include="ImageEffect.cpp">
       <Filter>Resource Files\Scripts\Core\ScreenEffects</Filter>
     </ClCompile>
     <ClCompile Include="MRTCompositeRenderPass.cpp">
@@ -343,13 +343,13 @@
     <None Include="FirstPersonControls.cpp">
       <Filter>Resource Files\Scripts\Core\Camera</Filter>
     </None>
-    <None Include="Renderer.scr">
+    <None Include="Renderer.cpp">
       <Filter>Resource Files\Scripts\Core\Renderers</Filter>
     </None>
-    <None Include="MeshRenderer.scr">
+    <None Include="MeshRenderer.cpp">
       <Filter>Resource Files\Scripts\Core\Renderers</Filter>
     </None>
-    <None Include="FXAAEffect.scr">
+    <None Include="FXAAEffect.cpp">
       <Filter>Resource Files\Scripts\Core\ScreenEffects</Filter>
     </None>
   </ItemGroup>

@@ -37,7 +37,7 @@ public:
 	void ResetBuffer();
 
 	//Gets the first image in the images vector. BUFFER MUST HAVE ALREADY COMPLETED. THIS IS NOT ASSURED BY THIS FUNCTION.
-	Image* GetImage(int index);
+	Image* GetImage(unsigned int index);
 
 	VkRenderPass GetVKRenderPass() const { return renderPass; }
 	VkDescriptorSetLayout GetVKDescriptorSetLayout() const { return descriptorSetLayout[0]; }

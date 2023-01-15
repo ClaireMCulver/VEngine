@@ -29,10 +29,10 @@
 
 #include "Rotate.cpp"
 #include "FirstPersonControls.cpp"
-#include "ParticleRenderer.scr"
+#include "ParticleRenderer.cpp"
 #include "ParticleSystem.cpp"
-#include "MeshRenderer.scr"
-#include "FXAAEffect.scr"
+#include "MeshRenderer.cpp"
+#include "FXAAEffect.cpp"
 
 void main()
 {

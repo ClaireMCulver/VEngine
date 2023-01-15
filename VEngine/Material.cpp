@@ -239,7 +239,7 @@ void Material::FinalizeMaterial(RenderPass &renderPass, VkPrimitiveTopology prim
 		att_state[i].dstAlphaBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 		att_state[i].alphaBlendOp = VkBlendOp::VK_BLEND_OP_ADD;
 	}
-	cb.attachmentCount = renderPass.GetAttachmentsCount();
+	cb.attachmentCount = (uint32_t)renderPass.GetAttachmentsCount();
 	cb.pAttachments = att_state.data();
 	cb.logicOpEnable = VK_FALSE;
 	cb.logicOp = VK_LOGIC_OP_NO_OP;
